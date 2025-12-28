@@ -22,8 +22,9 @@ export default function ProductsPage() {
       {/* FEATURED COLLECTION HEADER */}
       <div className="featured-header">
         <div className="featured-container">
-          <div className="featured-subtitle">Featured Collection</div>
-          <h1 className="featured-title">HANDCRAFTED PIECES OF ART</h1>
+          <h1 className="featured-title">Featured Collection</h1>
+          <div className="featured-subtitle">Handcrafted Pieces of ART</div>
+          
           <div className="featured-divider"></div>
         </div>
       </div>
