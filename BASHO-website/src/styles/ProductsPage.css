@@ -298,3 +298,9 @@
     font-size: 1rem;
   }
 }
+
+.products-page,
+.hero-section,
+.featured-section {
+  padding-top: 100px; /* navbar height + buffer */
+}
