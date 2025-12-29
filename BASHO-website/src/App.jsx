@@ -11,6 +11,8 @@ import WorkshopsPage from "./pages/WorkshopsPage";
 import CareGuide from "./pages/CareGuide";
 import "./index.css";
 
+
+
 // Home Page Component
 function HomePage() {
   return (
