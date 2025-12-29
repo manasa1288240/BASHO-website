@@ -10,6 +10,8 @@ import ProductsPage from "./pages/ProductsPage";
 import WorkshopsPage from "./pages/WorkshopsPage";
 import "./index.css";
 
+
+
 // Home Page Component
 function HomePage() {
   return (
