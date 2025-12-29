@@ -8,6 +8,7 @@ import Journey from "./components/Journey";
 import Footer from "./components/Footer";
 import ProductsPage from "./pages/ProductsPage";
 import WorkshopsPage from "./pages/WorkshopsPage";
+import CareGuide from "./pages/CareGuide";
 import "./index.css";
 
 // Home Page Component
@@ -33,6 +34,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/workshops" element={<WorkshopsPage />} />
+        <Route path="/care-guide" element={<CareGuide />} />
       </Routes>
     </Router>
   );

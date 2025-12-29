@@ -1,0 +1,81 @@
+.care-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.featured-header .featured-container {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.care-hero {
+  padding: 2.5rem 1.5rem;
+  background: #faf6f3;
+}
+
+.care-hero .care-container {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.care-content {
+  padding: 2rem 1.5rem 4rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.care-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  align-items: stretch; /* make grid items stretch to equal height */
+  grid-auto-rows: 1fr; /* ensure rows distribute height evenly */
+}
+
+.care-card {
+  background: #fff;
+  padding: 1.25rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 100%; /* fill the grid cell so cards match height */
+}
+
+.care-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.care-card ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.care-card li {
+  margin-bottom: 0.4rem;
+  line-height: 1.45;
+}
+
+.care-extra {
+  background: #fff;
+  padding: 1.25rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-top: 1rem;
+}
+
+.care-extra ul {
+  margin: 0.5rem 0 0 1.1rem;
+}
+
+.care-extra h3 { margin-top: 0; margin-bottom: 0.5rem; }
+
+/* small gap between the page heading and the hero intro */
+.care-hero {
+  margin-top: 0.75rem;
+}

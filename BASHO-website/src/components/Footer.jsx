@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function Footer() {
   return (
     <footer className="footer-modern">
@@ -89,7 +91,7 @@ export default function Footer() {
               <li><span>Food Safe & Lead Free</span></li>
               <li><span>Microwave & Oven Friendly</span></li>
               <li><span>Dishwasher Friendly</span></li>
-              <li><a href="#care-guide">Full Care Guide</a></li>
+              <li><Link to="/care-guide">Full Care Guide</Link></li>
             </ul>
           </div>
         </div>
