@@ -1,76 +1,84 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import ProductCard from "../components/ProductCard";
-import products from "../data/products";
 import "../styles/ProductsPage.css";
 
 export default function ProductsPage() {
+  const [products, setProducts] = useState([]);
   const [activeFilter, setActiveFilter] = useState("All");
 
-  const categories = ["All", "Vases", "Bowls", "Mugs", "Planters", "Plates"];
+  useEffect(() => {
+    fetch("http://localhost:5000/api/products")
+      .then((res) => res.json())
+      .then((data) => setProducts(data))
+      .catch((err) => console.error("Failed to fetch products:", err));
+  }, []);
 
   const filteredProducts =
     activeFilter === "All"
       ? products
-      : products.filter((p) => p.category === activeFilter);
+      : products.filter(
+          (product) =>
+            product.category.toLowerCase() === activeFilter.toLowerCase()
+        );
 
   return (
-    <div className="products-page">
+    <div>
       <Navbar />
-      
-      {/* FEATURED COLLECTION HEADER */}
+
+      {/* FEATURED HEADER */}
       <div className="featured-header">
         <div className="featured-container">
-          <div className="featured-subtitle">Featured Collection</div>
-          <h1 className="featured-title">HANDCRAFTED PIECES OF ART</h1>
+          <div className="featured-subtitle">Handcrafted</div>
+          <h1 className="featured-title">CERAMIC COLLECTION</h1>
           <div className="featured-divider"></div>
         </div>
       </div>
 
-      {/* HERO SECTION */}
+      {/* HERO */}
       <section className="hero">
-        <div className="hero-content">
-          <h2 className="hero-main-title">
-            Where tradition <span className="highlight">meets</span> modern simplicity
+        <div className="hero-text">
+          <h2>
+            Timeless <em>ceramics</em>
           </h2>
-          <div className="hero-columns">
-            <div className="hero-column">
-              <p className="hero-text">
-                Our artisans honor centuries-old techniques
-              </p>
-            </div>
-            <div className="hero-column">
-              <p className="hero-text">
-                while creating pieces that belong in contemporary homes.
-              </p>
-            </div>
-          </div>
+          <p className="hero-desc">
+            Thoughtfully crafted pieces inspired by Japanese aesthetics and
+            slow living.
+          </p>
         </div>
       </section>
 
       {/* FILTERS */}
-      <div className="filters-container">
-        <div className="filters">
-          {["All", "Vases", "Bowls", "Mugs", "Planters", "Plates"].map((f) => (
-            <button 
-              key={f} 
-              className={activeFilter === f ? "active" : ""}
-              onClick={() => setActiveFilter(f)}
-            >
-              {f.toUpperCase()}
-            </button>
-          ))}
-        </div>
+      <div className="filters">
+        {["All", "Bowls", "Plates", "Cups"].map((filter) => (
+          <button
+            key={filter}
+            className={activeFilter === filter ? "active" : ""}
+            onClick={() => setActiveFilter(filter)}
+          >
+            {filter}
+          </button>
+        ))}
       </div>
 
-      {/* PRODUCTS */}
+      {/* PRODUCTS GRID */}
       <section className="grid">
-        {filteredProducts.map((p) => (
-          <ProductCard key={p.id} product={p} />
+        {filteredProducts.map((product) => (
+          <div key={product._id} className="product-card">
+            <div className="img-wrap">
+              <img src={product.image} alt={product.title} />
+              <div className="hover-info">
+                <p>{product.description}</p>
+              </div>
+              <span className="price">{product.price}</span>
+            </div>
+
+            <span className="category">{product.category}</span>
+            <h3>{product.title}</h3>
+          </div>
         ))}
       </section>
-      
+
       <Footer />
     </div>
   );
