@@ -90,11 +90,36 @@ function WorkshopDetailModal({ workshop, onClose }) {
     message: ""
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(`Booking request submitted for ${workshop.title}!\n\nWe'll contact you at ${formData.email} soon.`);
-    onClose();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    name: formData.name,
+    email: formData.email,
+    phone: formData.phone,
+    workshopType: workshop.title,
+    preferredDate: formData.date,
+    message: formData.message
   };
+
+  try {
+    const res = await fetch("http://localhost:5000/api/workshops", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    alert(data.message);
+    onClose();
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong. Please try again.");
+  }
+};
+
 
   return (
     <div className="modal-overlay" onClick={onClose}>
