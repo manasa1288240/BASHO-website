@@ -32,9 +32,9 @@ h1, h2, h3 {
   letter-spacing: -0.02em;
 }
 
-/* Smooth Scroll */
+/* Default Scroll - no smooth animation so new pages appear at the top instantly */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 /* Navbar */

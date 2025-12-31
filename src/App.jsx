@@ -6,6 +6,7 @@ import ProductScroll from "./components/ProductScroll";
 import Workshops from "./components/Workshops";
 import Journey from "./components/Journey";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 import ProductsPage from "./pages/ProductsPage";
 import WorkshopsPage from "./pages/WorkshopsPage";
 import BashoAbout from "./pages/BashoAbout/About";
@@ -31,6 +32,7 @@ function App() {
   return (
     <Router>
       <Navbar />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsPage />} />
