@@ -3,11 +3,24 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const workshopRoutes = require("./routes/workshopRoutes");
 const productRoutes = require("./routes/productRoutes");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const app = express();
 
-// connect to database
+// CONNECT DATABASE
 connectDB();
+
+app.get("/", (req, res) => {
+  res.send("Backend running");
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
 
 // middlewares
 app.use(cors());
