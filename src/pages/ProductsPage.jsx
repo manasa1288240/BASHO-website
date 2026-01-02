@@ -11,7 +11,9 @@ export default function ProductsPage() {
     fetch("http://localhost:5000/api/products")
       .then((res) => res.json())
       .then((data) => setProducts(data))
-      .catch((err) => console.error("Failed to fetch products:", err));
+      .catch((err) =>
+        console.error("Failed to fetch products:", err)
+      );
   }, []);
 
   const filteredProducts =
@@ -19,7 +21,9 @@ export default function ProductsPage() {
       ? products
       : products.filter(
           (product) =>
-            product.category.toLowerCase() === activeFilter.toLowerCase()
+            product.category &&
+            product.category.toLowerCase() ===
+              activeFilter.toLowerCase()
         );
 
   return (
@@ -42,18 +46,28 @@ export default function ProductsPage() {
             Timeless <em>ceramics</em>
           </h2>
           <p className="hero-desc">
-            Thoughtfully crafted pieces inspired by Japanese aesthetics and
-            slow living.
+            Thoughtfully crafted pieces inspired by Japanese
+            aesthetics and slow living.
           </p>
         </div>
       </section>
 
       {/* FILTERS */}
       <div className="filters">
-        {["All", "Bowls", "Plates", "Cups"].map((filter) => (
+        {[
+          "All",
+          "Mugs",
+          "Bowls",
+          "Plates",
+          "Platter",
+          "Vase",
+          "Fancy",
+        ].map((filter) => (
           <button
             key={filter}
-            className={activeFilter === filter ? "active" : ""}
+            className={
+              activeFilter === filter ? "active" : ""
+            }
             onClick={() => setActiveFilter(filter)}
           >
             {filter}
@@ -62,22 +76,37 @@ export default function ProductsPage() {
       </div>
 
       {/* PRODUCTS GRID */}
-      <section className="grid">
+      <div className="products-grid">
         {filteredProducts.map((product) => (
-          <div key={product._id} className="product-card">
+          <div
+            key={product._id}
+            className="product-card"
+          >
             <div className="img-wrap">
-              <img src={product.image} alt={product.title} />
+              {/* IMAGE PLACEHOLDER ONLY */}
+              <div className="image-placeholder"></div>
+
+              <span className="price">
+                {product.price}
+              </span>
+
               <div className="hover-info">
-                <p>{product.description}</p>
+                <p>
+                  {product.description ||
+                    "Handcrafted ceramic piece"}
+                </p>
               </div>
-              <span className="price">{product.price}</span>
             </div>
 
-            <span className="category">{product.category}</span>
-            <h3>{product.title}</h3>
+            <span className="category">
+              {product.category}
+            </span>
+            <h3 className="product-name">
+              {product.name}
+            </h3>
           </div>
         ))}
-      </section>
+      </div>
 
       <Footer />
     </div>

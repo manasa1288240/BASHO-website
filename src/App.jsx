@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useAppEffects } from "./AppEffects";  // Import the effects hook
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Philosophy from "./components/Philosophy";
@@ -29,6 +30,9 @@ function HomePage() {
 
 // Main App with Routing
 function App() {
+  // Call the effects hook - this enables scroll animations and other effects
+  useAppEffects();
+
   return (
     <Router>
       <Navbar />

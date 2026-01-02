@@ -1,169 +1,117 @@
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 const Product = require("./models/Product");
 
-mongoose.connect("mongodb://127.0.0.1:27017/bashoDB")
+dotenv.config();
+
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(async () => {
-    console.log("MongoDB connected for seeding");
+    console.log("Connected to MongoDB Atlas");
 
-    await Product.deleteMany(); // clears old products
-    console.log("Old products removed");
+    await Product.deleteMany(); // clean slate (run once)
 
-    const products = [
-
-      /* ================= MUGS ================= */
+    await Product.insertMany([
+      // MUGS
       {
-        title: "Sculpted Feminine Tumbler",
-        price: "₹1000",
+        name: "Sculpted Feminine Tumbler",
         category: "Mugs",
-        image: "/products/mugs/feminine-tumbler.jpg",
-        description: "Handcrafted sculpted ceramic tumbler."
+        price: "₹1000 / pc",
+        images: ["2554"],
       },
       {
-        title: "Coffee Tumbler",
-        price: "₹1000",
+        name: "Coffee Tumblers",
         category: "Mugs",
-        image: "/products/mugs/coffee-tumbler.jpg",
-        description: "Minimal coffee tumbler with smooth glaze."
+        price: "₹1000 / pc",
+        images: ["3097"],
       },
       {
-        title: "Cappuccino Mug",
-        price: "₹800",
+        name: "Cappuccino Mug",
         category: "Mugs",
-        image: "/products/mugs/cappuccino.jpg",
-        description: "Perfect-sized mug for cappuccino lovers."
+        price: "₹800 / pc",
+        images: ["9371"],
       },
       {
-        title: "Striped Mug Set",
-        price: "₹2580",
+        name: "Striped Coffee Mug Set",
         category: "Mugs",
-        image: "/products/mugs/striped-set.jpg",
-        description: "Includes plate, two mugs and coasters."
+        price: "₹2580 / set",
+        description: "Includes plate, 2 mugs, 2 coasters",
+        images: ["8899", "8912", "8925", "8997"],
       },
       {
-        title: "Beer Mug",
-        price: "₹1000",
+        name: "Beer Mug",
         category: "Mugs",
-        image: "/products/mugs/beer-mug.jpg",
-        description: "Handcrafted ceramic beer mug."
+        price: "₹1000 / pc",
+        images: ["3659"],
       },
 
-      /* ================= PLATES ================= */
+      // PLATES
       {
-        title: "Pasta Plate",
+        name: "Pasta Plates",
+        category: "Plates",
         price: "₹1800",
-        category: "Plates",
-        image: "/products/plates/pasta-plate.jpg",
-        description: "Wide ceramic pasta plate."
+        images: ["2319"],
       },
       {
-        title: "Classic Dinner Plate",
-        price: "₹1000",
+        name: "Wavy Plates",
         category: "Plates",
-        image: "/products/plates/classic-plate.jpg",
-        description: "Minimal everyday ceramic plate."
-      },
-      {
-        title: "Wavy Plate",
         price: "₹1500",
-        category: "Plates",
-        image: "/products/plates/wavy-plate.jpg",
-        description: "Organic wavy edged ceramic plate."
+        images: ["9385", "9388"],
       },
 
-      /* ================= PLATTERS ================= */
+      // PLATTERS
       {
-        title: "Garlic Grater",
-        price: "₹1500",
-        category: "Platters",
-        image: "/products/platters/garlic-grater.jpg",
-        description: "Handcrafted ceramic garlic grater."
-      },
-      {
-        title: "Chip & Dip Platter",
+        name: "Chip & Dip Platter",
+        category: "Platter",
         price: "₹3500",
-        category: "Platters",
-        image: "/products/platters/chip-dip.jpg",
-        description: "Serving platter with dip bowl."
-      },
-
-      /* ================= BOWLS ================= */
-      {
-        title: "Fruit Bowl",
-        price: "₹2800",
-        category: "Bowls",
-        image: "/products/bowls/fruit-bowl.jpg",
-        description: "Large handcrafted fruit bowl."
+        images: ["9067"],
       },
       {
-        title: "Matcha Bowl Set",
-        price: "₹2000",
-        category: "Bowls",
-        image: "/products/bowls/matcha.jpg",
-        description: "Matcha bowl with whisk holder."
-      },
-      {
-        title: "Heart Bowl",
-        price: "₹1000",
-        category: "Bowls",
-        image: "/products/bowls/heart-bowl.jpg",
-        description: "Heart-shaped ceramic bowl."
-      },
-
-      /* ================= VASES ================= */
-      {
-        title: "Minimal Vase",
-        price: "₹2500",
-        category: "Vases",
-        image: "/products/vases/minimal.jpg",
-        description: "Minimal ceramic vase for fresh or dried flowers."
-      },
-      {
-        title: "Flower Frog",
-        price: "₹500",
-        category: "Vases",
-        image: "/products/vases/flower-frog.jpg",
-        description: "Flower frog for ikebana arrangements."
-      },
-
-      /* ================= TRINKETS ================= */
-      {
-        title: "Striped Trinket Tray",
-        price: "₹800",
-        category: "Trinkets",
-        image: "/products/trinkets/striped.jpg",
-        description: "Decorative striped trinket tray."
-      },
-      {
-        title: "Oval Trinket Tray",
-        price: "₹600",
-        category: "Trinkets",
-        image: "/products/trinkets/oval.jpg",
-        description: "Small oval ceramic trinket tray."
-      },
-
-      /* ================= FANCY ================= */
-      {
-        title: "Tea Pot Set",
+        name: "Cheeseboard / Platter",
+        category: "Platter",
         price: "₹5000",
-        category: "Fancy",
-        image: "/products/fancy/teapot.jpg",
-        description: "Tea pot with two cups."
+        images: ["6842"],
+      },
+
+      // BOWLS
+      {
+        name: "Fruit Bowls",
+        category: "Bowls",
+        price: "₹2800",
       },
       {
-        title: "Tic Tac Toe Set",
-        price: "₹1500",
+        name: "Heart Bowl",
+        category: "Bowls",
+        price: "₹1000 (single) / ₹1800 (set of 2)",
+      },
+
+      // VASE
+      {
+        name: "Every Vase",
+        category: "Vase",
+        price: "₹2500",
+      },
+
+      // DINNER SET
+      {
+        name: "Dinner Set (Custom)",
+        category: "Dinner Sets",
+        price: "₹20,000 approx",
+        isCustomisable: true,
+      },
+
+      // FANCY
+      {
+        name: "Tea Pot Set",
         category: "Fancy",
-        image: "/products/fancy/tictactoe.jpg",
-        description: "Handcrafted ceramic tic tac toe."
-      }
+        price: "₹5000",
+      },
+    ]);
 
-    ];
-
-    await Product.insertMany(products);
     console.log("Products seeded successfully");
     process.exit();
   })
-  .catch(err => {
+  .catch((err) => {
     console.error(err);
     process.exit(1);
   });
