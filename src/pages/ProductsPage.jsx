@@ -69,19 +69,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* HERO */}
-      <section className="hero">
-        <div className="hero-text">
-          <h2>
-            Timeless <em>ceramics</em>
-          </h2>
-          <p className="hero-desc">
-            Thoughtfully crafted pieces inspired by Japanese aesthetics and
-            slow living.
-          </p>
-        </div>
-      </section>
-
+      
       {/* FILTERS */}
       <div className="filters">
         {["All", "Bowls", "Plates", "Cups"].map((filter) => (
