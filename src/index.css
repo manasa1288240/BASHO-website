@@ -56,9 +56,10 @@ html {
 }
 
 /* ===== SUBTLE ANIMATIONS ===== */
+/* Make sections visible by default so route changes don't hide pages */
 section {
-  opacity: 0;
-  transform: translateY(20px);
+  opacity: 1;
+  transform: translateY(0);
   transition: opacity 0.8s var(--transition-smooth), 
               transform 0.8s var(--transition-smooth);
 }
