@@ -165,6 +165,7 @@
 .hover-info p {
   display: -webkit-box;
   -webkit-line-clamp: 3;   /* max 3 lines */
+  line-clamp: 3;           /* standard property for compatibility */
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
