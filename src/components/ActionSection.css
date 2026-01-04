@@ -1,0 +1,207 @@
+/* =====================================================
+   ACTION SECTION (CARDS)
+===================================================== */
+
+.action-section {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 48px;
+  margin: 80px auto;
+  max-width: 1100px;   /* ✅ keeps it centered */
+  padding: 0 24px;     /* ✅ safe spacing on small screens */
+}
+
+
+.action-card {
+  width: 300px;
+  text-align: center;
+}
+
+.action-card img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+.action-card h3 {
+  margin: 16px 0 10px;
+  font-weight: 500;
+  color: #3a2a1d;
+}
+
+.action-card button {
+  padding: 14px 36px;
+  background: #3f372b;          /* dark earthy brown */
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;         /* 🔥 full pill shape */
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+
+  transition: all 0.3s ease;
+}
+
+.action-card button:hover {
+  background: #2f281f;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+
+/* =====================================================
+   MODAL OVERLAY
+===================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 9999;
+}
+
+/* =====================================================
+   MODAL CONTAINER
+===================================================== */
+
+.modal-box {
+  background: #faf8f5;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;          /* ✅ extra safety */
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  position: relative;
+}
+
+
+
+/* =====================================================
+   MODAL HEADER
+===================================================== */
+.modal-header {
+  padding: 28px 60px 18px 32px; /* space for close button */
+}
+
+
+
+.modal-header h2 {
+  font-size: 1.35rem;
+  color: #3a2a1d;
+  margin: 0;
+  line-height: 1.4;
+  max-width: 90%;
+}
+
+/* Close Button */
+.close-btn {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  background: #faf8f5;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #3a2a1d;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 50%;
+}
+
+.close-btn:hover {
+  background: rgba(107, 74, 47, 0.12);
+  color: #6b4a2f;
+}
+
+
+
+/* =====================================================
+   MODAL FORM
+===================================================== */
+
+.modal-form {
+  padding: 8px 32px 36px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inputs & Textarea — Workshop Style */
+.modal-form input,
+.modal-form textarea {
+  width: 100%;
+  padding: 14px 8px;
+  margin-bottom: 22px;
+  border: none;
+  border-bottom: 1px solid #b8b0a8;
+  background: transparent;
+  font-size: 0.95rem;
+  color: #3a2a1d;
+}
+
+.modal-form input::placeholder,
+.modal-form textarea::placeholder {
+  color: #8c7f75;
+}
+
+.modal-form input:focus,
+.modal-form textarea:focus {
+  outline: none;
+  border-bottom: 1px solid #6b4a2f;
+}
+
+.modal-form textarea {
+  resize: none;
+  min-height: 90px;
+}
+
+/* =====================================================
+   SUBMIT BUTTON
+===================================================== */
+
+.submit-btn {
+  margin-top: 14px;
+  padding: 6px;
+  background: #8e5022;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.submit-btn:hover {
+  background: #523826;
+  color:white;
+}
+
+/* =====================================================
+   SUCCESS MESSAGE
+===================================================== */
+
+.success-message {
+  padding: 60px 32px 48px;
+  text-align: center;
+}
+
+.success-message h2 {
+  color: #3a2a1d;
+  margin-bottom: 12px;
+}
+
+.success-message p {
+  color: #6b5c50;
+  font-size: 0.95rem;
+  margin-bottom: 28px;
+}

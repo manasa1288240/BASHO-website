@@ -12,6 +12,7 @@ import ProductsPage from "./pages/ProductsPage";
 import WorkshopsPage from "./pages/WorkshopsPage";
 import BashoAbout from "./pages/BashoAbout/About";
 import CareGuide from "./pages/CareGuide";
+import ActionSection from "./components/ActionSection"; // ✅ ADD THIS
 import "./index.css";
 
 // Home Page Component
@@ -22,6 +23,10 @@ function HomePage() {
       <Philosophy />
       <ProductScroll />
       <Workshops />
+
+      {/* ✅ Event Booking + Collaborate Section */}
+      <ActionSection />
+
       <Journey />
       <Footer />
     </>

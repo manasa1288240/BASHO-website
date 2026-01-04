@@ -20,27 +20,6 @@ export default function WorkshopsPage() {
         </div>
       </div>
 
-      {/* HERO SECTION */}
-      <section className="hero">
-        <div className="hero-content">
-          <h2 className="hero-main-title">
-            Discover the <em>meditative art</em> of pottery
-          </h2>
-          <div className="hero-columns">
-            <div className="hero-column">
-              <p className="hero-text">
-                Join our intimate workshops in Surat
-              </p>
-            </div>
-            <div className="hero-column">
-              <p className="hero-text">
-                and experience the joy of creating with your hands.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* WORKSHOPS GRID */}
       <section className="grid">
         {workshopsData.map((workshop) => (
