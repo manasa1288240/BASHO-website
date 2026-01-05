@@ -1,29 +1,45 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import axios from "axios";
 import "./AuthModal.css";
 
-export default function AuthModal({ open, onClose }) {
+export default function AuthModal({ open, onClose, onLoginSuccess }) {
   const inputRef = useRef(null);
   const otpRefs = useRef([]);
   const [step, setStep] = useState("login"); // login | otp
   const [contact, setContact] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if (!open) {
+      setStep("login");
+      setContact("");
+      setMessage("");
+      otpRefs.current = [];
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (step === "otp" && otpRefs.current[0]) {
+      otpRefs.current[0].focus();
+    }
+  }, [step]);
 
   if (!open) return null;
 
   const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-  const isMobile = (v) => /^[6-9]\d{9}$/.test(v);
 
-  const maskContact = (v) => {
-    if (isEmail(v)) {
-      const [name, domain] = v.split("@");
-      return name[0] + "•••@" + domain;
-    }
-    return v.slice(0, 2) + "•••••" + v.slice(-2);
+  const maskEmail = (email) => {
+    const [name, domain] = email.split("@");
+    return name[0] + "•••@" + domain;
   };
 
-  const handleLoginSubmit = (e) => {
+  // ================= SEND OTP =================
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
+
     const value = inputRef.current.value.trim();
-    inputRef.current.setCustomValidity("");
 
     if (!value) {
       inputRef.current.setCustomValidity("Please fill in this field");
@@ -31,22 +47,59 @@ export default function AuthModal({ open, onClose }) {
       return;
     }
 
-    if (!isEmail(value) && !isMobile(value)) {
-      inputRef.current.setCustomValidity(
-        "Enter a valid email or 10-digit mobile number"
-      );
+    if (!isEmail(value)) {
+      inputRef.current.setCustomValidity("Enter a valid email address");
       inputRef.current.reportValidity();
       return;
     }
 
-    setContact(value);
-    setStep("otp"); // 👉 DIRECT TRANSITION
+    setLoading(true);
+    try {
+      await axios.post("http://localhost:5000/api/auth/send-otp", {
+        email: value,
+      });
+      setContact(value);
+      setStep("otp");
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleOtpChange = (e, i) => {
-    const val = e.target.value.replace(/\D/g, "");
-    e.target.value = val;
-    if (val && i < 5) otpRefs.current[i + 1].focus();
+  // ================= VERIFY OTP =================
+  const handleVerify = async () => {
+    const otp = otpRefs.current.map((el) => el?.value).join("");
+
+    if (otp.length !== 6) {
+      setMessage("Please enter the 6-digit OTP");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/verify-otp",
+        {
+          email: contact,
+          otp,
+        }
+      );
+
+      // ✅ SAVE LOGIN STATE
+      localStorage.setItem(
+        "basho_user",
+        JSON.stringify(res.data.user)
+      );
+
+      if (onLoginSuccess) onLoginSuccess(res.data.user);
+
+      onClose();
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Invalid OTP");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,31 +111,37 @@ export default function AuthModal({ open, onClose }) {
           <>
             <h2 className="auth-title">Login or Sign up</h2>
             <p className="auth-subtitle">
-              Please enter your mobile number or email to continue
+              Please enter your email to continue
             </p>
 
             <form onSubmit={handleLoginSubmit} noValidate>
               <input
                 ref={inputRef}
-                type="text"
+                type="email"
                 className="auth-input"
-                placeholder="Mobile number or Email"
-                onInput={() => inputRef.current.setCustomValidity("")}
+                placeholder="Email address"
+                onInput={() => {
+                  inputRef.current.setCustomValidity("");
+                  setMessage("");
+                }}
+                disabled={loading}
               />
 
-              <button className="auth-btn" type="submit">
-                Continue
+              <button className="auth-btn" disabled={loading}>
+                {loading ? "Sending..." : "Continue"}
               </button>
             </form>
+
+            {message && <p className="auth-error">{message}</p>}
           </>
         )}
 
         {step === "otp" && (
           <>
-            <h2 className="auth-title">Verify your contact</h2>
+            <h2 className="auth-title">Verify your email</h2>
             <p className="auth-subtitle">
-              Enter the 6-digit code sent to <br />
-              <strong>{maskContact(contact)}</strong>
+              Enter the code sent to <br />
+              <strong>{maskEmail(contact)}</strong>
             </p>
 
             <div className="otp-boxes">
@@ -90,17 +149,27 @@ export default function AuthModal({ open, onClose }) {
                 <input
                   key={i}
                   ref={(el) => (otpRefs.current[i] = el)}
-                  type="text"
-                  maxLength="1"
                   className="otp-input"
-                  onChange={(e) => handleOtpChange(e, i)}
+                  maxLength="1"
+                  onChange={(e) => {
+                    e.target.value = e.target.value.replace(/\D/g, "");
+                    if (e.target.value && otpRefs.current[i + 1]) {
+                      otpRefs.current[i + 1].focus();
+                    }
+                  }}
                 />
               ))}
             </div>
 
-            <button className="auth-btn">
-              Verify
+            <button
+              className="auth-btn"
+              onClick={handleVerify}
+              disabled={loading}
+            >
+              {loading ? "Verifying..." : "Verify"}
             </button>
+
+            {message && <p className="auth-error">{message}</p>}
           </>
         )}
       </div>
