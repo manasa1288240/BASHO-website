@@ -4,13 +4,13 @@ const sendEmail = async ({ to, subject, text }) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "yourgmail@gmail.com",
-      pass: "your-app-password"
+      user: "gopskko8@gmail.com",      // same gmail you enabled 2-step for
+      pass: "yixzhlkduoaggzyl" // ← THIS MUST BE APP PASSWORD
     }
   });
 
   await transporter.sendMail({
-    from: `"BASHO Workshops" <yourgmail@gmail.com>`,
+    from: `"BASHO" <YOUR_GMAIL@gmail.com>`,
     to,
     subject,
     text
@@ -18,3 +18,4 @@ const sendEmail = async ({ to, subject, text }) => {
 };
 
 module.exports = sendEmail;
+
