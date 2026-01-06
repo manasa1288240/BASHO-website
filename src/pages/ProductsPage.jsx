@@ -13,6 +13,7 @@ export default function ProductsPage() {
   const [showCustomForm, setShowCustomForm] = useState(false);
   const location = useLocation();
 
+  // ✅ ALWAYS RETURN A VALID IMAGE
   const getProductImage = (product) => {
     if (product.image) return product.image;
 
@@ -25,7 +26,7 @@ export default function ProductsPage() {
       return product.images[0];
     }
 
-    return "";
+    return pot3; // ✅ fallback (NO broken images)
   };
 
   // Fetch products from backend
@@ -33,16 +34,12 @@ export default function ProductsPage() {
     const loadProducts = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/products");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new Error("Failed");
         const data = await res.json();
-
         if (Array.isArray(data) && data.length > 0) {
           setProducts(data);
-        } else {
-          setProducts(featuredProducts);
         }
-      } catch (err) {
-        console.error("Using static products:", err);
+      } catch {
         setProducts(featuredProducts);
       }
     };
@@ -50,7 +47,7 @@ export default function ProductsPage() {
     loadProducts();
   }, []);
 
-  // Auto-scroll to custom order section if URL hash exists
+  // Auto-scroll to custom order
   useEffect(() => {
     if (location.hash === "#custom-order") {
       const el = document.getElementById("custom-order");
@@ -65,19 +62,17 @@ export default function ProductsPage() {
   const filteredProducts =
     activeFilter === "All"
       ? products
-      : products.filter((product) => {
-          const category = product.category || "";
-          return (
-            typeof category === "string" &&
-            category.toLowerCase() === activeFilter.toLowerCase()
-          );
-        });
+      : products.filter(
+          (p) =>
+            p.category &&
+            p.category.toLowerCase() === activeFilter.toLowerCase()
+        );
 
   return (
     <div>
       <Navbar />
 
-      {/* FEATURED HEADER */}
+      {/* HEADER */}
       <div className="featured-header">
         <div className="featured-container">
           <div className="featured-subtitle">Handcrafted</div>
@@ -99,11 +94,10 @@ export default function ProductsPage() {
         ))}
       </div>
 
-      {/* PRODUCTS GRID */}
+      {/* GRID */}
       <section className="grid">
         {filteredProducts.map((product) => {
           const title = product.title || product.name;
-          const category = product.category;
           const imageSrc = getProductImage(product);
 
           return (
@@ -119,35 +113,33 @@ export default function ProductsPage() {
                 <span className="price">{product.price}</span>
               </div>
 
-              {category && <span className="category">{category}</span>}
+              <span className="category">{product.category}</span>
               <h3>{title}</h3>
             </div>
           );
         })}
 
-        {/* ⭐ CUSTOM ORDER CARD */}
+        {/* CUSTOM ORDER CARD */}
         <div
           id="custom-order"
           className="product-card custom-order-card"
           onClick={() => setShowCustomForm(true)}
         >
           <div className="img-wrap">
-            <img src={pot3} alt="Custom Ceramic Order" />
+            <img src={pot3} alt="Custom Order" />
             <div className="hover-info">
               <p>
                 Looking for something unique?
                 <br />
-                Tell us your idea and we’ll craft it just for you.
+                Tell us your idea and we’ll craft it.
               </p>
             </div>
           </div>
-
           <span className="category">Custom</span>
           <h3>Custom Order</h3>
         </div>
       </section>
 
-      {/* Custom Order Modal */}
       {showCustomForm && (
         <CustomOrderForm onClose={() => setShowCustomForm(false)} />
       )}

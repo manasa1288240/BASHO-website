@@ -5,8 +5,7 @@ const connectDB = async () => {
     await mongoose.connect(process.env.MONGO_URI);
 
     console.log("MongoDB Atlas connected");
-    console.log("Connected DB:", mongoose.connection.name); // ✅ HERE
-
+    console.log("Connected DB:", mongoose.connection.name);
   } catch (error) {
     console.error("MongoDB connection failed:", error.message);
     process.exit(1);
