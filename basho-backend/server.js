@@ -1,14 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-require("dotenv").config();
+
+dotenv.config();
+
 const connectDB = require("./config/db");
 const workshopRoutes = require("./routes/workshopRoutes");
 const productRoutes = require("./routes/productRoutes");
 const authRoutes = require("./routes/authRoutes");
-
-
-dotenv.config();
 
 const app = express();
 
@@ -24,11 +23,11 @@ app.get("/", (req, res) => {
 // API routes
 app.use("/api/workshops", workshopRoutes);
 app.use("/api/products", productRoutes);
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes); // ✅ YOU WERE MISSING THIS
 
 const PORT = process.env.PORT || 5000;
 
-// Connect to DB first, then start server
+// Connect DB then start server
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
