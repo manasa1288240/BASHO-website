@@ -17,9 +17,10 @@ export default function ProductScroll() {
         Each piece is lovingly crafted by hand, embracing the beauty of imperfection
       </p>
 
-      <div className="products-grid">
+      {/* 🔥 HORIZONTAL SCROLL CONTAINER */}
+      <div className="products-scroll">
         {products.map((product, index) => (
-          <div key={index} className="product-card">
+          <div key={index} className="product-card scroll-card">
             <div className="product-image-wrapper">
               <img
                 src={product.img}
@@ -27,12 +28,30 @@ export default function ProductScroll() {
                 className="product-image"
               />
             </div>
+
             <div className="product-info">
               <h3>{product.name}</h3>
               <p className="product-price">{product.price}</p>
             </div>
           </div>
         ))}
+
+        {/* ⭐ CUSTOM ORDER CARD */}
+        <Link to="/products#custom-order" className="product-card scroll-card custom-order-card">
+
+          <div className="product-image-wrapper">
+            <img
+              src={pot3}
+              alt="Custom Orders"
+              className="product-image"
+            />
+          </div>
+
+          <div className="product-info">
+            <h3>Custom Orders</h3>
+            <p className="product-price">Made for You</p>
+          </div>
+        </Link>
       </div>
 
       <div className="section-button-wrapper">

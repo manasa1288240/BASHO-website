@@ -1,22 +1,26 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import CustomOrderForm from "../components/CustomOrderForm";
 import featuredProducts from "../data/products";
+import pot3 from "../assets/pot3.png";
 import "../styles/ProductsPage.css";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState(featuredProducts);
   const [activeFilter, setActiveFilter] = useState("All");
+  const [showCustomForm, setShowCustomForm] = useState(false);
+  const location = useLocation();
 
   const getProductImage = (product) => {
-    // Prefer explicit image on the object (static data)
     if (product.image) return product.image;
 
-    // Fallback: match backend product by name to static featured product to reuse its image
-    const staticMatch = featuredProducts.find((p) => p.name === product.name);
+    const staticMatch = featuredProducts.find(
+      (p) => p.name === product.name
+    );
     if (staticMatch?.image) return staticMatch.image;
 
-    // Last resort: if backend sends an images array, try first entry as-is
     if (Array.isArray(product.images) && product.images.length > 0) {
       return product.images[0];
     }
@@ -24,6 +28,7 @@ export default function ProductsPage() {
     return "";
   };
 
+  // Fetch products from backend
   useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -37,13 +42,25 @@ export default function ProductsPage() {
           setProducts(featuredProducts);
         }
       } catch (err) {
-        console.error("Failed to fetch products, using static featured products:", err);
+        console.error("Using static products:", err);
         setProducts(featuredProducts);
       }
     };
 
     loadProducts();
   }, []);
+
+  // Auto-scroll to custom order section if URL hash exists
+  useEffect(() => {
+    if (location.hash === "#custom-order") {
+      const el = document.getElementById("custom-order");
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 300);
+      }
+    }
+  }, [location]);
 
   const filteredProducts =
     activeFilter === "All"
@@ -69,7 +86,6 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      
       {/* FILTERS */}
       <div className="filters">
         {["All", "Bowls", "Plates", "Cups"].map((filter) => (
@@ -91,7 +107,10 @@ export default function ProductsPage() {
           const imageSrc = getProductImage(product);
 
           return (
-            <div key={product._id || product.id || product.name} className="product-card">
+            <div
+              key={product._id || product.id || product.name}
+              className="product-card"
+            >
               <div className="img-wrap">
                 <img src={imageSrc} alt={title} />
                 <div className="hover-info">
@@ -105,7 +124,33 @@ export default function ProductsPage() {
             </div>
           );
         })}
+
+        {/* ⭐ CUSTOM ORDER CARD */}
+        <div
+          id="custom-order"
+          className="product-card custom-order-card"
+          onClick={() => setShowCustomForm(true)}
+        >
+          <div className="img-wrap">
+            <img src={pot3} alt="Custom Ceramic Order" />
+            <div className="hover-info">
+              <p>
+                Looking for something unique?
+                <br />
+                Tell us your idea and we’ll craft it just for you.
+              </p>
+            </div>
+          </div>
+
+          <span className="category">Custom</span>
+          <h3>Custom Order</h3>
+        </div>
       </section>
+
+      {/* Custom Order Modal */}
+      {showCustomForm && (
+        <CustomOrderForm onClose={() => setShowCustomForm(false)} />
+      )}
 
       <Footer />
     </div>

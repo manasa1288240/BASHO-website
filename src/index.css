@@ -114,15 +114,16 @@ section.fade-in-visible {
 
 .nav-links li a {
   text-decoration: none;
-  color: var(--primary);
   font-weight: 450;
   font-size: 0.85rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   position: relative;
   padding: 0.5rem 0;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease; /* keep this for smooth color change */
+  /* remove color: var(--primary); */
 }
+
 
 .nav-links li a::before {
   content: '';
@@ -497,6 +498,64 @@ section h2::after {
   color: var(--white);
   transform: translateY(-2px);
 }
+
+/* ===============================
+   HORIZONTAL PRODUCT SCROLL
+================================ */
+
+.products-scroll {
+  display: flex;
+  gap: 2rem;
+  overflow-x: auto;
+  padding: 1rem 0 1.5rem;
+  scroll-behavior: smooth;
+}
+
+/* Prevent wrapping */
+.scroll-card {
+  min-width: 260px;
+  flex-shrink: 0;
+}
+
+/* ===============================
+   BROWN SCROLLBAR
+================================ */
+
+/* Chrome / Edge / Safari */
+.products-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.products-scroll::-webkit-scrollbar-track {
+  background: #efe8e2;
+  border-radius: 10px;
+}
+
+.products-scroll::-webkit-scrollbar-thumb {
+  background: #7c4a33;
+  border-radius: 10px;
+}
+
+.products-scroll::-webkit-scrollbar-thumb:hover {
+  background: #5e3525;
+}
+
+/* Firefox */
+.products-scroll {
+  scrollbar-color: #7c4a33 #efe8e2;
+  scrollbar-width: thin;
+}
+
+/* ===============================
+   CUSTOM ORDER CARD POLISH
+================================ */
+
+.custom-order-card {
+  text-decoration: none;   /* 🚫 remove underline */
+  color: inherit;          /* keep same text color */
+}
+
+
 
 /* ===== SECTION BUTTONS ===== */
 .section-button-wrapper {

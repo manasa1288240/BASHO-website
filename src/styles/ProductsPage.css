@@ -5,14 +5,23 @@
 
 .featured-header {
   position: relative;
-  height: 220px;
-  background: url("public/Background.png") center / cover no-repeat;
+  width: 100%;
+
+  /* ✅ let content decide height */
+  padding: 80px 20px 70px;
+
+  /* ✅ show full image */
+  background-image: url("/Background.png");
+  background-size: contain;
+  background-position: top center;
+  background-repeat: no-repeat;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+
   margin: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .featured-subtitle {
@@ -261,4 +270,57 @@
   .hero-text {
     font-size: 1rem;
   }
+}
+
+/* ===============================
+   CUSTOM ORDER CARD
+================================ */
+
+.custom-order-card {
+  height: 420px;
+  border: 2px dashed #7c4a33;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f6efe7, #efe5db);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.custom-order-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 40px rgba(124, 74, 51, 0.25);
+}
+
+.custom-order-content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.custom-order-content h3 {
+  font-family: "Playfair Display", serif;
+  font-size: 1.6rem;
+  color: #371d15;
+  margin-bottom: 1rem;
+}
+
+.custom-order-content p {
+  font-size: 0.95rem;
+  color: #5e4a42;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.custom-order-btn {
+  background: #7c4a33;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.6rem;
+  border-radius: 25px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
 }
