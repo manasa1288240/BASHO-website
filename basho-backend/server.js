@@ -1,10 +1,12 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+require("dotenv").config();
 const connectDB = require("./config/db");
 const workshopRoutes = require("./routes/workshopRoutes");
 const productRoutes = require("./routes/productRoutes");
 const authRoutes = require("./routes/authRoutes");
+
 
 dotenv.config();
 
@@ -22,6 +24,7 @@ app.get("/", (req, res) => {
 // API routes
 app.use("/api/workshops", workshopRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 5000;
 
