@@ -4,14 +4,58 @@ import logo from "../assets/logo.png";
 import AuthModal from "./AuthModal";
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [bgColor, setBgColor] = useState("rgba(250, 247, 242, 0.92)");
+  const [textColor, setTextColor] = useState("#222");
   const [showAuth, setShowAuth] = useState(false);
   const [user, setUser] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
 
-  // Scroll effect
+  // Scroll-gradient effect
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      const scrollFraction = Math.min(scrollTop / docHeight, 1);
+
+      const colors = ["#ffffff", "#edd8b4", "#8e5022", "#652810", "#442d1c"];
+      const index = Math.floor(scrollFraction * (colors.length - 1));
+      const nextIndex = Math.min(index + 1, colors.length - 1);
+      const localFraction = scrollFraction * (colors.length - 1) - index;
+
+      const interpolateColor = (c1, c2, t) => {
+        const hexToRgb = (hex) => {
+          const bigint = parseInt(hex.slice(1), 16);
+          return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+        };
+        const rgbToHex = (r, g, b) =>
+          `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+
+        const [r1, g1, b1] = hexToRgb(c1);
+        const [r2, g2, b2] = hexToRgb(c2);
+
+        const r = Math.round(r1 + (r2 - r1) * t);
+        const g = Math.round(g1 + (g2 - g1) * t);
+        const b = Math.round(b1 + (b2 - b1) * t);
+
+        return rgbToHex(r, g, b);
+      };
+
+      const bg = interpolateColor(colors[index], colors[nextIndex], localFraction);
+
+      // Set navbar background with transparency
+      setBgColor(
+        `rgba(${parseInt(bg.slice(1, 3), 16)},${parseInt(
+          bg.slice(3, 5),
+          16
+        )},${parseInt(bg.slice(5, 7), 16)},0.92)`
+      );
+
+      // Adaptive text color for links and icons
+      const rgb = bg.match(/\w\w/g).map((x) => parseInt(x, 16));
+      const brightness = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
+      setTextColor(brightness < 128 ? "#f5f5f5" : "#222");
+    };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -39,27 +83,48 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`navbar ${isScrolled ? "scrolled" : ""}`}>
+      <nav
+        className="navbar"
+        style={{ backgroundColor: bgColor, color: textColor }}
+      >
         <div className="navbar-container">
+          {/* LOGO */}
           <img src={logo} alt="Basho Logo" className="logo" />
 
+          {/* NAV LINKS */}
           <ul className="nav-links">
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/products">Products</Link></li>
-            <li><Link to="/workshops">Workshops</Link></li>
-            <li><Link to="/about-basho">About Basho</Link></li>
+            <li>
+              <Link to="/" style={{ color: textColor }}>
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/products" style={{ color: textColor }}>
+                Products
+              </Link>
+            </li>
+            <li>
+              <Link to="/workshops" style={{ color: textColor }}>
+                Workshops
+              </Link>
+            </li>
+            <li>
+              <Link to="/about-basho" style={{ color: textColor }}>
+                About Basho
+              </Link>
+            </li>
 
-            {/* ACCOUNT */}
+            {/* ACCOUNT ICON */}
             <li className="account-nav" style={{ position: "relative" }}>
               <a href="#" onClick={handleAccountClick} aria-label="Account">
                 {!user ? (
-                  // BEFORE LOGIN → DEFAULT ICON
+                  // BEFORE LOGIN → round head/body SVG, adaptive color
                   <svg
                     width="22"
                     height="22"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="currentColor"
+                    stroke={textColor}
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -123,6 +188,7 @@ export default function Navbar() {
         </div>
       </nav>
 
+      {/* AUTH MODAL */}
       <AuthModal
         open={showAuth}
         onClose={() => {

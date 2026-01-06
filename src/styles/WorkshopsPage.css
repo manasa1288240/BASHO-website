@@ -10,15 +10,25 @@
 /* FEATURED HEADER */
 .featured-header {
   position: relative;
-  height: 220px;
-  background: url("public/Background.png") center / cover no-repeat;
+  width: 100%;
+
+  /* ✅ let content decide height */
+  padding: 80px 20px 70px;
+
+  /* ✅ show full image */
+  background-image: url("/Background.png");
+  background-size: contain;
+  background-position: top center;
+  background-repeat: no-repeat;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+
   margin: 0;
-  overflow: hidden;
+  overflow: visible;
 }
+
 
 .featured-container {
   text-align: center;
