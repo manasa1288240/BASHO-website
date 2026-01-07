@@ -12,6 +12,7 @@ import ProductsPage from "./pages/ProductsPage";
 import WorkshopsPage from "./pages/WorkshopsPage";
 import BashoAbout from "./pages/BashoAbout/About";
 import CareGuide from "./pages/CareGuide";
+import AuthPage from "./pages/AuthPage";
 import ActionSection from "./components/ActionSection"; // ✅ ADD THIS
 import "./index.css";
 
@@ -48,6 +49,7 @@ function App() {
         <Route path="/workshops" element={<WorkshopsPage />} />
         <Route path="/care-guide" element={<CareGuide />} />
         <Route path="/about-basho" element={<BashoAbout />} />
+        <Route path="/auth" element={<AuthPage />} />
       </Routes>
     </Router>
   );
