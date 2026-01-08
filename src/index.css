@@ -14,13 +14,25 @@
   --highlight: #E8D8C3;
   --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-/* ===== RESET & BASE STYLES ===== */
 * {
+  box-sizing: border-box;
+}
+
+html, body {
   margin: 0;
   padding: 0;
-  box-sizing: content-box;
+  width: 100%;
+  overflow-x: hidden;
 }
+
+/* ===== RESET & BASE STYLES ===== */
+
 
 body {
   margin: 0;
