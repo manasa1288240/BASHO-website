@@ -1,97 +1,131 @@
+/* 1. Backdrop - Centering the entire modal on the screen */
 .auth-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.45); /* Soft dimming of the background */
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
 
+/* 2. Main Modal Container - Fixed alignment for images b87146 and b8eca9 */
 .auth-modal {
-  background: #fffaf3;
+  background: #fffaf3; /* Cream background to match your design */
   width: 440px;
   max-width: 94%;
   border-radius: 20px;
-  padding: 0;
+  padding: 40px 32px;
   position: relative;
-}
-
-.auth-content {
-  padding: 32px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  align-items: center; /* Horizontally centers all child elements */
+  text-align: center;   /* Centers text lines for title and subtitle */
 }
 
+/* 3. Close Button */
 .auth-close {
   position: absolute;
-  top: 16px;
+  top: 18px;
   right: 18px;
   background: none;
   border: none;
-  font-size: 22px;
+  font-size: 24px;
   cursor: pointer;
+  color: #333;
+  line-height: 1;
 }
 
+/* 4. Text Elements - Centered Alignment */
 .auth-title {
   font-size: 26px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  width: 100%;
+  font-family: 'Serif', serif;
+  color: #1a1a1a;
+  font-weight: 600;
 }
 
 .auth-subtitle {
   font-size: 14px;
   color: #666;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
+  width: 100%;
+  line-height: 1.5;
+}
+
+/* 5. Form & Input Alignment - Matches image_b87146.png */
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Ensures button and input stay centered */
 }
 
 .auth-input {
   width: 100%;
   padding: 14px 16px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid #ccc;
   font-size: 15px;
   margin-bottom: 18px;
-  box-sizing: border-box;
+  box-sizing: border-box; /* Prevents input from overflowing the modal width */
+  background: white;
+  text-align: left; /* Keeps placeholder text naturally aligned */
 }
 
 .auth-btn {
   width: 100%;
-  padding: 14px;
-  border-radius: 10px;
+  padding: 15px;
+  border-radius: 12px;
   border: none;
-  background: #3f2f24;
+  background: #3f2f24; /* Your signature dark brown color */
   color: #fff;
   font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.auth-btn:hover {
+  opacity: 0.9;
 }
 
 .auth-btn:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.auth-error {
-  margin-top: 14px;
-  font-size: 13px;
-  color: #b00020;
-  text-align: center;
-}
-
+/* 6. OTP Verification Alignment - Matches image_b8eca9.png */
 .otp-boxes {
   display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin: 26px 0;
+  justify-content: center; /* Perfectly centers the row of 6 boxes */
+  gap: 10px;
+  margin: 20px 0 30px 0;
+  width: 100%;
 }
 
 .otp-input {
-  width: 46px;
-  height: 54px;
+  width: 48px;
+  height: 58px;
   text-align: center;
   font-size: 22px;
   border-radius: 10px;
   border: 1.5px solid #d5c7b8;
+  background: #fff;
+  transition: border-color 0.2s;
 }
 
 .otp-input:focus {
+  outline: none;
   border-color: #3f2f24;
+}
+
+/* 7. Error Message Alignment */
+.auth-error {
+  margin-top: 16px;
+  font-size: 13px;
+  color: #b00020;
+  text-align: center;
 }
