@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { CartProvider } from "./contexts/CartContext";
 import { useAppEffects } from "./AppEffects";  // Import the effects hook
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -40,18 +41,20 @@ function App() {
   useAppEffects();
 
   return (
-    <Router>
-      <Navbar />
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/workshops" element={<WorkshopsPage />} />
-        <Route path="/care-guide" element={<CareGuide />} />
-        <Route path="/about-basho" element={<BashoAbout />} />
-        <Route path="/auth" element={<AuthPage />} />
-      </Routes>
-    </Router>
+    <CartProvider>
+      <Router>
+        <Navbar />
+        <ScrollToTop />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/workshops" element={<WorkshopsPage />} />
+          <Route path="/care-guide" element={<CareGuide />} />
+          <Route path="/about-basho" element={<BashoAbout />} />
+          <Route path="/auth" element={<AuthPage />} />
+        </Routes>
+      </Router>
+    </CartProvider>
   );
 }
 
