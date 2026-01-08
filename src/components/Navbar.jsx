@@ -2,13 +2,19 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import AuthModal from "./AuthModal";
+import CartModal from "./CartModal";
+import { useCart } from "../contexts/CartContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const { items } = useCart();
   const [bgColor, setBgColor] = useState("rgba(250, 247, 242, 0.92)");
   const [textColor, setTextColor] = useState("#222");
   const [user, setUser] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
+  const [showCart, setShowCart] = useState(false);
+
+  const cartCount = (items.products?.length || 0) + (items.workshops?.length || 0);
 
   // Scroll-gradient effect
   useEffect(() => {
@@ -114,6 +120,36 @@ export default function Navbar() {
               </Link>
             </li>
 
+            {/* CART ICON */}
+            <li className="cart-nav" style={{ position: "relative" }}>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowCart(true);
+                }}
+                aria-label="Cart"
+              >
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke={textColor}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="9" cy="21" r="1" />
+                  <circle cx="20" cy="21" r="1" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
+                {cartCount > 0 && (
+                  <span className="cart-badge">{cartCount}</span>
+                )}
+              </a>
+            </li>
+
             {/* ACCOUNT ICON */}
             <li className="account-nav" style={{ position: "relative" }}>
               <a href="#" onClick={handleAccountClick} aria-label="Account">
@@ -189,6 +225,7 @@ export default function Navbar() {
       </nav>
 
       {/* AUTH MODAL - REMOVED, now using dedicated AuthPage */}
+      {showCart && <CartModal onClose={() => setShowCart(false)} />}
     </>
   );
 }
