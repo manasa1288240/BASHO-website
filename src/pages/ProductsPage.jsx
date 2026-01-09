@@ -5,7 +5,6 @@ import Footer from "../components/Footer";
 import CustomOrderForm from "../components/CustomOrderForm";
 import featuredProducts from "../data/products";
 import pot3 from "../assets/pot3.png";
-import { useCart } from "../contexts/CartContext";
 import "../styles/ProductsPage.css";
 
 export default function ProductsPage() {
@@ -13,12 +12,6 @@ export default function ProductsPage() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [showCustomForm, setShowCustomForm] = useState(false);
   const location = useLocation();
-  const { addProduct } = useCart();
-
-  const handleAddToCart = (product) => {
-    addProduct(product);
-    alert(`${product.title || product.name} added to cart!`);
-  };
 
   // ✅ ALWAYS RETURN A VALID IMAGE
   const getProductImage = (product) => {
@@ -122,9 +115,6 @@ export default function ProductsPage() {
 
               <span className="category">{product.category}</span>
               <h3>{title}</h3>
-              <button onClick={() => handleAddToCart(product)} className="add-to-cart-btn">
-                Add to Cart
-              </button>
             </div>
           );
         })}
