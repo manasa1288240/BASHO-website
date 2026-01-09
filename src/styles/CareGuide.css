@@ -10,6 +10,7 @@
 .featured-header {
   position: relative;
   height: 220px;
+  margin-top: 60px;
   background: url("../assets/Background.png") center / cover no-repeat;
   display: flex;
   align-items: center;

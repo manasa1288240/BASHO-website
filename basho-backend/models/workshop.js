@@ -21,8 +21,23 @@ const workshopSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  participants: {
+    type: Number,
+    default: 1
+  },
   message: {
     type: String
+  },
+  paymentId: {
+    type: String
+  },
+  orderId: {
+    type: String
+  },
+  paymentStatus: {
+    type: String,
+    enum: ["pending", "completed", "failed"],
+    default: "pending"
   }
 }, {
   timestamps: true

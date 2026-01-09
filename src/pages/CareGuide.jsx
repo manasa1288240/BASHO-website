@@ -1,12 +1,9 @@
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/CareGuide.css";
 
 export default function CareGuide() {
   return (
     <div className="care-page">
-      <Navbar />
-
       <div className="featured-header">
         <div className="featured-container">
           <div className="featured-subtitle">Care & Keeping</div>

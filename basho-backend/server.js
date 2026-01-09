@@ -11,8 +11,10 @@ const cartRoutes = require("./routes/cartRoutes");
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // TEST ROUTE
 app.get("/", (req, res) => {
@@ -26,6 +28,12 @@ app.use("/api/auth", authRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/auth", authRoutes); // ✅ YOU WERE MISSING THIS
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ success: false, error: err.message });
+});
 
 const PORT = process.env.PORT || 5000;
 

@@ -1,5 +1,4 @@
-import { useState } from "react";
-import Navbar from "../components/Navbar";
+import { useState, useEffect } from "react";
 import Footer from "../components/Footer";
 import workshopsData from "../data/workshops";
 import "../styles/WorkshopsPage.css";
@@ -7,10 +6,16 @@ import "../styles/WorkshopsPage.css";
 export default function WorkshopsPage() {
   const [selectedWorkshop, setSelectedWorkshop] = useState(null);
 
+  useEffect(() => {
+    // Load Razorpay script
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
   return (
     <div className="workshops-page">
-      <Navbar />
-      
       {/* FEATURED HEADER */}
       <div className="featured-header">
         <div className="featured-container">
@@ -60,6 +65,7 @@ export default function WorkshopsPage() {
 
 function WorkshopDetailModal({ workshop, onClose }) {
   const [showBooking, setShowBooking] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -70,35 +76,94 @@ function WorkshopDetailModal({ workshop, onClose }) {
   });
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    setLoading(true);
 
-  const payload = {
-    name: formData.name,
-    email: formData.email,
-    phone: formData.phone,
-    workshopType: workshop.title,
-    preferredDate: formData.date,
-    message: formData.message
+    try {
+      // Extract price number
+      const priceNumber = parseInt(workshop.price.replace('₹', '').replace(',', ''));
+      const totalAmount = priceNumber * parseInt(formData.participants || 1);
+
+      // Step 1: Create Razorpay order
+      const orderRes = await fetch("http://localhost:5000/api/workshops/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: totalAmount,
+          currency: "INR",
+          receipt: `workshop-${Date.now()}`
+        })
+      });
+
+      const orderData = await orderRes.json();
+      if (!orderData.success) throw new Error(orderData.error);
+
+      // Step 2: Open Razorpay checkout
+      const options = {
+        key: "rzp_test_S1ra8fUDoBRjlX", // Your Razorpay Key ID
+        amount: orderData.amount,
+        currency: orderData.currency,
+        order_id: orderData.orderId,
+        name: "BASHO",
+        description: `${workshop.title} Workshop Booking`,
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+          contact: formData.phone
+        },
+        handler: async (response) => {
+          // Step 3: Verify payment and save booking
+          try {
+            const bookingData = {
+              name: formData.name,
+              email: formData.email,
+              phone: formData.phone,
+              workshopType: workshop.title,
+              preferredDate: formData.date,
+              participants: formData.participants,
+              message: formData.message
+            };
+
+            const verifyRes = await fetch("http://localhost:5000/api/workshops/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                bookingData
+              })
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyData.success) {
+              alert("Booking confirmed! Payment successful. You'll receive a confirmation email shortly.");
+              onClose();
+            } else {
+              alert("Payment verification failed: " + verifyData.message);
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Error processing booking. Please contact support.");
+          }
+          setLoading(false);
+        },
+        modal: {
+          ondismiss: () => {
+            setLoading(false);
+            alert("Payment cancelled");
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error(err);
+      alert("Error: " + err.message);
+      setLoading(false);
+    }
   };
-
-  try {
-    const res = await fetch("http://localhost:5000/api/workshops", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await res.json();
-    alert(data.message);
-    onClose();
-  } catch (err) {
-    console.error(err);
-    alert("Something went wrong. Please try again.");
-  }
-};
-
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -244,8 +309,8 @@ function WorkshopDetailModal({ workshop, onClose }) {
                   Total: <strong>{workshop.price}</strong> × {formData.participants} = 
                   <strong> ₹{parseInt(workshop.price.replace('₹', '').replace(',', '')) * parseInt(formData.participants || 1)}</strong>
                 </p>
-                <button type="submit" className="submit-btn">
-                  Confirm Booking
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? "Processing..." : "Pay & Confirm Booking"}
                 </button>
               </div>
             </form>

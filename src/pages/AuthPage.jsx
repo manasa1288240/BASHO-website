@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/AuthPage.css";
 
@@ -96,8 +95,6 @@ export default function AuthPage() {
 
   return (
     <div className="auth-page">
-      <Navbar />
-
       <div className="auth-container">
         {/* LEFT SECTION - BRANDING */}
         <div className="auth-branding">
