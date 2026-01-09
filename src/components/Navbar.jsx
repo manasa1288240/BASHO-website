@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import AuthModal from "./AuthModal";
+import { useShop } from "../context/ShopContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ export default function Navbar() {
   const [textColor, setTextColor] = useState("#222");
   const [user, setUser] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
+  const { wishlist, cart } = useShop();
 
   // Scroll-gradient effect
   useEffect(() => {
@@ -111,6 +113,58 @@ export default function Navbar() {
             <li>
               <Link to="/about-basho" style={{ color: textColor }}>
                 About Basho
+              </Link>
+            </li>
+            {/* WISHLIST ICON */}
+            <li>
+              <Link
+                to="/wishlist"
+                style={{ color: textColor }}
+                className="nav-icon-link"
+                aria-label="Wishlist"
+              >
+                <span className="nav-icon-count">{wishlist.length}</span>
+                <svg
+                  className="nav-icon-svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke={textColor}
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path
+                    d="M12 19.5s-4.6-3.2-7-5.8C3.3 12 3 11 3 10c0-2 1.5-3.5 3.5-3.5 1.3 0 2.5.7 3.1 1.8C10.2 7.2 11.4 6.5 12.7 6.5 14.7 6.5 16.2 8 16.2 10c0 1-.3 2-2 3.7-2.4 2.6-7 5.8-7 5.8z"
+                  />
+                </svg>
+              </Link>
+            </li>
+
+            {/* CART ICON */}
+            <li>
+              <Link
+                to="/cart"
+                style={{ color: textColor }}
+                className="nav-icon-link"
+                aria-label="Cart"
+              >
+                <span className="nav-icon-count">
+                  {cart.reduce((sum, item) => sum + (item.qty || 1), 0)}
+                </span>
+                <svg
+                  className="nav-icon-svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke={textColor}
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="9" cy="19" r="1.6" />
+                  <circle cx="17" cy="19" r="1.6" />
+                  <path d="M4 5h2.2l1.4 9.2c.1.9.9 1.6 1.8 1.6H18" />
+                  <path d="M8 7h11l-1.2 5.5H9.5" />
+                </svg>
               </Link>
             </li>
 

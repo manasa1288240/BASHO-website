@@ -156,6 +156,32 @@ section.fade-in-visible {
   width: 100%;
 }
 
+/* Icon-style nav links (wishlist, cart) */
+.nav-icon-link {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.25rem 0;
+}
+
+.nav-icon-link::before {
+  display: none; /* no underline for pure icon links */
+}
+
+.nav-icon-count {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.nav-icon-svg {
+  width: 22px;
+  height: 22px;
+}
+
 .nav-links li a.active {
   color: var(--accent);
 }

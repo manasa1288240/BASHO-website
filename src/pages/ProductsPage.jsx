@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import CustomOrderForm from "../components/CustomOrderForm";
 import featuredProducts from "../data/products";
+import { useShop } from "../context/ShopContext";
 import pot3 from "../assets/pot3.png";
 import "../styles/ProductsPage.css";
 
@@ -11,6 +12,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState(featuredProducts);
   const [activeFilter, setActiveFilter] = useState("All");
   const [showCustomForm, setShowCustomForm] = useState(false);
+  const { wishlist, cart, toggleWishlist, addToCart } = useShop();
   const location = useLocation();
 
   // ✅ ALWAYS RETURN A VALID IMAGE
@@ -28,6 +30,15 @@ export default function ProductsPage() {
 
     return pot3; // ✅ fallback (NO broken images)
   };
+
+  // Helpers for wishlist & cart
+  const getProductKey = (product) => product._id || product.id || product.name;
+
+  const isInWishlist = (product) =>
+    wishlist.includes(getProductKey(product));
+
+  const isInCart = (product) =>
+    cart.some((item) => item.id === getProductKey(product));
 
   // Fetch products from backend
   useEffect(() => {
@@ -99,6 +110,8 @@ export default function ProductsPage() {
         {filteredProducts.map((product) => {
           const title = product.title || product.name;
           const imageSrc = getProductImage(product);
+          const inWishlist = isInWishlist(product);
+          const inCart = isInCart(product);
 
           return (
             <div
@@ -113,8 +126,27 @@ export default function ProductsPage() {
                 <span className="price">{product.price}</span>
               </div>
 
-              <span className="category">{product.category}</span>
-              <h3>{title}</h3>
+              <div className="product-meta">
+                <span className="category">{product.category}</span>
+                <h3>{title}</h3>
+              </div>
+
+              <div className="product-actions">
+                <button
+                  type="button"
+                  className={`wishlist-btn ${inWishlist ? "active" : ""}`}
+                  onClick={() => toggleWishlist(product)}
+                >
+                  {inWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+                </button>
+                <button
+                  type="button"
+                  className={`cart-btn ${inCart ? "active" : ""}`}
+                  onClick={() => addToCart(product)}
+                >
+                  {inCart ? "Add More" : "Add to Cart"}
+                </button>
+              </div>
             </div>
           );
         })}

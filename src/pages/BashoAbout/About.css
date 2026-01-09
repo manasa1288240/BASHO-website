@@ -5,6 +5,40 @@
     padding-top: 6rem; /* offset for fixed navbar */
 }
 
+/* Top header band using Background.png (shared with other pages) */
+.featured-header {
+    position: relative;
+    width: 100%;
+    padding: 80px 20px 70px;
+    background-image: url("/Background.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    overflow: visible;
+}
+
+/* Pull the header up so its background aligns with other pages */
+.basho-about-page .featured-header {
+    margin-top: -6rem;
+}
+
+.featured-title {
+    font-family: "Playfair Display", serif;
+    font-size: 4rem;
+    text-align: center;
+}
+
+.featured-divider {
+    width: 60px;
+    height: 2px;
+    background: #7c4a33;
+    margin: 1rem auto 0;
+}
+
 .basho-about-section {
     max-width: 1200px;
     margin: 0 auto;
@@ -174,8 +208,44 @@
 .basho-about-mission-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 2rem;
+    gap: 1.5rem;
     margin-top: 2.5rem;
+}
+
+/* Explicit grid spacing for Mission & Vision section */
+.basho-about-mission .grid.lg\:grid-cols-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 0.75rem;  /* much tighter space between Mission & Vision */
+    row-gap: 1rem;
+}
+
+.basho-about-mission .grid.md\:grid-cols-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;         /* tighter space between Core Value cards */
+}
+
+.basho-about-mission .grid.gap-8 {
+    row-gap: 1rem;        /* less vertical space between principles */
+}
+
+/* Extra styling hooks for Mission/Vision visuals */
+.basho-mission-emoji {
+    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.12));
+}
+
+.basho-mission-heading {
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.basho-mission-body {
+    font-size: 1.02rem;
+}
+
+.basho-principle-number {
+    letter-spacing: 0.12em;
 }
 
 .basho-about-mission-card {

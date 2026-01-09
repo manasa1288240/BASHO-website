@@ -77,7 +77,7 @@ const MissionVision = () => {
         </motion.div>
 
         {/* Mission & Vision Cards */}
-        <div className="grid lg:grid-cols-2 gap-12 mb-24">
+        <div className="grid lg:grid-cols-2 gap-4 mb-10">
           {/* Mission Card */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -86,12 +86,12 @@ const MissionVision = () => {
             className="group"
           >
             <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-10 shadow-2xl border border-sand hover:shadow-3xl transition-all duration-500 h-full">
-              <div className="text-5xl mb-6">🎯</div>
+              <div className="text-5xl mb-6 basho-mission-emoji">🎯</div>
               <div className="flex items-center mb-6">
                 <div className="w-12 h-1 bg-gradient-to-r from-terracotta to-cinnamon mr-4"></div>
-                <h3 className="text-3xl font-japanese text-mahogany">Mission</h3>
+                <h3 className="text-3xl font-japanese text-mahogany basho-mission-heading">Mission</h3>
               </div>
-              <p className="text-lg text-clay/80 leading-relaxed mb-8">
+              <p className="text-lg text-clay/80 leading-relaxed mb-8 basho-mission-body">
                 To craft ceramic pieces that serve as daily reminders of
                 Wabi-Sabi—objects that celebrate imperfection, honor natural
                 materials, and bring mindful beauty into contemporary living
@@ -109,12 +109,12 @@ const MissionVision = () => {
             className="group"
           >
             <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-10 shadow-2xl border border-sand hover:shadow-3xl transition-all duration-500 h-full">
-              <div className="text-5xl mb-6">🔮</div>
+              <div className="text-5xl mb-6 basho-mission-emoji">🔮</div>
               <div className="flex items-center mb-6">
                 <div className="w-12 h-1 bg-gradient-to-r from-cinnamon to-mahogany mr-4"></div>
-                <h3 className="text-3xl font-japanese text-mahogany">Vision</h3>
+                <h3 className="text-3xl font-japanese text-mahogany basho-mission-heading">Vision</h3>
               </div>
-              <p className="text-lg text-clay/80 leading-relaxed mb-8">
+              <p className="text-lg text-clay/80 leading-relaxed mb-8 basho-mission-body">
                 To establish Bashō as the bridge between centuries-old Japanese
                 craftsmanship and modern global living—creating heirlooms that
                 inspire mindfulness, conversations, and a deeper connection to
@@ -138,7 +138,7 @@ const MissionVision = () => {
             Core Values
           </h3>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-3">
             {values.map((value, index) => (
               <motion.div
                 key={index}
@@ -176,7 +176,7 @@ const MissionVision = () => {
         >
           <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-terracotta/30 to-transparent transform -translate-x-1/2"></div>
 
-          <div className="grid gap-12">
+          <div className="grid gap-4">
             {principles.map((principle, index) => (
               <motion.div
                 key={index}
@@ -196,7 +196,7 @@ const MissionVision = () => {
                       index % 2 === 0 ? 'bg-white/80' : 'bg-clay/5'
                     }`}
                   >
-                    <div className="text-terracotta text-5xl font-japanese mb-4">
+                    <div className="text-terracotta text-5xl font-japanese mb-4 basho-principle-number">
                       {principle.number}
                     </div>
                     <h4 className="text-2xl font-japanese text-mahogany mb-3">
