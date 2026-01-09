@@ -10,8 +10,10 @@ const paymentRoutes = require("./routes/paymentRoutes"); // ✅ FIX
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // TEST ROUTE
 app.get("/", (req, res) => {
@@ -23,6 +25,12 @@ app.use("/api/workshops", workshopRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/payment", paymentRoutes); // ✅ NOW REGISTERED
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ success: false, error: err.message });
+});
 
 const PORT = process.env.PORT || 5000;
 

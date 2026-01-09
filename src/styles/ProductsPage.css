@@ -1,5 +1,6 @@
-/* HEADER */
+/* PAGE WRAPPER - PUSH BELOW FIXED NAVBAR */
 .featured-header {
+  margin-top: 60px;
   padding: 80px 20px 70px;
   background-image: url("/Background.png");
   background-size: contain;

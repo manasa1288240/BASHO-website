@@ -9,7 +9,6 @@ export default function Hero() {
       <div className="hero-left">
         <div className="hero-image-container">
           <img src={claybg} alt="Clay Background" className="hero-clay-bg" />
-          <img src={pottery} alt="Pottery" className="hero-pottery" />
         </div>
       </div>
 
