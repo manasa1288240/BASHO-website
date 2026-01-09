@@ -44,13 +44,14 @@ export default function ProductsPage() {
     const loadProducts = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/products");
-        if (!res.ok) throw new Error("Failed");
+        if (!res.ok) throw new Error("Failed to fetch products");
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
           setProducts(data);
         }
-      } catch {
-        setProducts(featuredProducts);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        // Keep the initial featuredProducts if fetch fails
       }
     };
 

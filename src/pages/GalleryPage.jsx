@@ -1,6 +1,5 @@
 import React from "react";
 import { motion } from "framer-motion";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "./GalleryPage.css";
 
@@ -34,8 +33,6 @@ const images = [
 const GalleryPage = () => {
   return (
     <>
-      <Navbar />
-
       <section className="gallery-page">
         <div className="gallery-intro">
           <h1>Our Story in Clay</h1>

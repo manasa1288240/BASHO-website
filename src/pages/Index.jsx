@@ -1,4 +1,3 @@
-import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import Philosophy from "../components/Philosophy";
 import ProductScroll from "../components/ProductScroll";
@@ -9,7 +8,6 @@ import Footer from "../components/Footer";
 export default function Index() {
   return (
     <main className="page">
-      <Navbar />
       <Hero />
       <Philosophy />
       <ProductScroll />

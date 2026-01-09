@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { useAppEffects } from "./AppEffects";  // Import the effects hook
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -36,16 +36,13 @@ function HomePage() {
   );
 }
 
-// Main App with Routing
-function App() {
-  // Call the effects hook - this enables scroll animations and other effects
-  useAppEffects();
+// Routes Component - needs to be inside Router context
+function AppRoutes() {
+  const location = useLocation();
 
   return (
-    <Router>
-      <Navbar />
-      <ScrollToTop />
-      <Routes>
+    <div key={location.pathname}>
+      <Routes location={location}>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/workshops" element={<WorkshopsPage />} />
@@ -55,6 +52,20 @@ function App() {
         <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/cart" element={<CartPage />} />
       </Routes>
+    </div>
+  );
+}
+
+// Main App with Routing
+function App() {
+  // Call the effects hook - this enables scroll animations and other effects
+  useAppEffects();
+
+  return (
+    <Router>
+      <Navbar />
+      <ScrollToTop />
+      <AppRoutes />
     </Router>
   );
 }
