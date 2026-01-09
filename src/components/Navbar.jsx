@@ -115,6 +115,11 @@ export default function Navbar() {
                 About Basho
               </Link>
             </li>
+            <li>
+              <Link to="/gallery" style={{ color: textColor }}>
+                Gallery
+              </Link>
+            </li>
             {/* WISHLIST ICON */}
             <li>
               <Link
