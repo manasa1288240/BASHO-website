@@ -1,27 +1,38 @@
-import heroImg from "../assets/bg.png";
+import claybg from "../assets/claybg.jpg";
+import pottery from "../assets/pottery.jpg";
+import "./Hero.css";
 
 export default function Hero() {
   return (
-    <section
-      id="home"
-      className="hero w-full h-screen bg-cover bg-center relative"
-      style={{
-        backgroundImage: `url(${heroImg})`,
-      }}
-    >
-      <div className="absolute inset-0 bg-black/20"></div>
-      <div className="relative z-10 flex items-center justify-center h-full flex-col px-6">
-        <h1 className="text-white text-5xl md:text-7xl font-serif font-bold">
-          場所
-        </h1>
-        <p className="text-white text-xl md:text-2xl mt-4 max-w-2xl">
-          ---BASHO---<br/>
-          (noun)<br/>
-          baa-sho /<br/>
-          origin:Japanese<br/>
-          <b>A place - A space that sparks joy, creativity, or comfort</b>
-        </p>
+    <div id="home" className="hero-split">
+      {/* Left Side - Images */}
+      <div className="hero-left">
+        <div className="hero-image-container">
+          <img src={claybg} alt="Clay Background" className="hero-clay-bg" />
+          <img src={pottery} alt="Pottery" className="hero-pottery" />
+        </div>
       </div>
-    </section>
+
+      {/* Right Side - Content */}
+      <div className="hero-right">
+        <div className="hero-content">
+          {/* Japanese Title */}
+          <h1 className="japanese-title">場所</h1>
+          
+          {/* Definition */}
+          <div className="basho-definition">
+            <div className="definition-label">BASHO</div>
+            <div className="definition-details">
+              <span className="pronunciation">noun</span>
+              <span className="pronunciation-sep">•</span>
+              <span className="pronunciation">/bä-shō/</span>
+            </div>
+            <p className="definition-meaning">
+              A place where joy, creativity, and comfort naturally unfold
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

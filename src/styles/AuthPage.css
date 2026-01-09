@@ -1,0 +1,473 @@
+/* ===============================
+   AUTH PAGE
+================================ */
+
+.auth-page {
+  min-height: 100vh;
+  background: #faf7f3;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.auth-container {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  width: 100%;
+  min-height: calc(100vh - 70px);
+}
+
+/* ===============================
+   LEFT SECTION - BRANDING
+================================ */
+
+.auth-branding {
+  background: linear-gradient(135deg, #7c4a33 0%, #5e3525 100%);
+  padding: 60px 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  min-height: 100%;
+}
+
+/* Subtle decorative pattern */
+.auth-branding::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 35px,
+      rgba(255, 255, 255, 0.03) 35px,
+      rgba(255, 255, 255, 0.03) 70px
+    );
+  pointer-events: none;
+}
+
+.branding-content {
+  position: relative;
+  z-index: 2;
+  max-width: 400px;
+}
+
+.branding-title {
+  font-family: "Playfair Display", serif;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  color: #faf7f3;
+}
+
+.branding-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  font-weight: 400;
+  color: #edd8b4;
+  line-height: 1.6;
+}
+
+.branding-divider {
+  width: 50px;
+  height: 3px;
+  background: #edd8b4;
+  margin-bottom: 2rem;
+  border-radius: 2px;
+}
+
+.branding-description {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #e8d7bf;
+  opacity: 0.95;
+}
+
+/* ===============================
+   RIGHT SECTION - FORM
+================================ */
+
+.auth-form-section {
+  background: #faf7f3;
+  padding: 80px 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+}
+
+.auth-form-wrapper {
+  width: 100%;
+  max-width: 380px;
+  box-sizing: border-box;
+}
+
+.auth-title {
+  font-family: "Playfair Display", serif;
+  font-size: 2.2rem;
+  color: #371d15;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  word-wrap: break-word;
+}
+
+.auth-subtitle {
+  font-size: 1rem;
+  color: #8b7355;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.auth-subtitle strong {
+  color: #5e3525;
+  font-weight: 600;
+}
+
+/* ===============================
+   FORM GROUPS
+================================ */
+
+.form-group {
+  margin-bottom: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #5e3525;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 2px solid #efe8e2;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: #7c4a33;
+  box-shadow: 0 0 0 3px rgba(124, 74, 51, 0.1);
+}
+
+.auth-input:disabled {
+  background: #f5f3f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===============================
+   BUTTONS
+================================ */
+
+.auth-btn {
+  width: 100%;
+  padding: 1rem;
+  background: #7c4a33;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-sizing: border-box;
+}
+
+.auth-btn:hover:not(:disabled) {
+  background: #5e3525;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(124, 74, 51, 0.25);
+}
+
+.auth-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.auth-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.auth-back-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: transparent;
+  color: #7c4a33;
+  border: 2px solid #efe8e2;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  box-sizing: border-box;
+}
+
+.auth-back-btn:hover:not(:disabled) {
+  border-color: #7c4a33;
+  background: #f9f6f2;
+}
+
+.auth-back-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   OTP SECTION
+================================ */
+
+.otp-container {
+  margin: 2rem 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.otp-boxes {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.otp-input {
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  border: 2px solid #efe8e2;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  font-family: "Courier New", monospace;
+  transition: all 0.3s ease;
+  background: #fff;
+  color: #371d15;
+}
+
+.otp-input:focus {
+  outline: none;
+  border-color: #7c4a33;
+  box-shadow: 0 0 0 3px rgba(124, 74, 51, 0.1);
+}
+
+.otp-input::placeholder {
+  color: #d4c4b8;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.otp-input:disabled {
+  background: #f5f3f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===============================
+   ERROR & MESSAGES
+================================ */
+
+.auth-error {
+  color: #c5421a;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(197, 66, 26, 0.08);
+  border-radius: 8px;
+  border-left: 3px solid #c5421a;
+  margin-bottom: 1rem;
+}
+
+.auth-terms {
+  font-size: 0.8rem;
+  color: #8b7355;
+  margin-top: 2rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 1024px) {
+  .auth-branding {
+    padding: 40px 30px;
+  }
+
+  .auth-form-section {
+    padding: 40px 30px;
+  }
+
+  .branding-title {
+    font-size: 2.5rem;
+  }
+
+  .auth-form-wrapper {
+    max-width: 340px;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-container {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .auth-branding {
+    padding: 40px 30px;
+    min-height: 280px;
+  }
+
+  .branding-title {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .branding-subtitle {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .branding-description {
+    font-size: 0.9rem;
+  }
+
+  .auth-form-section {
+    padding: 40px 30px;
+    min-height: auto;
+  }
+
+  .auth-form-wrapper {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .auth-title {
+    font-size: 1.8rem;
+  }
+
+  .otp-boxes {
+    gap: 0.5rem;
+  }
+
+  .otp-input {
+    width: 45px;
+    height: 45px;
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-page {
+    min-height: 100vh;
+  }
+
+  .auth-container {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .auth-branding {
+    padding: 30px 20px;
+    min-height: 220px;
+  }
+
+  .branding-content {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .branding-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .branding-subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .branding-divider {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .branding-description {
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .auth-form-section {
+    padding: 25px 20px;
+    min-height: auto;
+  }
+
+  .auth-form-wrapper {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .auth-title {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .auth-subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    font-size: 0.75rem;
+  }
+
+  .auth-input,
+  .auth-btn,
+  .auth-back-btn {
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .otp-boxes {
+    gap: 0.25rem;
+  }
+
+  .otp-input {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+  }
+
+  .auth-terms {
+    font-size: 0.75rem;
+    margin-top: 1.5rem;
+  }
+}

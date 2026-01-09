@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import AuthModal from "./AuthModal";
 import { useShop } from "../context/ShopContext";
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const [bgColor, setBgColor] = useState("rgba(250, 247, 242, 0.92)");
   const [textColor, setTextColor] = useState("#222");
-  const [showAuth, setShowAuth] = useState(false);
   const [user, setUser] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
   const { wishlist, cart } = useShop();
@@ -73,7 +73,7 @@ export default function Navbar() {
     if (user) {
       setShowMenu((prev) => !prev); // toggle logout menu
     } else {
-      setShowAuth(true); // open login modal
+      navigate("/auth"); // navigate to auth page
     }
   };
 
@@ -168,6 +168,8 @@ export default function Navbar() {
               </Link>
             </li>
 
+
+
             {/* ACCOUNT ICON */}
             <li className="account-nav" style={{ position: "relative" }}>
               <a href="#" onClick={handleAccountClick} aria-label="Account">
@@ -242,15 +244,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* AUTH MODAL */}
-      <AuthModal
-        open={showAuth}
-        onClose={() => {
-          setShowAuth(false);
-          const u = localStorage.getItem("basho_user");
-          if (u) setUser(JSON.parse(u));
-        }}
-      />
+      {/* AUTH MODAL - REMOVED, now using dedicated AuthPage */}
     </>
   );
 }
