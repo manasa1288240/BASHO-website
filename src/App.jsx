@@ -12,6 +12,8 @@ import ProductsPage from "./pages/ProductsPage";
 import WorkshopsPage from "./pages/WorkshopsPage";
 import BashoAbout from "./pages/BashoAbout/About";
 import CareGuide from "./pages/CareGuide";
+import WishlistPage from "./pages/WishlistPage";
+import CartPage from "./pages/CartPage";
 import ActionSection from "./components/ActionSection"; // ✅ ADD THIS
 import "./index.css";
 
@@ -48,6 +50,8 @@ function App() {
         <Route path="/workshops" element={<WorkshopsPage />} />
         <Route path="/care-guide" element={<CareGuide />} />
         <Route path="/about-basho" element={<BashoAbout />} />
+        <Route path="/wishlist" element={<WishlistPage />} />
+        <Route path="/cart" element={<CartPage />} />
       </Routes>
     </Router>
   );

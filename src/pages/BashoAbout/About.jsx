@@ -17,6 +17,15 @@ const BashoAbout = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
+      {/* Header band with Background.png like other pages */}
+      <div className="featured-header">
+        <div className="featured-container">
+          <div className="featured-subtitle">About</div>
+          <h1 className="featured-title">ABOUT BASHO</h1>
+          <div className="featured-divider"></div>
+        </div>
+      </div>
+
       {/* 1. Basho & Wabi-Sabi */}
       <HeroSection />
 

@@ -9,6 +9,54 @@ const userSchema = new mongoose.Schema(
     },
     otp: String,
     otpExpiresAt: Date,
+
+    // Wishlist: list of product IDs
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
+
+    // Cart: products with quantities
+    cart: [
+      {
+        product: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        qty: {
+          type: Number,
+          default: 1,
+          min: 1,
+        },
+      },
+    ],
+
+    // Purchase history (previously bought items)
+    orders: [
+      {
+        items: [
+          {
+            product: {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: "Product",
+              required: true,
+            },
+            qty: {
+              type: Number,
+              default: 1,
+              min: 1,
+            },
+          },
+        ],
+        purchasedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );
