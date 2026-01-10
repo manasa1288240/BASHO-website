@@ -8,6 +8,7 @@ export default function AuthPage() {
   const navigate = useNavigate();
   const inputRef = useRef(null);
   const otpRefs = useRef([]);
+
   const [step, setStep] = useState("login"); // login | otp
   const [contact, setContact] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,7 +27,6 @@ export default function AuthPage() {
     return name[0] + "•••@" + domain;
   };
 
-  // ================= SEND OTP =================
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -34,13 +34,13 @@ export default function AuthPage() {
     const value = inputRef.current.value.trim();
 
     if (!value) {
-      inputRef.current.setCustomValidity("Please fill in this field");
+      inputRef.current.setCustomValidity("Please enter email");
       inputRef.current.reportValidity();
       return;
     }
 
     if (!isEmail(value)) {
-      inputRef.current.setCustomValidity("Enter a valid email address");
+      inputRef.current.setCustomValidity("Enter valid email");
       inputRef.current.reportValidity();
       return;
     }
@@ -59,12 +59,11 @@ export default function AuthPage() {
     }
   };
 
-  // ================= VERIFY OTP =================
   const handleVerify = async () => {
     const otp = otpRefs.current.map((el) => el?.value).join("");
 
     if (otp.length !== 6) {
-      setMessage("Please enter the 6-digit OTP");
+      setMessage("Please enter 6-digit OTP");
       return;
     }
 
@@ -78,13 +77,14 @@ export default function AuthPage() {
         }
       );
 
-      // ✅ SAVE LOGIN STATE
       localStorage.setItem(
         "basho_user",
         JSON.stringify(res.data.user)
       );
 
-      // Redirect to home after successful login
+      // 🔥 ONLY ADDITION (fixes refresh issue)
+      window.dispatchEvent(new Event("basho-login"));
+
       navigate("/");
     } catch (err) {
       setMessage(err.response?.data?.message || "Invalid OTP");
@@ -96,7 +96,6 @@ export default function AuthPage() {
   return (
     <div className="auth-page">
       <div className="auth-container">
-        {/* LEFT SECTION - BRANDING */}
         <div className="auth-branding">
           <div className="branding-content">
             <h1 className="branding-title">Welcome to Basho</h1>
@@ -105,35 +104,34 @@ export default function AuthPage() {
             </p>
             <div className="branding-divider"></div>
             <p className="branding-description">
-              Join our community to explore handcrafted pottery, exclusive workshops, and the timeless beauty of traditional Japanese ceramics.
+              Join our community to explore handcrafted pottery,
+              exclusive workshops, and timeless ceramics.
             </p>
           </div>
         </div>
 
-        {/* RIGHT SECTION - FORM */}
         <div className="auth-form-section">
           <div className="auth-form-wrapper">
             {step === "login" && (
               <>
                 <h2 className="auth-title">Login or Sign Up</h2>
                 <p className="auth-subtitle">
-                  Enter your email to get started
+                  Enter your email to continue
                 </p>
 
                 <form onSubmit={handleLoginSubmit} noValidate>
                   <div className="form-group">
-                    <label htmlFor="email">Email Address</label>
+                    <label>Email Address</label>
                     <input
-                      id="email"
                       ref={inputRef}
                       type="email"
                       className="auth-input"
                       placeholder="your@email.com"
+                      disabled={loading}
                       onInput={() => {
                         inputRef.current.setCustomValidity("");
                         setMessage("");
                       }}
-                      disabled={loading}
                     />
                   </div>
 
@@ -143,40 +141,32 @@ export default function AuthPage() {
                 </form>
 
                 {message && <p className="auth-error">{message}</p>}
-
-                <p className="auth-terms">
-                  By signing in, you agree to our Terms of Service and Privacy Policy
-                </p>
               </>
             )}
 
             {step === "otp" && (
               <>
-                <h2 className="auth-title">Verify Your Email</h2>
+                <h2 className="auth-title">Verify Email</h2>
                 <p className="auth-subtitle">
-                  We've sent a code to<br />
-                  <strong>{maskEmail(contact)}</strong>
+                  Code sent to <strong>{maskEmail(contact)}</strong>
                 </p>
 
                 <div className="otp-container">
-                  <div className="otp-boxes">
-                    {[...Array(6)].map((_, i) => (
-                      <input
-                        key={i}
-                        ref={(el) => (otpRefs.current[i] = el)}
-                        className="otp-input"
-                        maxLength="1"
-                        placeholder={String(i + 1)}
-                        onChange={(e) => {
-                          e.target.value = e.target.value.replace(/\D/g, "");
-                          if (e.target.value && otpRefs.current[i + 1]) {
-                            otpRefs.current[i + 1].focus();
-                          }
-                        }}
-                        disabled={loading}
-                      />
-                    ))}
-                  </div>
+                  {[...Array(6)].map((_, i) => (
+                    <input
+                      key={i}
+                      ref={(el) => (otpRefs.current[i] = el)}
+                      className="otp-input"
+                      maxLength="1"
+                      disabled={loading}
+                      onChange={(e) => {
+                        e.target.value = e.target.value.replace(/\D/g, "");
+                        if (e.target.value && otpRefs.current[i + 1]) {
+                          otpRefs.current[i + 1].focus();
+                        }
+                      }}
+                    />
+                  ))}
                 </div>
 
                 <button
@@ -189,18 +179,17 @@ export default function AuthPage() {
 
                 {message && <p className="auth-error">{message}</p>}
 
-                <button 
-                  type="button"
+                <button
                   className="auth-back-btn"
+                  disabled={loading}
                   onClick={() => {
                     setStep("login");
                     setContact("");
                     setMessage("");
                     inputRef.current?.focus();
                   }}
-                  disabled={loading}
                 >
-                  ← Back to Email
+                  ← Back
                 </button>
               </>
             )}
