@@ -4,7 +4,7 @@ import "./Chatbot.css";
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "Hi 🌿 I’m BASHO AI. How can I help you today?" }
+    { sender: "bot", text: "Hi 🏺 I’m BASHO AI. How can I help you today?" }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
