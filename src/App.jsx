@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useAppEffects } from "./AppEffects";  // Import the effects hook
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { useAppEffects } from "./AppEffects";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Philosophy from "./components/Philosophy";
@@ -14,7 +14,9 @@ import BashoAbout from "./pages/BashoAbout/About";
 import CareGuide from "./pages/CareGuide";
 import WishlistPage from "./pages/WishlistPage";
 import CartPage from "./pages/CartPage";
-import ActionSection from "./components/ActionSection"; // ✅ ADD THIS
+import GalleryPage from "./pages/GalleryPage";
+import ActionSection from "./components/ActionSection";
+import Chatbot from "./components/Chatbot"; // ✅ ADD THIS
 import "./index.css";
 
 // Home Page Component
@@ -25,34 +27,45 @@ function HomePage() {
       <Philosophy />
       <ProductScroll />
       <Workshops />
-
-      {/* ✅ Event Booking + Collaborate Section */}
       <ActionSection />
-
       <Journey />
       <Footer />
     </>
   );
 }
 
-// Main App with Routing
+// Routes Component
+function AppRoutes() {
+  const location = useLocation();
+
+  return (
+    <div key={location.pathname}>
+      <Routes location={location}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/workshops" element={<WorkshopsPage />} />
+        <Route path="/care-guide" element={<CareGuide />} />
+        <Route path="/about-basho" element={<BashoAbout />} />
+        <Route path="/gallery" element={<GalleryPage />} />
+        <Route path="/wishlist" element={<WishlistPage />} />
+        <Route path="/cart" element={<CartPage />} />
+      </Routes>
+    </div>
+  );
+}
+
+// Main App
 function App() {
-  // Call the effects hook - this enables scroll animations and other effects
   useAppEffects();
 
   return (
     <Router>
       <Navbar />
       <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/workshops" element={<WorkshopsPage />} />
-        <Route path="/care-guide" element={<CareGuide />} />
-        <Route path="/about-basho" element={<BashoAbout />} />
-        <Route path="/wishlist" element={<WishlistPage />} />
-        <Route path="/cart" element={<CartPage />} />
-      </Routes>
+      <AppRoutes />
+
+      {/* 🤖 AI Chatbot – global */}
+      <Chatbot />
     </Router>
   );
 }
