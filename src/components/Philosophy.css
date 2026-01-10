@@ -35,35 +35,35 @@
   position: relative;
 }
 
-/* Main flex wrapper */
+/* Main flex wrapper - ensures side-by-side alignment */
 .philosophy-flex-container {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between; /* Keeps clear separation */
   width: 100%;
-  max-width: 1400px;
-  height: 100%;
+  max-width: 1200px; /* Tightened for better focus */
+  height: 80vh; /* Prevents edge-to-edge stretching */
   position: relative;
   padding: 0 5%;
 }
 
 /* Left side text stack */
 .philosophy-left-stack {
-  width: 50%;
+  width: 45%;
   height: 100%;
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: center; /* Vertically centers the active text */
 }
 
 /* Right side image stack */
 .philosophy-right-stack {
-  width: 50%;
+  width: 45%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease, transform 0.5s ease;
   z-index: 2;
 }
 
@@ -76,13 +76,13 @@
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
+  pointer-events: none; /* Prevents overlapping text from blocking clicks */
 }
 
-/* Alignment for Intro and Quote (Full Width Centering) */
-.reveal-text-item.intro,
+/* Special Alignment for Quote (Centers it in the screen) */
 .reveal-text-item.quote {
-  width: 180%; 
-  left: 10%;
+  width: 200%; /* Spans across the gap left by the hidden image */
+  left: 0;
   align-items: center;
   text-align: center;
 }
@@ -90,33 +90,33 @@
 /* Title Styles */
 .reveal-title {
   font-family: "Serif", serif;
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
   color: #333;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
+  line-height: 1.2;
 }
 
-/* Quote font styling */
+/* Quote specific title */
 .reveal-text-item.quote .reveal-title {
   font-size: clamp(1.5rem, 3vw, 2.2rem);
   font-style: italic;
   font-weight: 400;
-  line-height: 1.5;
-  max-width: 900px;
+  line-height: 1.6;
+  max-width: 800px;
 }
 
 /* Gold Divider Line */
 .title-divider {
-  width: 60px;
+  width: 50px;
   height: 2px;
-  background-color: #c5a386; /* Match gold/tan color from images */
-  margin: 10px 0 25px 0;
+  background-color: #c5a386;
+  margin: 15px 0 25px 0;
 }
 
-/* Center divider for Intro, Quote, and Header */
-.reveal-text-item.intro .title-divider,
+/* Center divider for Quote and Intro Header */
 .reveal-text-item.quote .title-divider,
 .philosophy-intro-header .title-divider {
-  margin: 15px auto 25px auto;
+  margin: 20px auto;
 }
 
 /* Description Text */
@@ -124,24 +124,19 @@
   font-size: 1.1rem;
   line-height: 1.8;
   color: #666;
-  max-width: 550px;
+  max-width: 480px;
 }
 
-/* Center description for Intro and Quote */
-.reveal-text-item.intro .reveal-desc,
-.reveal-text-item.quote .reveal-desc {
-  max-width: 800px;
-}
-
-/* Image Frame Container */
+/* Image Frame Container - The "Perfect" alignment anchor */
 .image-frame {
   position: relative;
-  width: 400px;
-  height: 550px;
-  background: #eee;
-  border-radius: 20px;
+  width: 100%;
+  max-width: 420px; /* Limits size on large screens */
+  aspect-ratio: 4 / 5; /* Maintains consistent proportions */
+  background: #f0ede9;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
 }
 
 .philosophy-image {
@@ -150,29 +145,37 @@
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* Ensures images fill frame without distortion */
+  display: block;
 }
 
-/* Responsive adjustments */
+/* Mobile & Tablet Responsive */
 @media (max-width: 1024px) {
   .philosophy-flex-container {
     flex-direction: column;
+    justify-content: center;
+    gap: 40px;
   }
-  .philosophy-left-stack, .philosophy-right-stack {
+  
+  .philosophy-left-stack, 
+  .philosophy-right-stack {
     width: 100%;
-    height: 50%;
+    height: auto;
+    min-height: 300px;
   }
+
   .reveal-text-item {
     align-items: center;
     text-align: center;
-    top: 20%;
+    position: relative; /* Switch to relative for easier mobile flow if needed */
   }
-  .reveal-text-item.intro, .reveal-text-item.quote {
+
+  .reveal-text-item.quote {
     width: 100%;
-    left: 0;
   }
+
   .image-frame {
-    width: 280px;
-    height: 380px;
+    width: 300px;
+    height: 400px;
   }
 }

@@ -1024,3 +1024,83 @@ section h2::after {
     padding: 0.8rem 1.5rem;
   }
 }
+/* ===============================
+   COLLECTION-STYLE WORKSHOPS
+================================ */
+
+.collection-section {
+  padding: 6rem 2rem;
+  background: #f6efe7;
+  text-align: center;
+}
+
+.collection-scroll {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2.5rem;
+  padding: 3rem 3rem 1rem;
+}
+
+.collection-card {
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.collection-card:hover {
+  transform: translateY(-8px);
+}
+
+.collection-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.collection-info {
+  padding: 1.5rem;
+  text-align: left;
+}
+
+.collection-info h3 {
+  font-family: "Playfair Display", serif;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.collection-price {
+  display: inline-block;
+  font-size: 0.9rem;
+  color: #a36a4f;
+  margin-bottom: 0.8rem;
+}
+
+.collection-info p {
+  font-size: 0.95rem;
+  color: #6f6a66;
+  line-height: 1.5;
+}
+
+/* BUTTON SAME AS COLLECTION */
+.section-button-wrapper {
+  margin-top: 2.5rem;
+}
+
+.more-button {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  border: 1px solid #6f4b3e;
+  border-radius: 30px;
+  color: #6f4b3e;
+  text-decoration: none;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.more-button:hover {
+  background: #6f4b3e;
+  color: #fff;
+}

@@ -7,7 +7,11 @@ const router = express.Router();
 // POST - Create Razorpay order
 router.post("/create-order", async (req, res) => {
   try {
-    const { amount, currency = "INR", receipt } = req.body;
+    if (!razorpay) {
+      return res.status(503).json({ error: "Payment service not configured" });
+    }
+
+    const { amount } = req.body;
 
     const options = {
       amount: Math.round(amount * 100), // Convert to paise
