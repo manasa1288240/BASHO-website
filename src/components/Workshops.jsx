@@ -6,44 +6,40 @@ export default function Workshops() {
     {
       img: workshopImg,
       title: "Wheel Throwing",
-      duration: "3 hours",
+      duration: "3 Hours",
       description: "Master the fundamentals of throwing on the potter's wheel",
     },
     {
       img: workshopImg,
       title: "Hand-Building Techniques",
-      duration: "4 hours",
-      description: "Explore coil, slab, and pinch techniques to create unique forms",
+      duration: "4 Hours",
+      description:
+        "Explore coil, slab, and pinch techniques to create unique forms",
     },
     {
       img: workshopImg,
       title: "Glazing Masterclass",
-      duration: "2 hours",
+      duration: "2 Hours",
       description: "Learn the art of mixing and applying beautiful glazes",
     },
   ];
 
   return (
-    <section id="workshops" className="workshops-section">
+    <section className="collection-section">
       <h2 className="section-title">Workshops</h2>
       <p className="section-subtitle">
         Learn the meditative art of pottery in our hands-on classes
       </p>
 
-      <div className="workshops-grid">
+      <div className="collection-scroll">
         {workshops.map((workshop, index) => (
-          <div key={index} className="workshop-card">
-            <div className="workshop-image-wrapper">
-              <img
-                src={workshop.img}
-                alt={workshop.title}
-                className="workshop-image"
-              />
-            </div>
-            <div className="workshop-info">
+          <div key={index} className="collection-card">
+            <img src={workshop.img} alt={workshop.title} />
+
+            <div className="collection-info">
               <h3>{workshop.title}</h3>
-              <p className="workshop-duration">{workshop.duration}</p>
-              <p className="workshop-description">{workshop.description}</p>
+              <span className="collection-price">{workshop.duration}</span>
+              <p>{workshop.description}</p>
             </div>
           </div>
         ))}
