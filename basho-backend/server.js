@@ -6,6 +6,7 @@ const connectDB = require("./config/db");
 const workshopRoutes = require("./routes/workshopRoutes");
 const productRoutes = require("./routes/productRoutes");
 const authRoutes = require("./routes/authRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const chatbotRoutes = require("./routes/chatbotRoutes"); // ✅ Chatbot
@@ -32,6 +33,7 @@ app.get("/", (req, res) => {
 app.use("/api/workshops", workshopRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/payment", paymentRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/chatbot", chatbotRoutes); // ✅ Chatbot route

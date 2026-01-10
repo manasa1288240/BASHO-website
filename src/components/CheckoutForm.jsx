@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./CheckoutForm.css";
 
 export default function CheckoutForm({ items, total, onClose, onBack }) {
@@ -10,12 +10,18 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
     city: "",
     state: "",
     pincode: "",
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
   });
 
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Load Razorpay script
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
 
   // Helper function to extract numeric price
   const getNumericPrice = (price) => {
@@ -29,8 +35,9 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     // Validate required fields
     if (
@@ -40,12 +47,10 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
       !formData.address ||
       !formData.city ||
       !formData.state ||
-      !formData.pincode ||
-      !formData.cardNumber ||
-      !formData.expiryDate ||
-      !formData.cvv
+      !formData.pincode
     ) {
       alert("Please fill in all fields");
+      setLoading(false);
       return;
     }
 
@@ -53,29 +58,100 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       alert("Please enter a valid email");
+      setLoading(false);
       return;
     }
 
     // Validate phone
     if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ""))) {
       alert("Please enter a valid 10-digit phone number");
+      setLoading(false);
       return;
     }
 
     // Validate pincode
     if (!/^\d{6}$/.test(formData.pincode)) {
       alert("Please enter a valid 6-digit pincode");
+      setLoading(false);
       return;
     }
 
-    // Validate card number (basic check - 16 digits)
-    if (!/^\d{16}$/.test(formData.cardNumber.replace(/\s/g, ""))) {
-      alert("Please enter a valid 16-digit card number");
-      return;
-    }
+    try {
+      // Create order
+      const orderRes = await fetch("http://localhost:5000/api/payment/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: total,
+          currency: "INR",
+          receipt: `order-${Date.now()}`
+        })
+      });
 
-    console.log("Order placed:", formData);
-    setOrderPlaced(true);
+      if (!orderRes.ok) {
+        throw new Error(`Server error: ${orderRes.status} ${orderRes.statusText}`);
+      }
+
+      const orderData = await orderRes.json();
+      if (!orderData.success) throw new Error(orderData.error || "Failed to create order");
+
+      // Open Razorpay checkout
+      const options = {
+        key: "rzp_test_S1ra8fUDoBRjlX",
+        amount: orderData.amount,
+        currency: orderData.currency,
+        order_id: orderData.orderId,
+        name: "BASHO",
+        description: "Product Purchase",
+        prefill: {
+          name: formData.fullName,
+          email: formData.email,
+          contact: formData.phone
+        },
+        handler: async (response) => {
+          try {
+            const verifyRes = await fetch("http://localhost:5000/api/payment/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                orderData: {
+                  ...formData,
+                  items: items,
+                  amount: total
+                }
+              })
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyData.success) {
+              setOrderPlaced(true);
+            } else {
+              alert("Payment verification failed: " + verifyData.error);
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Error verifying payment");
+          }
+          setLoading(false);
+        },
+        modal: {
+          ondismiss: () => {
+            setLoading(false);
+            alert("Payment cancelled");
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error(err);
+      alert("Error: " + err.message);
+      setLoading(false);
+    }
   };
 
   if (orderPlaced) {
@@ -95,6 +171,18 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
             <p className="confirmation-email">
               A confirmation email has been sent to {formData.email}
             </p>
+            <div className="order-items">
+              <h4>Items Ordered:</h4>
+              {items.map((item, idx) => (
+                <div key={idx} className="order-item">
+                  <span>{item.name || item.title}</span>
+                  <span>₹{getNumericPrice(item.price).toFixed(2)}</span>
+                </div>
+              ))}
+              <div className="order-total">
+                <strong>Total Amount: ₹{total.toFixed(2)}</strong>
+              </div>
+            </div>
             <button className="close-order-btn" onClick={onClose}>
               Continue Shopping
             </button>
@@ -203,42 +291,9 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
             {/* Payment Information */}
             <div className="form-section">
               <h3>Payment Information</h3>
-
-              <div className="form-group">
-                <label>Card Number *</label>
-                <input
-                  type="text"
-                  name="cardNumber"
-                  value={formData.cardNumber}
-                  onChange={handleChange}
-                  placeholder="1234 5678 9012 3456"
-                  maxLength="16"
-                />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Expiry Date *</label>
-                  <input
-                    type="text"
-                    name="expiryDate"
-                    value={formData.expiryDate}
-                    onChange={handleChange}
-                    placeholder="MM/YY"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>CVV *</label>
-                  <input
-                    type="text"
-                    name="cvv"
-                    value={formData.cvv}
-                    onChange={handleChange}
-                    placeholder="123"
-                    maxLength="4"
-                  />
-                </div>
-              </div>
+              <p className="payment-info">
+                You will be redirected to Razorpay secure payment gateway
+              </p>
             </div>
 
             {/* Order Summary */}
@@ -258,8 +313,8 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
               </div>
             </div>
 
-            <button type="submit" className="place-order-btn">
-              Place Order
+            <button type="submit" className="place-order-btn" disabled={loading}>
+              {loading ? "Processing..." : `Pay ₹${total.toFixed(2)} with Razorpay`}
             </button>
           </form>
         </div>
