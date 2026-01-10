@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import { useAppEffects } from "./AppEffects";  // Import the effects hook
+import { useAppEffects } from "./AppEffects";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Philosophy from "./components/Philosophy";
@@ -15,7 +15,8 @@ import CareGuide from "./pages/CareGuide";
 import WishlistPage from "./pages/WishlistPage";
 import CartPage from "./pages/CartPage";
 import GalleryPage from "./pages/GalleryPage";
-import ActionSection from "./components/ActionSection"; // ✅ ADD THIS
+import ActionSection from "./components/ActionSection";
+import Chatbot from "./components/Chatbot"; // ✅ ADD THIS
 import "./index.css";
 
 // Home Page Component
@@ -26,17 +27,14 @@ function HomePage() {
       <Philosophy />
       <ProductScroll />
       <Workshops />
-
-      {/* ✅ Event Booking + Collaborate Section */}
       <ActionSection />
-
       <Journey />
       <Footer />
     </>
   );
 }
 
-// Routes Component - needs to be inside Router context
+// Routes Component
 function AppRoutes() {
   const location = useLocation();
 
@@ -56,9 +54,8 @@ function AppRoutes() {
   );
 }
 
-// Main App with Routing
+// Main App
 function App() {
-  // Call the effects hook - this enables scroll animations and other effects
   useAppEffects();
 
   return (
@@ -66,6 +63,9 @@ function App() {
       <Navbar />
       <ScrollToTop />
       <AppRoutes />
+
+      {/* 🤖 AI Chatbot – global */}
+      <Chatbot />
     </Router>
   );
 }
