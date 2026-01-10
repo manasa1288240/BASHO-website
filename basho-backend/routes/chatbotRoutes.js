@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const fetch = (...args) =>
-  import("node-fetch").then(({ default: fetch }) => fetch(...args));
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-// ================= DATA =================
+// ===== Website Data =====
 const productsData = [
   { name: "Fluted Stoneware Bowls", category: "Bowls", price: 2800 },
   { name: "Minimal Studio Mugs", category: "Cups", price: 1900 },
@@ -25,143 +24,163 @@ const workshopsData = [
 ];
 
 const careTips = [
-  "Hand wash pottery with mild soap",
-  "Avoid sudden temperature changes",
-  "Do not use abrasive scrubbers",
-  "Store carefully to avoid chipping"
+  "Hand wash your pottery with mild soap to avoid cracks.",
+  "Avoid sudden temperature changes; don’t put hot pottery directly in cold water.",
+  "Do not use abrasive cleaning pads or harsh chemicals.",
+  "Store pottery carefully to prevent chipping."
 ];
 
-// ================= HELPERS =================
-const avg = (arr) =>
-  Math.round(arr.reduce((s, i) => s + i.price, 0) / arr.length);
+const customOrders = [
+  "We accept custom orders for mugs, bowls, and plates.",
+  "Custom orders may take 1–2 weeks depending on complexity.",
+  "Contact us via the Custom Orders page on our website to place your order."
+];
 
-// ================= ROUTE =================
+// ===== Helper Functions =====
+function getAveragePrice(products, category = null) {
+  const filtered = category
+    ? products.filter(p => p.category.toLowerCase() === category.toLowerCase())
+    : products;
+  if (filtered.length === 0) return 0;
+  return Math.round(filtered.reduce((sum, p) => sum + p.price, 0) / filtered.length);
+}
+
+function getProductsUnderBudget(products, budget, category = null) {
+  const filtered = category
+    ? products.filter(p => p.category.toLowerCase() === category.toLowerCase())
+    : products;
+  return filtered.filter(p => p.price <= budget);
+}
+
+function getWorkshopsUnderBudget(workshops, budget) {
+  return workshops.filter(w => w.price <= budget);
+}
+
+// ===== POST /api/chatbot =====
 router.post("/", async (req, res) => {
-  const { message } = req.body;
-  if (!message || !message.trim()) {
-    return res.json({ reply: "Please ask something 😊" });
-  }
+  try {
+    const { message } = req.body;
+    if (!message || message.trim() === "") {
+      return res.status(400).json({ error: "Message is required" });
+    }
 
-  const lower = message.toLowerCase();
-  let handled = false;
+    const lowerMsg = message.toLowerCase().trim();
 
-  // ===== GREETINGS =====
-  if (lower === "hi" || lower === "hello" || lower.includes("hey")) {
-    handled = true;
-    return res.json({
-      reply:
-        "Hi 🌿 I’m BASHO AI. I can help you with pottery products, workshops, care tips, or budget suggestions."
-    });
-  }
+    // ===== BASIC CONVERSATION HANDLING =====
+    if (["hi", "hello", "hey", "hai"].some(greet => lowerMsg === greet || lowerMsg.startsWith(greet))) {
+      return res.json({
+        reply: "🏺 Hi! I’m **BASHO AI**. I can help you explore our pottery products, prices, workshops, budgets, and care tips. What would you like to know?"
+      });
+    }
 
-  // ===== THANKS =====
-  if (lower.includes("thank")) {
-    handled = true;
-    return res.json({
-      reply: "You’re welcome 🌿 Happy to help anytime!"
-    });
-  }
+    if (lowerMsg.includes("thank")) {
+      return res.json({
+        reply: "🏺 You’re very welcome! Happy to help anytime. Let me know if you’d like product details, prices, or workshop info."
+      });
+    }
 
-  // ===== BYE =====
-  if (lower.includes("bye")) {
-    handled = true;
-    return res.json({
-      reply: "Bye 👋 Hope to see you again at BASHO!"
-    });
-  }
+    if (lowerMsg.includes("bye") || lowerMsg.includes("goodbye")) {
+      return res.json({
+        reply: "🏺 Goodbye! Hope to see you again at BASHO. Have a calm, creative day 🤍"
+      });
+    }
 
-  // ===== BUDGET =====
-  const budgetMatch = message.match(/\b(?:₹|rs)?\s?(\d{3,6})\b/i);
-  if (budgetMatch) {
-    const budget = parseInt(budgetMatch[1]);
-    const products = productsData.filter(p => p.price <= budget);
-    const workshops = workshopsData.filter(w => w.price <= budget);
+    if (lowerMsg.includes("who are you")) {
+      return res.json({
+        reply: "🏺 I’m **BASHO AI**, your pottery assistant. I help with product details, price ranges, workshops, budgets, care tips, and custom orders."
+      });
+    }
 
-    handled = true;
-    return res.json({
-      reply:
-        `🌿 With ₹${budget}, you can consider:\n\n` +
-        (products.length
-          ? "Products:\n" +
-            products.map(p => `- ${p.name}: ₹${p.price}`).join("\n")
-          : "No products under this budget.") +
-        "\n\n" +
-        (workshops.length
-          ? "Workshops:\n" +
-            workshops.map(w => `- ${w.name}: ₹${w.price}`).join("\n")
-          : "No workshops under this budget.")
-    });
-  }
+    if (lowerMsg.includes("help") || lowerMsg.includes("what can you do")) {
+      return res.json({
+        reply: "🏺 I can help you with:\n• Product details & prices\n• Budget-based recommendations\n• Workshop info\n• Average price ranges\n• Pottery care tips\n• Custom orders\n\nJust ask naturally 🙂"
+      });
+    }
 
-  // ===== AVERAGE =====
-  if (lower.includes("average")) {
-    handled = true;
-    return res.json({
-      reply:
-        `🌿 Average product price is ₹${avg(productsData)}.` +
-        ` Average workshop price is ₹${avg(workshopsData)}.`
-    });
-  }
+    // ===== Detect category =====
+    let category = null;
+    if (lowerMsg.includes("cups")) category = "Cups";
+    else if (lowerMsg.includes("bowls")) category = "Bowls";
+    else if (lowerMsg.includes("plates")) category = "Plates";
+    else if (lowerMsg.includes("workshop")) category = "Workshops";
 
-  // ===== WORKSHOPS =====
-  if (lower.includes("workshop")) {
-    handled = true;
-    return res.json({
-      reply:
-        "🌿 Our workshops:\n" +
-        workshopsData
-          .map(w => `- ${w.name}: ₹${w.price} (${w.duration})`)
-          .join("\n")
-    });
-  }
+    // ===== Detect budget =====
+    const budgetMatch = message.match(/\b(?:₹|rs|inr)?\s?(\d{3,6})\b/i);
+    const budget = budgetMatch ? parseInt(budgetMatch[1]) : null;
 
-  // ===== CARE TIPS =====
-  if (lower.includes("care")) {
-    handled = true;
-    return res.json({
-      reply: "🌿 Pottery care tips:\n- " + careTips.join("\n- ")
-    });
-  }
+    // ===== Category + budget logic =====
+    if (budget && category && category !== "Workshops") {
+      const products = getProductsUnderBudget(productsData, budget, category);
+      const reply =
+        products.length > 0
+          ? `🏺 ${category} under ₹${budget}:\n` +
+            products.map(p => `• ${p.name} – ₹${p.price}`).join("\n")
+          : `🏺 No ${category.toLowerCase()} found under ₹${budget}.`;
+      return res.json({ reply });
+    }
 
-  // ===== GEMINI AI (ONLY IF NOT HANDLED) =====
-  if (!handled && process.env.GEMINI_API_KEY) {
-    try {
-      const prompt = `
-You are BASHO AI, a pottery assistant.
-Answer ONLY if the question is related to pottery, products, workshops, or care.
-If not relevant, reply: "I don’t have information on that yet."
+    if (budget && category === "Workshops") {
+      const workshops = getWorkshopsUnderBudget(workshopsData, budget);
+      const reply =
+        workshops.length > 0
+          ? `🏺 Workshops under ₹${budget}:\n` +
+            workshops.map(w => `• ${w.name} – ₹${w.price} (${w.duration})`).join("\n")
+          : `🏺 No workshops available under ₹${budget}.`;
+      return res.json({ reply });
+    }
 
-User question: ${message}
-`;
+    // ===== Average price =====
+    if (lowerMsg.includes("average price") || lowerMsg.includes("average cost")) {
+      if (category && category !== "Workshops") {
+        return res.json({
+          reply: `🏺 The average price of ${category.toLowerCase()} is ₹${getAveragePrice(productsData, category)}.`
+        });
+      }
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
-        }
+      const avgProduct = getAveragePrice(productsData);
+      const avgWorkshop = Math.round(
+        workshopsData.reduce((s, w) => s + w.price, 0) / workshopsData.length
       );
 
-      const data = await response.json();
-      const aiReply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-      if (aiReply && aiReply.trim()) {
-        handled = true;
-        return res.json({ reply: aiReply });
-      }
-    } catch (err) {
-      console.error("Gemini error:", err.message);
+      return res.json({
+        reply: `🏺 Average product price is ₹${avgProduct}, and average workshop price is ₹${avgWorkshop}.`
+      });
     }
-  }
 
-  // ===== GRACEFUL FALLBACK =====
-  return res.json({
-    reply:
-      "🌿 I’m sorry, I don’t have information on that yet. I can help you with pottery products, workshops, care tips, or budget-related questions."
-  });
+    // ===== Gemini AI fallback =====
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: message }] }],
+              generationConfig: { temperature: 0.7, maxOutputTokens: 300 }
+            })
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (reply) return res.json({ reply });
+        }
+      } catch (err) {
+        console.warn("Gemini API failed");
+      }
+    }
+
+    // ===== Final fallback =====
+    return res.json({
+      reply: "🏺 I can help with pottery products, prices, workshops, budgets, and care tips. Try asking something like *“cups under 2000”* or *“average workshop cost”*."
+    });
+
+  } catch (error) {
+    console.error("Chatbot error:", error.message);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 module.exports = router;
