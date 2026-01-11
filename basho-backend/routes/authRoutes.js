@@ -1,6 +1,7 @@
 const express = require("express");
 const User = require("../models/User");
 const sendEmail = require("../utils/sendEmail");
+const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
@@ -69,6 +70,44 @@ router.post("/verify-otp", async (req, res) => {
     res.json({
       message: "Login successful",
       user: { email: user.email },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+/**
+ * ADMIN LOGIN
+ */
+router.post("/admin-login", async (req, res) => {
+  try {
+    console.log("ADMIN LOGIN BODY --->", req.body);
+
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    // Demo admin credentials (In production, use a separate Admin model with proper hashing)
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@basho.com";
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+
+    if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+      return res.status(401).json({ message: "Invalid admin credentials" });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { email: email, role: "admin" },
+      process.env.JWT_SECRET || "your-secret-key",
+      { expiresIn: "24h" }
+    );
+
+    res.json({
+      message: "Admin login successful",
+      token: token,
+      email: email,
     });
   } catch (error) {
     console.error(error);

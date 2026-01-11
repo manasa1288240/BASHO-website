@@ -11,7 +11,11 @@ router.post("/create-order", async (req, res) => {
       return res.status(503).json({ error: "Payment service not configured" });
     }
 
-    const { amount } = req.body;
+    const { amount, currency = "INR", receipt } = req.body;
+
+    if (!amount) {
+      return res.status(400).json({ error: "Amount is required" });
+    }
 
     const options = {
       amount: Math.round(amount * 100), // Convert to paise
@@ -27,6 +31,7 @@ router.post("/create-order", async (req, res) => {
       currency: order.currency,
     });
   } catch (error) {
+    console.error("Payment order creation error:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

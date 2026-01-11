@@ -27,6 +27,22 @@ import CartPage from "./pages/CartPage";
 import GalleryPage from "./pages/GalleryPage";
 import AuthPage from "./pages/AuthPage";
 
+// Admin imports
+import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminWorkshops from "./pages/admin/AdminWorkshops";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminPayments from "./pages/admin/AdminPayments";
+import AdminCustomers from "./pages/admin/AdminCustomers";
+import AdminEvents from "./pages/admin/AdminEvents";
+import AdminGallery from "./pages/admin/AdminGallery";
+import AdminTestimonials from "./pages/admin/AdminTestimonials";
+import AdminSettings from "./pages/admin/AdminSettings";
+
 import "./index.css";
 
 /* ---------------- HOME PAGE ---------------- */
@@ -60,6 +76,31 @@ function AppRoutes() {
         <Route path="/gallery" element={<GalleryPage />} />
         <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/cart" element={<CartPage />} />
+
+        {/* ✅ ADMIN ROUTES */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route
+          path="/admin/*"
+          element={
+            <AdminProtectedRoute>
+              <Routes location={location}>
+                <Route element={<AdminLayout />}>
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="users" element={<AdminUsers />} />
+                  <Route path="workshops" element={<AdminWorkshops />} />
+                  <Route path="products" element={<AdminProducts />} />
+                  <Route path="orders" element={<AdminOrders />} />
+                  <Route path="payments" element={<AdminPayments />} />
+                  <Route path="customers" element={<AdminCustomers />} />
+                  <Route path="events" element={<AdminEvents />} />
+                  <Route path="gallery" element={<AdminGallery />} />
+                  <Route path="testimonials" element={<AdminTestimonials />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                </Route>
+              </Routes>
+            </AdminProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );
