@@ -92,7 +92,7 @@ export default function ProductsPage() {
 
       {/* FILTERS */}
       <div className="filters">
-        {["All", "Bowls", "Plates", "Cups"].map((filter) => (
+        {["All", "Mugs", "Plates", "Platter/Cheeseboard","Bowls","Vase","Fancy","Picasso Limited Collection"].map((filter) => (
           <button
             key={filter}
             className={activeFilter === filter ? "active" : ""}

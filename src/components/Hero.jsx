@@ -1,5 +1,6 @@
 import claybg from "../assets/claybg.jpg";
 import elegant from "../assets/elegant.jpg";
+import bg2 from "../assets/bg2.jpeg";
 import "./Hero.css";
 
 export default function Hero() {
@@ -8,7 +9,7 @@ export default function Hero() {
       {/* Left Side - Images */}
       <div className="hero-left">
         <div className="hero-image-container">
-          <img src={elegant} alt="Clay Background" className="hero-clay-bg" />
+          <img src={bg2} alt="Clay Background" className="hero-clay-bg" />
         </div>
       </div>
 

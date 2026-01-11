@@ -359,11 +359,24 @@
 
 .detail-meta {
   display: flex;
-  gap: 2rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid #efe8e2;
+  flex-direction: column;
+  gap: 0.4rem;          /* controlled spacing */
+  margin: 1rem 0;
 }
+
+.detail-meta p {
+  margin: 0;            /* 🔴 IMPORTANT */
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+.detail-meta strong {
+  color: #000;
+  font-weight: 600;
+}
+
+
 
 .meta-item {
   font-size: 0.95rem;
@@ -659,4 +672,301 @@
     height: 35px;
     font-size: 1.2rem;
   }
+}
+/* ===============================
+   WORKSHOP & CUSTOM FORM STYLES
+================================ */
+/* ===============================
+   CUSTOM WORKSHOP FORM
+================================ */
+
+.custom-form {
+  max-width: 520px;
+  margin: 60px auto;
+  padding: 28px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+}
+
+.custom-form h2 {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.custom-form .form-note {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 18px;
+}
+
+/* Inputs fill box */
+.custom-form input,
+.custom-form textarea {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+  font-size: 0.95rem;
+}
+
+.custom-form input:focus,
+.custom-form textarea:focus {
+  outline: none;
+  border-color: #c89b63;
+  background: #fff;
+}
+
+/* Preference blocks */
+.preference-group {
+  margin-bottom: 14px;
+}
+
+.preference-group label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.preference-group input {
+  margin-bottom: 8px;
+}
+
+/* Disclaimer */
+.disclaimer {
+  font-size: 0.8rem;
+  color: #777;
+  margin-top: 10px;
+}
+
+/* Submit button */
+.custom-form button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 999px;
+  border: none;
+  background: #2e2a26;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+/* 🔥 Hover effect */
+.custom-form button:hover {
+  background: #c89b63;
+  transform: translateY(-2px);
+}
+
+/* Success message */
+.custom-form.success {
+  text-align: center;
+}
+
+.custom-form.success h2 {
+  margin-bottom: 10px;
+}
+
+.custom-form.success p {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* Session type selector */
+.session-type {
+  margin-bottom: 14px;
+}
+
+.session-type label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.radio-group {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.radio-group input {
+  accent-color: #c89b63;
+}
+
+/* Section Styles */
+.completed-area {
+  padding: 60px 0;
+  background-color: #f1ede9; /* Slightly darker than page background */
+  margin-top: 80px;
+}
+
+.grayscale-card {
+  filter: grayscale(100%);
+  opacity: 0.7;
+}
+
+.completed-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+/* Badge & Text Styles */
+.sold-out-badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: #c5421a;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  z-index: 10;
+}
+
+.seats-status {
+  margin: 5px 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.text-red { color: #c5421a; }
+.text-green { color: #2d6a4f; }
+
+/* Modal & Form Fixes */
+.modal-inner-scroll {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.booking-form-container {
+  padding: 20px;
+}
+
+.disabled-btn {
+  background: #999 !important;
+  cursor: not-allowed !important;
+}
+
+.form-summary {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+  text-align: right;
+}
+
+.total-price span {
+  font-size: 1.5rem;
+  color: #7c4a33;
+  font-weight: bold;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #efe8e2;
+  border-radius: 10px;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #371d15;
+  cursor: pointer;
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: #7c4a33;
+}
+
+.success-msg {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.success-msg h2 {
+  color: #2d6a4f;
+  margin-bottom: 15px;
+}
+
+/* TOAST NOTIFICATION */
+.toast-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 320px;
+  padding: 1.2rem;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 9999;
+  animation: slideIn 0.4s ease-out;
+  border-left: 6px solid #7c4a33;
+}
+.toast-message.error { border-left-color: #c5421a; }
+.toast-message.success { border-left-color: #2d6a4f; }
+.toast-content { display: flex; gap: 12px; align-items: center; }
+.toast-content p { margin: 0; font-weight: 600; color: #371d15; }
+.toast-close { background: none; border: none; cursor: pointer; font-size: 1.2rem; }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* COMPLETED SECTION */
+.completed-area {
+  padding: 60px 0;
+  background-color: #f1ede9;
+  margin-top: 80px;
+}
+.grayscale-card { filter: grayscale(100%); opacity: 0.7; }
+.completed-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+/* BADGES */
+.sold-out-badge {
+  position: absolute;
+  top: 15px; left: 15px;
+  background: #c5421a; color: white;
+  padding: 5px 12px; border-radius: 4px;
+  font-size: 0.75rem; z-index: 5;
+}
+.seats-status { margin: 5px 15px; font-size: 0.85rem; font-weight: 600; }
+.text-red { color: #c5421a; }
+.text-green { color: #2d6a4f; }
+
+/* MODAL FIXES */
+.disabled-btn { background: #999 !important; cursor: not-allowed !important; }
+.form-group select {
+  width: 100%; padding: 0.75rem; border: 2px solid #efe8e2;
+  border-radius: 10px; font-size: 1rem;
 }
