@@ -77,10 +77,13 @@ export default function AuthPage() {
         }
       );
 
-      localStorage.setItem(
-        "basho_user",
-        JSON.stringify(res.data.user)
-      );
+      // Save user info and token (if issued)
+      const user = res.data.user || {};
+      localStorage.setItem("basho_user", JSON.stringify(user));
+      if (res.data.token) {
+        localStorage.setItem("basho_token", res.data.token);
+        if (user.isAdmin) localStorage.setItem("admin_token", res.data.token);
+      }
 
       // 🔥 ONLY ADDITION (fixes refresh issue)
       window.dispatchEvent(new Event("basho-login"));

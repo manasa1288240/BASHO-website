@@ -14,6 +14,8 @@ const chatbotRoutes = require("./routes/chatbotRoutes");
 
 // ✅ NEW: Gallery routes
 const galleryRoutes = require("./routes/galleryRoutes");
+// Admin product management
+const adminProductRoutes = require("./routes/adminProductRoutes");
 
 const app = express();
 
@@ -50,6 +52,9 @@ app.use("/api/chatbot", chatbotRoutes);
 
 // ✅ NEW: Gallery API
 app.use("/api/gallery", galleryRoutes);
+
+// Admin routes
+app.use("/api/admin/products", adminProductRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

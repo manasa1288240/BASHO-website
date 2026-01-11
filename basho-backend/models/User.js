@@ -7,6 +7,15 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    // Password is optional (used for admin account)
+    password: {
+      type: String,
+    },
+    // Flag to identify the single admin user
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
     otp: String,
     otpExpiresAt: Date,
 
