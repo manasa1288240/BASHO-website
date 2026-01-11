@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
 import Footer from "../components/Footer";
 import "./GalleryPage.css";
 
-// Gallery images
+// PRODUCT images (UNCHANGED)
 import img1 from "../assets/gallery/img1.png";
 import img2 from "../assets/gallery/img2.png";
 import img3 from "../assets/gallery/img3.png";
@@ -23,36 +24,77 @@ import img16 from "../assets/gallery/img16.png";
 import img17 from "../assets/gallery/img17.png";
 import img18 from "../assets/gallery/img18.png";
 
-
-const images = [
+// PRODUCTS (static)
+const productImages = [
   img1, img2, img3, img4, img5, img6, img7,
   img8, img9, img10, img11, img12, img13,
   img14, img15, img16, img17, img18,
-];
+].map(img => ({ imageUrl: img, type: "product" }));
 
 const GalleryPage = () => {
+  const [activeTab, setActiveTab] = useState("all"); // NEW
+  const [workshops, setWorkshops] = useState([]);   // NEW
+  const [events, setEvents] = useState([]);         // NEW
+
+  // FETCH from MongoDB
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/gallery").then(res => {
+      const workshopImgs = res.data
+        .filter(i => i.category === "workshop")
+        .map(i => ({ imageUrl: i.imageUrl, type: "workshop" }));
+
+      const eventImgs = res.data
+        .filter(i => i.category === "event")
+        .map(i => ({ imageUrl: i.imageUrl, type: "event" }));
+
+      setWorkshops(workshopImgs);
+      setEvents(eventImgs);
+    });
+  }, []);
+
+  // COMBINED gallery
+  const allImages = [...productImages, ...workshops, ...events];
+
+  const visibleImages =
+    activeTab === "all"
+      ? allImages
+      : allImages.filter(img => img.type === activeTab);
+
   return (
     <>
       <section className="gallery-page">
-        <div className="gallery-intro">
+        <div className="gallery-story-intro">
           <h1>Our Story in Clay</h1>
           <p>Every piece unfolds as you scroll</p>
         </div>
 
+        {/* FILTER TABS (NEW) */}
+        <div className="gallery-tabs">
+          {["all", "product", "workshop", "event"].map(tab => (
+            <button
+              key={tab}
+              className={`gallery-tab ${activeTab === tab ? "active" : ""}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab === "all"
+                ? "All"
+                : tab.charAt(0).toUpperCase() + tab.slice(1) + "s"}
+            </button>
+          ))}
+        </div>
+
+        {/* GALLERY */}
         <div className="masonry-container">
-          {images.map((img, index) => (
+          {visibleImages.map((img, index) => (
             <motion.div
               key={index}
               className="gallery-card"
               initial={{ opacity: 0, y: 80, scale: 0.95 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: false, margin: "-100px" }}
-              transition={{
-                duration: 0.8,
-                ease: [0.16, 1, 0.3, 1],
-              }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              <img src={img} alt={`Gallery ${index}`} />
+              <img src={img.imageUrl} alt={img.type} />
             </motion.div>
           ))}
         </div>

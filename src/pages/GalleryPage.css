@@ -160,3 +160,30 @@
 .gallery-card.stacked:nth-child(4) { z-index: 15; }
 .gallery-card.stacked:nth-child(5) { z-index: 14; }
 
+/* ===== GALLERY TABS ===== */
+.gallery-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.gallery-tab {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: none;
+  background: #f1ede7;
+  color: #333;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.gallery-tab.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.gallery-tab:hover {
+  transform: translateY(-1px);
+}
