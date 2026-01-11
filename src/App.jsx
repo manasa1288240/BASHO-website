@@ -26,6 +26,8 @@ import WishlistPage from "./pages/WishlistPage";
 import CartPage from "./pages/CartPage";
 import GalleryPage from "./pages/GalleryPage";
 import AuthPage from "./pages/AuthPage";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 
 import "./index.css";
 
@@ -54,6 +56,8 @@ function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} /> {/* ✅ LOGIN PAGE */}
         <Route path="/products" element={<ProductsPage />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/workshops" element={<WorkshopsPage />} />
         <Route path="/care-guide" element={<CareGuide />} />
         <Route path="/about-basho" element={<BashoAbout />} />
