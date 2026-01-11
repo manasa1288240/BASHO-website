@@ -1,63 +1,72 @@
 import { useEffect, useState } from "react";
 import ProductList from "../components/admin/ProductList";
-
-function Nav({ onLogout }) {
-  return (
-    <div style={{ display: "flex", gap: 12, padding: 12, borderBottom: "1px solid #eee" }}>
-      <a href="/admin">Products</a>
-      <a href="/admin#orders">Orders</a>
-      <a href="/admin#workshops">Workshops</a>
-      <a href="/admin#customers">Customers</a>
-      <button onClick={onLogout} style={{ marginLeft: "auto" }}>
-        Logout
-      </button>
-    </div>
-  );
-}
+import WorkshopList from "../components/admin/WorkshopList";
+import OrderList from "../components/admin/OrderList";
 
 export default function AdminDashboard() {
-  const [authed, setAuthed] = useState(null);
+  const [activeTab, setActiveTab] = useState("products");
 
-useEffect(() => {
-  const t = localStorage.getItem("admin_token");
-  setAuthed(!!t);
-}, []);
-
-
-  function logout() {
-    localStorage.removeItem("admin_token");
-    setAuthed(false);
-    window.location.href = "/admin/login";
-  }
-
- if (authed === null) {
-  return null; // or loading spinner
-}
-
-if (!authed) {
-  window.location.href = "/admin/login";
-  return null;
-}
-
+  // Debugging: This will show in your console if the button click is even registered
+  const handleTabChange = (tabName) => {
+    console.log("Switching to tab:", tabName);
+    setActiveTab(tabName);
+  };
 
   return (
-    <div>
-      <Nav onLogout={logout} />
-      <div style={{ padding: 16 }}>
-        <h1>Admin Dashboard</h1>
-        <section>
-          <h2>Products</h2>
-          <ProductList />
-        </section>
-        <section id="orders">
-          <h2>Orders</h2>
-          <p>Orders management will be added here.</p>
-        </section>
-        <section id="workshops">
-          <h2>Workshops</h2>
-          <p>Workshop registrations management will be added here.</p>
-        </section>
+    <div style={{ display: "flex", minHeight: "100vh", paddingTop: "85px" }}>
+      {/* SIDEBAR - Added zIndex and cursor pointer to guarantee it works */}
+      <div style={{ 
+        width: "250px", 
+        backgroundColor: "#2c3e50", 
+        color: "white", 
+        position: "fixed", 
+        left: 0, 
+        top: "85px", 
+        bottom: 0,
+        zIndex: 1000,
+        padding: "20px 0"
+      }}>
+        <button 
+          onClick={() => handleTabChange("products")} 
+          style={sidebarBtnStyle(activeTab === "products")}
+        >
+          📦 Products
+        </button>
+        <button 
+          onClick={() => handleTabChange("orders")} 
+          style={sidebarBtnStyle(activeTab === "orders")}
+        >
+          🛒 Orders
+        </button>
+        <button 
+          onClick={() => handleTabChange("workshops")} 
+          style={sidebarBtnStyle(activeTab === "workshops")}
+        >
+          🎨 Workshops
+        </button>
       </div>
+
+      {/* MAIN CONTENT AREA */}
+      <main style={{ flex: 1, marginLeft: "250px", padding: "30px", backgroundColor: "#f4f7f6" }}>
+        <div style={{ backgroundColor: "white", padding: "25px", borderRadius: "10px", minHeight: "80vh" }}>
+          {activeTab === "products" && <ProductList />}
+          {activeTab === "orders" && <OrderList />}
+          {activeTab === "workshops" && <WorkshopList />}
+        </div>
+      </main>
     </div>
   );
 }
+
+const sidebarBtnStyle = (isActive) => ({
+  width: "100%",
+  padding: "15px 25px",
+  backgroundColor: isActive ? "#34495e" : "transparent",
+  color: isActive ? "#C4A484" : "white",
+  border: "none",
+  textAlign: "left",
+  cursor: "pointer", // This ensures the hand icon appears
+  fontSize: "16px",
+  fontWeight: isActive ? "bold" : "normal",
+  pointerEvents: "auto" // This forces the button to be clickable
+});
