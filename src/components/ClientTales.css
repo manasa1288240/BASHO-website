@@ -1,0 +1,86 @@
+.client-tales {
+  min-height: 80vh;
+  background: linear-gradient(135deg, #faf7f2, #f4efe9);
+  padding: 6rem 1.5rem;
+  text-align: center;
+}
+
+.client-title {
+  font-size: 2.6rem;
+  font-weight: 400;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.client-subtitle {
+  font-size: 0.95rem;
+  color: #777;
+  margin-bottom: 4rem;
+}
+
+/* -------- CAROUSEL -------- */
+
+.carousel-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+}
+
+.carousel-viewport {
+  width: 520px;
+  overflow: hidden;
+}
+
+.testimonial-card {
+  background: #ffffff;
+  padding: 2.8rem 2.4rem;
+  border-radius: 20px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.testimonial-text {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: #444;
+  margin-bottom: 1.8rem;
+}
+
+.testimonial-author strong {
+  display: block;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.testimonial-author span {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+/* -------- ARROWS -------- */
+
+.arrow {
+  background: none;
+  border: none;
+  font-size: 2.6rem;
+  color: var(--primary);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.arrow:hover {
+  transform: scale(1.25);
+}
+
+/* -------- RESPONSIVE -------- */
+
+@media (max-width: 768px) {
+  .carousel-viewport {
+    width: 90%;
+  }
+
+  .testimonial-card {
+    padding: 2rem;
+  }
+}
