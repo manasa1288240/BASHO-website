@@ -72,8 +72,8 @@ function Founder_journey() {
           </motion.div>
           {/* Right: All text content */}
           <div className="flex flex-col gap-8 justify-center h-full items-end">
-            <p className="text-lg text-[#442D1C]/70 max-w-2xl">
-              From architecture student to ceramic artist, a decade-long exploration of beauty, imperfection, and cultural connection
+            <p className="font-['Playfair_Display'] text-2xl leading-relaxed text-[#442D1C]/80 max-w-2xl">
+              From medicine to clay, Shivangi’s journey is one of quiet transformation — a path shaped by curiosity, cultural immersion, and a deep reverence for the beauty found in imperfection.
             </p>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -83,15 +83,19 @@ function Founder_journey() {
             >
               <div className="font-semibold text-[#652810] mb-2">Shivangi's Journey</div>
               <div className="text-3xl text-[#C85428] mb-4">“</div>
-              <blockquote className="text-lg text-[#442D1C] italic leading-relaxed mb-6">
-                I remember sitting in that Kyoto temple, holding a bowl that had been broken and repaired with gold. In that moment, I understood: the cracks weren't flaws—they were stories. They were evidence of life lived.
+              <blockquote className="font-['Playfair_Display'] text-2xl md:text-[1.7rem] leading-[1.6] text-[#442D1C] italic mb-8">
+
+                Hi, I’m Shivangi — the hands and heart behind Bashō.
+Bashō is a Japanese word that means “a place.” For me, it is my happy place — a space where time slows, intention matters, and every moment with clay is cherished.
+Each piece created here is shaped by hand, guided by instinct, and finished with patience — making no two forms ever the same. They carry individuality, just as people do.
               </blockquote>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-['Noto_Serif_JP'] text-[#652810]">Shivangi</div>
-                  <div className="text-[#442D1C]/60 text-sm">Founder & Creative Director</div>
+                  <div className="font-['Playfair_Display'] text-xl text-[#652810]">Shivangi</div>
+
+                  <div className="text-[#442D1C]/60 text-sm">Founder & Ceramic Artisan</div>
                 </div>
-                <div className="text-[#442D1C]/40">— Kintsugi Moment, 2017</div>
+                <div className="text-[#442D1C]/40">— The beginning of Bashō</div>
               </div>
             </motion.div>
             <motion.div
@@ -100,10 +104,6 @@ function Founder_journey() {
               transition={{ delay: 0.6 }}
               className="p-6 rounded-xl bg-gradient-to-r from-[#442D1C]/5 to-transparent border-l-4 border-[#8E5022]"
             >
-              <div className="font-semibold text-[#652810] mb-2">Shivangi's Philosophy</div>
-              <p className="text-[#442D1C]/80">
-                “My architecture background taught me about space. Japan taught me about the space between things—the ma (間) that holds meaning.”
-              </p>
             </motion.div>
           </div>
         </div>
