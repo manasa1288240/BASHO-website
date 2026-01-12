@@ -2,71 +2,97 @@ import { useEffect, useState } from "react";
 import ProductList from "../components/admin/ProductList";
 import WorkshopList from "../components/admin/WorkshopList";
 import OrderList from "../components/admin/OrderList";
+import CustomerList from "../components/admin/CustomerList"; 
+// ✅ STEP 1: Import the new GalleryManager component
+import GalleryManager from "../components/admin/GalleryManager"; 
+import "../styles/admin.css"; 
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("products");
 
-  // Debugging: This will show in your console if the button click is even registered
-  const handleTabChange = (tabName) => {
-    console.log("Switching to tab:", tabName);
-    setActiveTab(tabName);
-  };
+  const [stats, setStats] = useState({
+    totalRevenue: "₹45,231",
+    activeOrders: "12",
+    workshopSignups: "24",
+    gstCollected: "₹8,141"
+  });
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", paddingTop: "85px" }}>
-      {/* SIDEBAR - Added zIndex and cursor pointer to guarantee it works */}
-      <div style={{ 
-        width: "250px", 
-        backgroundColor: "#2c3e50", 
-        color: "white", 
-        position: "fixed", 
-        left: 0, 
-        top: "85px", 
-        bottom: 0,
-        zIndex: 1000,
-        padding: "20px 0"
-      }}>
-        <button 
-          onClick={() => handleTabChange("products")} 
-          style={sidebarBtnStyle(activeTab === "products")}
-        >
-          📦 Products
-        </button>
-        <button 
-          onClick={() => handleTabChange("orders")} 
-          style={sidebarBtnStyle(activeTab === "orders")}
-        >
-          🛒 Orders
-        </button>
-        <button 
-          onClick={() => handleTabChange("workshops")} 
-          style={sidebarBtnStyle(activeTab === "workshops")}
-        >
-          🎨 Workshops
-        </button>
-      </div>
+    <div className="admin-wrapper">
+      <aside className="admin-sidebar-new">
+        <div className="admin-logo">
+          <h2>BASHO ADMIN</h2>
+        </div>
+        <nav className="admin-nav-links">
+          <button 
+            className={activeTab === "products" ? "nav-item active" : "nav-item"}
+            onClick={() => setActiveTab("products")}
+          >
+            <span className="icon">📦</span> Inventory
+          </button>
+          <button 
+            className={activeTab === "orders" ? "nav-item active" : "nav-item"}
+            onClick={() => setActiveTab("orders")}
+          >
+            <span className="icon">🛒</span> Order Tracking
+          </button>
+          <button 
+            className={activeTab === "workshops" ? "nav-item active" : "nav-item"}
+            onClick={() => setActiveTab("workshops")}
+          >
+            <span className="icon">🎨</span> Workshops
+          </button>
+          <button 
+            className={activeTab === "customers" ? "nav-item active" : "nav-item"}
+            onClick={() => setActiveTab("customers")}
+          >
+            <span className="icon">👥</span> Customers
+          </button>
+          <button 
+            className={activeTab === "gallery" ? "nav-item active" : "nav-item"}
+            onClick={() => setActiveTab("gallery")}
+          >
+            <span className="icon">🖼️</span> Gallery & Testimonials
+          </button>
+        </nav>
+      </aside>
 
-      {/* MAIN CONTENT AREA */}
-      <main style={{ flex: 1, marginLeft: "250px", padding: "30px", backgroundColor: "#f4f7f6" }}>
-        <div style={{ backgroundColor: "white", padding: "25px", borderRadius: "10px", minHeight: "80vh" }}>
+      <main className="admin-main-view">
+        <header className="admin-top-bar">
+          <h1>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Management</h1>
+          <div className="admin-profile">
+            <span>Shivangi (Admin)</span>
+          </div>
+        </header>
+
+        <section className="stats-container">
+          <div className="stat-card-pro">
+            <p className="stat-label">Total Revenue</p>
+            <h3 className="stat-value">{stats.totalRevenue}</h3>
+          </div>
+          <div className="stat-card-pro">
+            <p className="stat-label">Active Orders</p>
+            <h3 className="stat-value">{stats.activeOrders}</h3>
+          </div>
+          <div className="stat-card-pro">
+            <p className="stat-label">Workshops</p>
+            <h3 className="stat-value">{stats.workshopSignups}</h3>
+          </div>
+          <div className="stat-card-pro">
+            <p className="stat-label">GST Handling</p>
+            <h3 className="stat-value">{stats.gstCollected}</h3>
+          </div>
+        </section>
+
+        <section className="content-card-pro">
           {activeTab === "products" && <ProductList />}
           {activeTab === "orders" && <OrderList />}
           {activeTab === "workshops" && <WorkshopList />}
-        </div>
+          {activeTab === "customers" && <CustomerList />}
+          {/* ✅ STEP 2: Replace the "Coming Soon" div with the actual component */}
+          {activeTab === "gallery" && <GalleryManager />}
+        </section>
       </main>
     </div>
   );
 }
-
-const sidebarBtnStyle = (isActive) => ({
-  width: "100%",
-  padding: "15px 25px",
-  backgroundColor: isActive ? "#34495e" : "transparent",
-  color: isActive ? "#C4A484" : "white",
-  border: "none",
-  textAlign: "left",
-  cursor: "pointer", // This ensures the hand icon appears
-  fontSize: "16px",
-  fontWeight: isActive ? "bold" : "normal",
-  pointerEvents: "auto" // This forces the button to be clickable
-});
