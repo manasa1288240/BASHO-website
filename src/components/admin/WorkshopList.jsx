@@ -1,97 +1,137 @@
 import { useState, useEffect } from "react";
 
+const API_BASE = "/api/admin/workshop-events";
+
+function authHeader() {
+  const t = localStorage.getItem("admin_token");
+  return t ? { Authorization: `Bearer ${t}` } : {};
+}
+
 export default function WorkshopList() {
   const [workshops, setWorkshops] = useState([]);
   const [formData, setFormData] = useState({
-    title: "", description: "", date: "", price: "", image: "", category: ""
+    title: "", 
+    description: "", 
+    date: "", 
+    price: "", 
+    image: "", 
+    category: "", // Changed to empty string for text input
+    capacity: "10"
   });
+
+  async function load() {
+    try {
+      const res = await fetch(API_BASE, { headers: { ...authHeader() } });
+      const data = await res.json();
+      if (data.success) setWorkshops(data.workshops);
+    } catch (err) { console.error("Load failed:", err); }
+  }
+
+  useEffect(() => { load(); }, []);
 
   const handleSave = async (e) => {
     e.preventDefault();
-    try {
-      const response = await fetch("/api/admin/workshop-events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-      });
-      if (response.ok) {
-        alert("Workshop Posted Successfully!");
-        // Refresh list logic here
-      }
-    } catch (err) {
-      console.error("Save failed:", err);
+    const res = await fetch(API_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authHeader() },
+      body: JSON.stringify(formData)
+    });
+    if (res.ok) {
+      alert("Workshop Saved!");
+      setFormData({ title: "", description: "", date: "", price: "", image: "", category: "", capacity: "10" });
+      load();
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2 style={{ fontFamily: "serif", marginBottom: "20px" }}>Workshops Management</h2>
+    <div className="content-card-pro">
+      <div className="section-header">
+        <h3>Workshops Management</h3>
+      </div>
       
-      {/* ADD WORKSHOP FORM - Matches your Product layout */}
-      <form onSubmit={handleSave} style={{ 
-        display: "grid", 
-        gridTemplateColumns: "1fr 1fr", 
-        gap: "20px", 
-        background: "#fff", 
-        padding: "25px", 
-        borderRadius: "8px", 
-        boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-        marginBottom: "40px"
-      }}>
+      <form onSubmit={handleSave} className="pro-form-grid">
         <div>
-          <label style={labelStyle}>Workshop Title</label>
-          <input style={inputStyle} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="e.g. Intro to Pottery" />
+          <label>Workshop Title</label>
+          <input type="text" value={formData.title} required
+            onChange={e => setFormData({...formData, title: e.target.value})} 
+            placeholder="e.g. Weekend Wheel Throwing" />
           
-          <label style={labelStyle}>Description</label>
-          <textarea style={{ ...inputStyle, height: "80px" }} onChange={e => setFormData({...formData, description: e.target.value})} />
-          
-          <label style={labelStyle}>Category</label>
-          <input style={inputStyle} onChange={e => setFormData({...formData, category: e.target.value})} />
+          {/* CATEGORY CHANGED FROM SELECT TO TEXT INPUT */}
+          <label>Category</label>
+          <input 
+            type="text" 
+            value={formData.category} 
+            onChange={e => setFormData({...formData, category: e.target.value})} 
+            placeholder="e.g. Couple Pottery, Family Session, etc." 
+            required
+          />
+
+          <label>Description</label>
+          <textarea rows="3" value={formData.description}
+            onChange={e => setFormData({...formData, description: e.target.value})} />
         </div>
 
         <div>
-          <label style={labelStyle}>Price (₹)</label>
-          <input type="number" style={inputStyle} onChange={e => setFormData({...formData, price: e.target.value})} />
+          <label>Price (₹)</label>
+          <input type="number" value={formData.price} required
+            onChange={e => setFormData({...formData, price: e.target.value})} />
           
-          <label style={labelStyle}>Event Date</label>
-          <input type="date" style={inputStyle} onChange={e => setFormData({...formData, date: e.target.value})} />
+          <label>Event Date</label>
+          <input type="date" value={formData.date} required
+            onChange={e => setFormData({...formData, date: e.target.value})} />
 
-          <label style={labelStyle}>Cover Image URL</label>
-          <input style={inputStyle} placeholder="https://..." onChange={e => setFormData({...formData, image: e.target.value})} />
+          <label>Capacity (Seats)</label>
+          <input type="number" value={formData.capacity} 
+            onChange={e => setFormData({...formData, capacity: e.target.value})} />
+
+          <label>Cover Image URL</label>
+          <input type="text" value={formData.image} 
+            onChange={e => setFormData({...formData, image: e.target.value})} 
+            placeholder="https://..." />
         </div>
 
-        <div style={{ gridColumn: "span 2" }}>
-          <button type="submit" style={{ padding: "10px 25px", backgroundColor: "#333", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}>
-            Save Workshop
-          </button>
+        <div className="form-actions">
+          <button type="submit" className="save-btn">Save Workshop</button>
         </div>
       </form>
 
-      {/* TABLE FOR EXISTING WORKSHOPS */}
-      <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+      <div className="section-header" style={{ marginTop: '40px' }}>
+        <h3>Active Workshops</h3>
+      </div>
+      <table className="pro-table">
         <thead>
-          <tr style={{ borderBottom: "2px solid #eee", color: "#666" }}>
-            <th style={{ padding: "12px" }}>Title</th>
+          <tr>
+            <th>Title</th>
             <th>Category</th>
-            <th>Price</th>
             <th>Date</th>
+            <th>Price + GST</th>
+            <th>Capacity</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {/* Example Data Row */}
-          <tr style={{ borderBottom: "1px solid #eee" }}>
-            <td style={{ padding: "12px" }}>Sample Pottery Class</td>
-            <td>Pottery</td>
-            <td>₹1500</td>
-            <td>2026-02-15</td>
-            <td><button style={{color: "red", border: "none", background: "none", cursor: "pointer"}}>Delete</button></td>
-          </tr>
+          {workshops.map((w) => {
+            const gst = (w.price * 0.18).toFixed(0);
+            return (
+              <tr key={w._id}>
+                <td style={{ fontWeight: '600' }}>{w.title}</td>
+                <td><span className="badge-category">{w.category}</span></td>
+                <td>{new Date(w.date).toLocaleDateString()}</td>
+                <td>₹{w.price} <small style={{color:'green'}}>(+₹{gst})</small></td>
+                <td>{w.capacity} Seats</td>
+                <td>
+                  <button className="delete-btn" onClick={async () => {
+                    if(confirm("Delete this workshop?")) {
+                      await fetch(`${API_BASE}/${w._id}`, { method: "DELETE", headers: { ...authHeader() } });
+                      load();
+                    }
+                  }}>Delete</button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
   );
 }
-
-const labelStyle = { display: "block", marginTop: "10px", fontWeight: "bold", fontSize: "14px" };
-const inputStyle = { width: "100%", padding: "10px", marginTop: "5px", border: "1px solid #ddd", borderRadius: "4px" };
