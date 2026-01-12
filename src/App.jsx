@@ -6,7 +6,6 @@ import {
 } from "react-router-dom";
 
 import { useAppEffects } from "./AppEffects";
-
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Philosophy from "./components/Philosophy";
@@ -18,6 +17,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import ActionSection from "./components/ActionSection";
 import Chatbot from "./components/Chatbot";
 
+/* -------- PAGES -------- */
 import ProductsPage from "./pages/ProductsPage";
 import WorkshopsPage from "./pages/WorkshopsPage";
 import BashoAbout from "./pages/BashoAbout/About";
@@ -28,6 +28,9 @@ import GalleryPage from "./pages/GalleryPage";
 import AuthPage from "./pages/AuthPage";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+
+/* -------- CLIENT TALES -------- */
+import ClientTales from "./components/ClientTales";
 
 import "./index.css";
 
@@ -54,16 +57,21 @@ function AppRoutes() {
     <div key={location.pathname}>
       <Routes location={location}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/auth" element={<AuthPage />} /> {/* ✅ LOGIN PAGE */}
+        <Route path="/auth" element={<AuthPage />} />
         <Route path="/products" element={<ProductsPage />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/workshops" element={<WorkshopsPage />} />
         <Route path="/care-guide" element={<CareGuide />} />
         <Route path="/about-basho" element={<BashoAbout />} />
         <Route path="/gallery" element={<GalleryPage />} />
         <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/cart" element={<CartPage />} />
+
+        {/* ✅ CLIENT TALES PAGE */}
+        <Route path="/client-tales" element={<ClientTales />} />
+
+        {/* -------- ADMIN -------- */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </div>
   );
