@@ -1,0 +1,92 @@
+/* src/components/Checkout/Checkout.css */
+.checkout-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #f9f5f0;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.checkout-container h2 {
+  text-align: center;
+  color: #5d4037;
+  margin-bottom: 2rem;
+  font-family: 'Playfair Display', serif;
+}
+
+.order-summary, .user-details {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e0d6cc;
+}
+
+.order-summary h3, .user-details h3 {
+  color: #795548;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #d7ccc8;
+  padding-bottom: 0.5rem;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed #e0d6cc;
+}
+
+.order-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
+  margin-top: 1rem;
+  border-top: 2px solid #795548;
+  font-size: 1.2rem;
+}
+
+.user-details input {
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border: 1px solid #d7ccc8;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.user-details input:focus {
+  outline: none;
+  border-color: #8d6e63;
+  box-shadow: 0 0 0 2px rgba(141, 110, 99, 0.2);
+}
+
+.pay-button {
+  width: 100%;
+  padding: 1rem;
+  background: #6d4c41;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.pay-button:hover:not(:disabled) {
+  background: #5d4037;
+}
+
+.pay-button:disabled {
+  background: #a1887f;
+  cursor: not-allowed;
+}
+
+.loading-text {
+  text-align: center;
+  color: #8d6e63;
+  margin-top: 1rem;
+  font-style: italic;
+}
