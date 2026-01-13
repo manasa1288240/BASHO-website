@@ -7,19 +7,20 @@
 
 /* Top header band using Background.png (shared with other pages) */
 .featured-header {
-    position: relative;
-    width: 100%;
-    padding: 80px 20px 70px;
-    background-image: url("/Background.png");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: top center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    overflow: visible;
+  position: relative;
+  margin-top: 100px;
+  padding: 50px 20px 70px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden; /* IMPORTANT */
 }
+
+.featured-container {
+  position: relative;
+  padding-top: 120px; /* ⬅ increased from 80px */
+  z-index: 1;
+}
+
 
 /* Pull the header up so its background aligns with other pages */
 .basho-about-page .featured-header {
