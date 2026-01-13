@@ -19,13 +19,7 @@ const adminProductRoutes = require("./routes/adminProductRoutes");
 
 const app = express();
 
-/* -------------------- MIDDLEWARE -------------------- */
-
-// Body parser
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// CORS
+// Middleware
 app.use(
   cors({
     origin: [

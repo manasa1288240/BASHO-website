@@ -1,8 +1,14 @@
 import { Link } from "react-router-dom";
 
 export default function Footer() {
-  // Your specific location link
-  const mapUrl = "https://www.google.com/maps/search/?api=1&query=21.130000,72.724000";
+  // EXACT Basho location coordinates: 21°07'48.0"N 72°43'26.4"E
+  const latitude = "21.13";
+  const longitude = "72.724";
+  
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+  
+  // Brown/Earth-toned Google Maps embed
+  const embeddedMapUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3719.092631361767!2d${longitude}!3d${latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjHCsDA3JzQ4LjAiTiA3MsKwNDMnMjYuNCJF!5e0!3m2!1sen!2sin!4v1705023456789&language=en&region=IN&scale=2&zoom=16&style=feature:all|element:labels|visibility:off&style=feature:administrative|visibility:off&style=feature:landscape|color:0xf5e9d9&style=feature:poi|visibility:off&style=feature:road|color:0xd4c4a8&style=feature:transit|visibility:off&style=feature:water|color:0xe8dcc5`;
 
   return (
     <footer className="footer-modern">
@@ -16,7 +22,7 @@ export default function Footer() {
               Handcrafted Japanese pottery celebrating the timeless beauty of wabi-sabi
             </p>
 
-            {/* Social Links with Corrected SVGs */}
+            {/* Social Links */}
             <div className="social-links">
               <a
                 href="https://www.instagram.com/bashobyyshivangi/"
@@ -56,35 +62,61 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Contact Section */}
+          {/* Contact Section - WITH "LOCATION" LINK */}
+         <div className="footer-column">
+  <h3 className="footer-heading">Contact Us</h3>
+  <div className="footer-content" style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+    <a
+      href={mapUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ 
+        textDecoration: "none", 
+        color: "inherit",
+        lineHeight: "2.2"
+      }}
+    >
+      311, Silent Zone, Gavier, Dumas Road, Surat-395007, India
+    </a>
+    
+    {/* "LOCATION" LINK that leads to coordinates */}
+    <a
+      href={mapUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ 
+        textDecoration: "none", 
+        color: "inherit",
+        lineHeight: "2.2"
+      }}
+    >
+      LOCATION
+    </a>
+    
+    <div style={{ lineHeight: "2.2" }}>bashobyyshivangi@gmail.com</div>
+    <div style={{ lineHeight: "2.2" }}>+91 98795 75601</div>
+  </div>
+</div>
+
+          {/* Mini Map Section with BROWN THEME */}
           <div className="footer-column">
-            <h3 className="footer-heading">Contact Us</h3>
-            <div className="footer-content">
-              <a
-                href={mapUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="contact-detail"
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                311, Silent Zone, Gavier, Dumas Road, Surat-395007, India
-              </a>
-              <p className="contact-detail">bashobyyshivangi@gmail.com</p>
-              <p className="contact-detail">+91 98795 75601</p>
+            <h3 className="footer-heading">Our Location</h3>
+            <div className="mini-map-container">
+              <iframe
+                src={embeddedMapUrl}
+                width="100%"
+                height="180"
+                style={{ border: 0, borderRadius: "8px" }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Bashō by Shivangi Location"
+                className="mini-map"
+              />
             </div>
           </div>
 
-          {/* Navigation & Care Sections */}
-          <div className="footer-column">
-            <h3 className="footer-heading">More Info</h3>
-            <ul className="footer-links">
-              <li><Link to="/about">Our Story</Link></li>
-              <li><Link to="/workshops">Workshops</Link></li>
-              <li><Link to="/client-tales">Client Tales</Link></li>
-              <li><Link to="/privacy-policy">Privacy Policy</Link></li>
-            </ul>
-          </div>
-
+          {/* Product Care Section */}
           <div className="footer-column">
             <h3 className="footer-heading">Product Care</h3>
             <ul className="footer-links">
@@ -92,6 +124,7 @@ export default function Footer() {
               <li>Microwave & Oven Friendly</li>
               <li>Dishwasher Friendly</li>
               <li><Link to="/care-guide">Full Care Guide</Link></li>
+              <li><Link to="/client-tales">Client Tales</Link></li>
             </ul>
           </div>
         </div>
