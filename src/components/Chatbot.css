@@ -275,11 +275,19 @@
   box-shadow: 0 10px 25px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
   overflow: hidden;
   border: 1px solid #eee;
-}
 
+  /* ✅ POSITIONING FIX */
+  position: absolute;
+  bottom: 15px; 
+  
+  /* ✅ SHIFT LEFT: Increase this value to move the box further left */
+  /* Changing from 0 to 80px will move it away from the Send button area */
+  right: 80px; 
+
+  margin-bottom: 0; 
+}
 .chatbot-header {
   background: #3d2b1f; /* Dark clay color */
   color: white;
