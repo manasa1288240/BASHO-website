@@ -1,3 +1,19 @@
+.featured-header {
+  position: relative;
+  margin-top: 60px;
+  padding: 80px 20px 70px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden; /* IMPORTANT */
+}
+
+
+
+.featured-container {
+  position: relative;
+  padding-top: 80px;
+  z-index: 1;
+}
 /* ===== GALLERY PAGE BASE ===== */
 .gallery-page {
   min-height: 100vh;

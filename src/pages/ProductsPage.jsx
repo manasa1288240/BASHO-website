@@ -10,6 +10,7 @@ import "../styles/ProductsPage.css";
 export default function ProductsPage() {
   const [products, setProducts] = useState(featuredProducts);
   const [activeFilter, setActiveFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
   const [showCustomForm, setShowCustomForm] = useState(false);
   const { wishlist, cart, toggleWishlist, addToCart } = useShop();
   const location = useLocation();
@@ -27,7 +28,7 @@ export default function ProductsPage() {
       return product.images[0];
     }
 
-    return pot3; // ✅ fallback (NO broken images)
+    return pot3;
   };
 
   // Helpers for wishlist & cart
@@ -51,7 +52,6 @@ export default function ProductsPage() {
         }
       } catch (error) {
         console.error("Error fetching products:", error);
-        // Keep the initial featuredProducts if fetch fails
       }
     };
 
@@ -70,14 +70,21 @@ export default function ProductsPage() {
     }
   }, [location]);
 
-  const filteredProducts =
-    activeFilter === "All"
-      ? products
-      : products.filter(
-          (p) =>
-            p.category &&
-            p.category.toLowerCase() === activeFilter.toLowerCase()
-        );
+  // ✅ FILTER + SEARCH
+  const filteredProducts = products.filter((product) => {
+    const title = (product.title || product.name || "").toLowerCase();
+    const category = (product.category || "").toLowerCase();
+    const search = searchTerm.toLowerCase();
+
+    const matchesCategory =
+      activeFilter === "All" ||
+      category === activeFilter.toLowerCase();
+
+    const matchesSearch =
+      title.includes(search) || category.includes(search);
+
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div>
@@ -92,7 +99,16 @@ export default function ProductsPage() {
 
       {/* FILTERS */}
       <div className="filters">
-        {["All", "Mugs", "Plates", "Platter/Cheeseboard","Bowls","Vase","Fancy","Picasso Limited Collection"].map((filter) => (
+        {[
+          "All",
+          "Mugs",
+          "Plates",
+          "Platter/Cheeseboard",
+          "Bowls",
+          "Vase",
+          "Fancy",
+          "Picasso Limited Collection",
+        ].map((filter) => (
           <button
             key={filter}
             className={activeFilter === filter ? "active" : ""}
@@ -101,6 +117,16 @@ export default function ProductsPage() {
             {filter}
           </button>
         ))}
+      </div>
+
+      {/* 🔍 SEARCH BAR */}
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
       {/* GRID */}
