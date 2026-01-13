@@ -1,42 +1,54 @@
 const express = require("express");
-const razorpay = require("../Razorpay");
+const razorpay = require("../Razorpay"); 
 const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail"); 
+
 
 const router = express.Router();
-
-// POST - Create Razorpay order
+console.log("Checking Razorpay Secret:", process.env.RAZORPAY_KEY_SECRET ? "LOADED ✅" : "MISSING ❌");
+/* -------------------- CREATE ORDER -------------------- */
 router.post("/create-order", async (req, res) => {
   try {
-    if (!razorpay) {
-      return res.status(503).json({ error: "Payment service not configured" });
+    const { amount, currency = "INR" } = req.body;
+
+    // Safety check: Ensure amount exists and is a number
+    if (!amount) {
+      console.error("❌ Error: Amount is missing in request body");
+      return res.status(400).json({ success: false, error: "Amount is required" });
     }
 
-    const { amount } = req.body;
-
     const options = {
-      amount: Math.round(amount * 100), // Convert to paise
+      amount: Math.round(Number(amount) * 100), // Convert to paise
       currency,
-      receipt: receipt || `order-${Date.now()}`,
+      receipt: `receipt_${Date.now()}`,
     };
 
+    console.log("Creating Razorpay order with options:", options);
     const order = await razorpay.orders.create(options);
-    res.json({
-      success: true,
-      orderId: order.id,
-      amount: order.amount,
-      currency: order.currency,
-    });
+    
+    res.json({ success: true, orderId: order.id, amount: order.amount });
+
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    // Log the FULL error object to see what is actually happening
+    console.error("🔥 Detailed Razorpay Error:", JSON.stringify(error, null, 2));
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || "Internal Server Error" 
+    });
   }
 });
 
-// POST - Verify payment signature
+/* -------------------- VERIFY PAYMENT -------------------- */
 router.post("/verify", async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderData } = req.body;
 
-    // Verify signature
+    // 1. Verify signature
+    // Ensure RAZORPAY_KEY_SECRET exists in your .env
+    if(!process.env.RAZORPAY_KEY_SECRET) {
+        throw new Error("RAZORPAY_KEY_SECRET is missing in server environment");
+    }
+
     const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
     hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
     const generated_signature = hmac.digest("hex");
@@ -45,19 +57,31 @@ router.post("/verify", async (req, res) => {
       return res.status(400).json({ success: false, error: "Payment verification failed" });
     }
 
-    // Save order to database (optional - you can add an Order model)
-    console.log("Order verified and payment successful:", {
-      orderId: razorpay_order_id,
-      paymentId: razorpay_payment_id,
-      orderData: orderData
-    });
+    // 2. TRIGGER EMAIL:
+    // This will send the email for both Products and Workshops if they use this route.
+    const userEmail = orderData?.email || req.body.email; 
+
+    if (userEmail) {
+      try {
+        await sendEmail({
+          to: userEmail,
+          subject: "Success! Your BASHO Order is Confirmed",
+          text: `Hello! Your payment was successful. Payment ID: ${razorpay_payment_id}. Thank you for your purchase!`
+        });
+        console.log("✅ Success email sent to:", userEmail);
+      } catch (emailErr) {
+        console.error("❌ Email failed to send:", emailErr.message);
+      }
+    }
 
     res.json({ 
       success: true, 
       message: "Payment verified successfully",
       paymentId: razorpay_payment_id
     });
+
   } catch (error) {
+    console.error("🔥 Verification Error:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
