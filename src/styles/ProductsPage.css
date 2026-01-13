@@ -1,14 +1,22 @@
 /* PAGE WRAPPER - PUSH BELOW FIXED NAVBAR */
 .featured-header {
+  position: relative;
   margin-top: 60px;
   padding: 80px 20px 70px;
-  background-image: url("/Background.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: top center;
   display: flex;
   justify-content: center;
+  overflow: hidden; /* IMPORTANT */
 }
+
+
+
+.featured-container {
+  position: relative;
+  padding-top: 80px;
+  z-index: 1;
+}
+
+
 
 .featured-title {
   font-family: "Playfair Display", serif;
@@ -159,4 +167,25 @@
   border: 2px dashed #7c4a33;
   background: linear-gradient(135deg, #f6efe7, #efe5db);
   cursor: pointer;
+}
+
+.search-bar {
+  display: flex;
+  justify-content: center;
+  margin: 20px auto 30px;
+}
+
+.search-bar input {
+  width: 100%;
+  max-width: 420px;
+  padding: 12px 16px;
+  border-radius: 30px;
+  border: 1px solid #d6cfc7;
+  font-size: 15px;
+  outline: none;
+  background: #fff;
+}
+
+.search-bar input:focus {
+  border-color: #9c7a5b;
 }
