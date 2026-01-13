@@ -19,6 +19,12 @@ const adminProductRoutes = require("./routes/adminProductRoutes");
 
 const app = express();
 
+// ========== CRITICAL MIDDLEWARE ==========
+// Parse JSON bodies (THIS IS WHAT YOU'RE MISSING)
+app.use(express.json());
+// Parse URL-encoded bodies
+app.use(express.urlencoded({ extended: true }));
+
 // Middleware
 app.use(
   cors({
@@ -32,6 +38,26 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+/* -------------------- DEBUG MIDDLEWARE -------------------- */
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  // Log request body for POST/PUT requests
+  if (req.method === "POST" || req.method === "PUT") {
+    console.log("Request Body:", req.body);
+  }
+  next();
+});
+
+/* -------------------- TEST ENV VARIABLES -------------------- */
+app.get("/api/test-env", (req, res) => {
+  res.json({
+    razorpayKeyId: process.env.RAZORPAY_KEY_ID ? "✅ Present" : "❌ Missing",
+    razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET ? "✅ Present" : "❌ Missing",
+    nodeEnv: process.env.NODE_ENV || "Not set",
+    port: process.env.PORT || "5000 (default)"
+  });
+});
 
 /* -------------------- TEST ROUTE -------------------- */
 app.get("/", (req, res) => {
@@ -71,6 +97,9 @@ connectDB()
   .then(() => {
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log("📋 Available test routes:");
+      console.log(`   - http://localhost:${PORT}/ (Basic test)`);
+      console.log(`   - http://localhost:${PORT}/api/test-env (Check env variables)`);
     });
   })
   .catch((err) => {
