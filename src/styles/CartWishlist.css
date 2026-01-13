@@ -260,3 +260,110 @@
 .checkout-btn:active {
   transform: translateY(0);
 }
+
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(61, 53, 43, 0.4);
+  background: rgba(255, 252, 246, 0.9);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.qty-btn:hover {
+  background: rgba(244, 231, 214, 0.9);
+}
+
+.qty-count {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.remove-btn {
+  border: none;
+  background: transparent;
+  color: #7c4a33;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-top: 0.3rem;
+}
+
+.remove-btn:hover {
+  color: #4a2918;
+}
+
+/* Quantity + Price + Remove layout */
+.item-actions {
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
+/* + / - controls */
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255, 252, 246, 0.85);
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(61, 53, 43, 0.35);
+}
+
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(124, 74, 51, 0.15);
+  color: #5a3a24;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.qty-btn:hover {
+  background: rgba(124, 74, 51, 0.3);
+}
+
+.qty-count {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 600;
+  color: #3d352b;
+}
+
+/* Subtotal price */
+.item-subtotal {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #7c4a33;
+}
+
+/* Remove button */
+.remove-btn {
+  border: none;
+  background: transparent;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(90, 58, 36, 0.65);
+  cursor: pointer;
+  padding: 0;
+}
+
+.remove-btn:hover {
+  color: #4a2918;
+  text-decoration: underline;
+}
+

@@ -6,11 +6,15 @@ import featuredProducts from "../data/products";
 import pot3 from "../assets/pot3.png";
 import "../styles/CartWishlist.css";
 
+const safeArray = (v) => Array.isArray(v) ? v : [];
 const CartPage = () => {
   const navigate = useNavigate();
-  const { cart, history, markAsPurchased } = useShop();
+  const { cart, history = [], increaseQty, decreaseQty, removeFromCart } = useShop();
   const [products, setProducts] = useState(featuredProducts);
   const [showCheckout, setShowCheckout] = useState(false);
+  const safeCart = Array.isArray(cart) ? cart : [];
+  const safeHistory = Array.isArray(history) ? history : [];
+
 
   // Load full product data so we can show images in the cart
   useEffect(() => {
@@ -51,22 +55,29 @@ const CartPage = () => {
     return isNaN(numericPrice) ? 0 : numericPrice;
   };
 
-  const cartIsEmpty = !cart || cart.length === 0;
+const cartIsEmpty = safeCart.length === 0;
+
 
   // Get cart items with full product data
-  const cartItems = cart?.map((item) => {
+ const cartItems = safeCart.map((item) => 
+ {
     const product = products.find((p) => getProductKey(p) === item.id);
     return {
-      ...product,
-      name: product?.title || product?.name || item.name,
-      price: product?.price || item.price,
-      id: item.id
-    };
+  ...product,
+  name: product?.title || product?.name || item.name,
+price: getNumericPrice(product?.price ?? item.price ?? 0),
+
+  id: item.id,
+  qty: item.qty ?? 1
+};
+
   }) || [];
 
   const total = cartItems.reduce((sum, item) => {
-    return sum + getNumericPrice(item.price);
-  }, 0);
+  return sum + getNumericPrice(item.price) * item.qty;
+
+}, 0);
+
 
   if (showCheckout) {
     return (
@@ -119,8 +130,44 @@ const CartPage = () => {
                     </div>
                   </div>
                   <div className="item-actions">
-                    <span className="item-price">₹{getNumericPrice(item.price).toFixed(2)}</span>
-                  </div>
+  {/* Quantity controls */}
+  <div className="qty-controls">
+    <button
+  className="qty-btn"
+  onClick={() => decreaseQty(item.id)}
+  disabled={item.qty <= 1}
+  aria-label="Decrease quantity"
+>
+
+      −
+    </button>
+
+    <span className="qty-count">{item.qty}</span>
+
+    <button
+      className="qty-btn"
+      onClick={() => increaseQty(item.id)}
+      aria-label="Increase quantity"
+    >
+      +
+    </button>
+  </div>
+
+  {/* Item subtotal */}
+  <div className="item-subtotal">
+    ₹{(getNumericPrice(item.price) * item.qty).toFixed(2)}
+  </div>
+
+  {/* Remove */}
+  <button
+    className="remove-btn"
+    onClick={() => removeFromCart(item.id)}
+  >
+    Remove ✕
+  </button>
+</div>
+
+
                 </li>
               );
             })}
@@ -142,11 +189,11 @@ const CartPage = () => {
       )}
 
       <h3>Purchase History</h3>
-      {(!history || history.length === 0) ? (
+      {safeHistory.length === 0 ? (
         <p>No previous purchases.</p>
       ) : (
         <ul className="history-list">
-          {history.map((item, idx) => {
+          {safeHistory.map((item, idx) => {
             const product = products.find((p) => getProductKey(p) === item.id);
             const title = product?.title || product?.name || item.name;
             const imageSrc = getProductImage(product);
@@ -178,3 +225,4 @@ const CartPage = () => {
 };
 
 export default CartPage;
+ 
