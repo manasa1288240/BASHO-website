@@ -132,7 +132,7 @@ export default function Chatbot() {
       <div className="chatbot-toggle-area">
   {!open && (
     <div className="chatbot-dialogue-bubble">
-      Hi! I'm BASHO AI 🏺
+      Hi! I'm BASHO AI          🏺
     </div>
   )}
 

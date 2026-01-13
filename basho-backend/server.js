@@ -28,11 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 // Middleware
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://127.0.0.1:5173",
-    ],
+    origin: "*", // Allow all origins for now
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -41,15 +37,26 @@ app.use(
 
 /* -------------------- DEBUG MIDDLEWARE -------------------- */
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
-  // Log request body for POST/PUT requests
-  if (req.method === "POST" || req.method === "PUT") {
-    console.log("Request Body:", req.body);
+  console.log(`\n=== ${req.method} ${req.url} ===`);
+  
+  // Log headers for payment requests
+  if (req.url.includes('/payment')) {
+    console.log('Headers:', req.headers);
   }
+  
+  // Log request body for POST/PUT requests
+  if (req.method === 'POST' || req.method === 'PUT') {
+    console.log('Request Body:', req.body);
+  }
+  
   next();
 });
 
-/* -------------------- TEST ENV VARIABLES -------------------- */
+/* -------------------- TEST ENDPOINTS -------------------- */
+app.get("/", (req, res) => {
+  res.send("✅ BASHO backend is running");
+});
+
 app.get("/api/test-env", (req, res) => {
   res.json({
     razorpayKeyId: process.env.RAZORPAY_KEY_ID ? "✅ Present" : "❌ Missing",
@@ -59,9 +66,24 @@ app.get("/api/test-env", (req, res) => {
   });
 });
 
-/* -------------------- TEST ROUTE -------------------- */
-app.get("/", (req, res) => {
-  res.send("✅ BASHO backend is running");
+app.post("/api/payment/test-simple", (req, res) => {
+  console.log("✅ Simple test endpoint called");
+  console.log("Body:", req.body);
+  
+  // Return a fixed test order
+  res.json({
+    success: true,
+    id: "order_test_" + Date.now(),
+    entity: "order",
+    amount: 10000,
+    amount_paid: 0,
+    amount_due: 10000,
+    currency: "INR",
+    receipt: "test_receipt",
+    status: "created",
+    attempts: 0,
+    created_at: Date.now()
+  });
 });
 
 /* -------------------- API ROUTES -------------------- */
@@ -100,6 +122,7 @@ connectDB()
       console.log("📋 Available test routes:");
       console.log(`   - http://localhost:${PORT}/ (Basic test)`);
       console.log(`   - http://localhost:${PORT}/api/test-env (Check env variables)`);
+      console.log(`   - POST http://localhost:${PORT}/api/payment/test-simple (Test payment)`);
     });
   })
   .catch((err) => {
