@@ -116,6 +116,58 @@ export function ShopProvider({ children }) {
     } catch (err) { console.error("[Shop] Failed to add to cart", err); }
   };
 
+  // ADDED: increase quantity
+const increaseQty = async (id) => {
+  setCart(prev =>
+    prev.map(item =>
+      item.id === id
+        ? { ...item, qty: item.qty + 1 }
+        : item
+    )
+  );
+
+  const email = getCurrentUserEmail();
+  if (!email) return;
+
+  try {
+    await axios.post(`${API_BASE}/api/cart/add`, { email, productId: id });
+  } catch (err) {
+    console.error("[Shop] Failed to increase qty", err);
+  }
+};
+
+// ADDED: decrease quantity
+const decreaseQty = async (id) => {
+  let removed = false;
+
+  setCart(prev =>
+    prev
+      .map(item => {
+        if (item.id !== id) return item;
+        if (item.qty === 1) {
+          removed = true;
+          return null;
+        }
+        return { ...item, qty: item.qty - 1 };
+      })
+      .filter(Boolean)
+  );
+
+  const email = getCurrentUserEmail();
+  if (!email) return;
+
+  try {
+    if (removed) {
+      await axios.post(`${API_BASE}/api/cart/remove`, { email, productId: id });
+    } else {
+      await axios.post(`${API_BASE}/api/cart/decrease`, { email, productId: id });
+    }
+  } catch (err) {
+    console.error("[Shop] Failed to decrease qty", err);
+  }
+};
+
+
   const removeFromCart = async (id) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
     const email = getCurrentUserEmail();
@@ -145,7 +197,18 @@ export function ShopProvider({ children }) {
   useEffect(() => { localStorage.setItem("basho_cart", JSON.stringify(cart)); }, [cart]);
   useEffect(() => { localStorage.setItem("basho_history", JSON.stringify(history)); }, [history]);
 
-  const value = { wishlist, cart, history, toggleWishlist, addToCart, removeFromCart, markAsPurchased };
+  const value = {
+  wishlist,
+  cart,
+  history,
+  toggleWishlist,
+  addToCart,
+  increaseQty,    // ADDED
+  decreaseQty,    // ADDED
+  removeFromCart,
+  markAsPurchased
+};
+
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;
 }
