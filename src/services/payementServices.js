@@ -49,7 +49,7 @@ export const initiateRazorpayPayment = async (order, userData, onSuccess, onFail
     }
 
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_S2dB2rrkK9f1cG',
       amount: order.amount,
       currency: order.currency || 'INR',
       name: 'BASHO by Shivangi',

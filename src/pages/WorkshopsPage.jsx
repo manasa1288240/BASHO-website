@@ -201,23 +201,206 @@ function WorkshopModal({ workshop, onClose, triggerNotify }) {
 /* ================================================= */
 
 function WorkshopBookingForm({ workshop, triggerNotify }) {
-  const handleSubmit = (e) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    source: ""
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    triggerNotify("Redirecting to payment gateway...", "success");
-    // Razorpay logic here
+    setLoading(true);
+
+    if (!formData.name || !formData.phone || !formData.email || !formData.source) {
+      triggerNotify("Please fill in all fields", "error");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      triggerNotify("Creating payment order...", "info");
+
+      // Step 1: Extract price amount
+      const priceText = workshop.price.replace(/[^\d]/g, "");
+      const amount = parseInt(priceText);
+
+      if (!amount || amount <= 0) {
+        throw new Error("Invalid workshop price");
+      }
+
+      console.log('🟡 Creating workshop order for amount:', amount);
+
+      // Step 2: Create Razorpay order
+      const orderResponse = await fetch("http://localhost:5000/api/workshops/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: amount,
+          currency: "INR",
+          receipt: `workshop-${Date.now()}`
+        })
+      });
+
+      if (!orderResponse.ok) {
+        const errorText = await orderResponse.text();
+        console.error('❌ Server error:', errorText);
+        throw new Error("Failed to create order");
+      }
+
+      const orderData = await orderResponse.json();
+      console.log('✅ Order created:', orderData);
+
+      if (!orderData.success) {
+        throw new Error(orderData.error || "Order creation failed");
+      }
+
+      // Step 3: Load Razorpay script
+      if (!window.Razorpay) {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.onload = () => openRazorpay(orderData);
+        script.onerror = () => {
+          triggerNotify("Failed to load payment gateway", "error");
+          setLoading(false);
+        };
+        document.body.appendChild(script);
+      } else {
+        openRazorpay(orderData);
+      }
+    } catch (error) {
+      console.error('🔴 Workshop booking error:', error);
+      triggerNotify("Error: " + error.message, "error");
+      setLoading(false);
+    }
+  };
+
+  const openRazorpay = (orderData) => {
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_S2dB2rrkK9f1cG",
+      amount: orderData.amount,
+      currency: orderData.currency,
+      name: "BASHO Pottery",
+      description: `${workshop.title} Workshop`,
+      order_id: orderData.orderId,
+      prefill: {
+        name: formData.name,
+        email: formData.email,
+        contact: formData.phone
+      },
+      theme: {
+        color: "#8B4513"
+      },
+      handler: async (response) => {
+        try {
+          console.log('💳 Payment completed, verifying...', response);
+          triggerNotify("Verifying payment...", "info");
+
+          const verifyResponse = await fetch("http://localhost:5000/api/workshops/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              bookingData: {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                workshopType: workshop.title,
+                preferredDate: workshop.date,
+                participants: 1,
+                source: formData.source
+              }
+            })
+          });
+
+          const verifyData = await verifyResponse.json();
+          console.log('✅ Verification response:', verifyData);
+
+          if (verifyData.success) {
+            triggerNotify("✅ Workshop booked successfully! Check your email for confirmation.", "success");
+            setLoading(false);
+            setTimeout(() => window.location.reload(), 2000);
+          } else {
+            triggerNotify("Payment verification failed: " + (verifyData.message || "Unknown error"), "error");
+            setLoading(false);
+          }
+        } catch (error) {
+          console.error('❌ Verification error:', error);
+          triggerNotify("Error verifying payment: " + error.message, "error");
+          setLoading(false);
+        }
+      },
+      modal: {
+        ondismiss: () => {
+          console.log('Payment modal closed');
+          triggerNotify("Payment cancelled", "info");
+          setLoading(false);
+        }
+      }
+    };
+
+    const rzp = new window.Razorpay(options);
+    
+    rzp.on('payment.failed', function (response) {
+      console.error('🔴 Payment failed:', response.error);
+      triggerNotify("Payment failed: " + (response.error.description || "Unknown error"), "error");
+      setLoading(false);
+    });
+
+    rzp.open();
   };
 
   return (
     <form className="booking-form-container" onSubmit={handleSubmit}>
       <h2 className="form-title">Booking Details</h2>
       <div className="form-row">
-        <div className="form-group"><label>Full Name *</label><input type="text" required /></div>
-        <div className="form-group"><label>Phone *</label><input type="tel" required /></div>
+        <div className="form-group">
+          <label>Full Name *</label>
+          <input 
+            type="text" 
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required 
+          />
+        </div>
+        <div className="form-group">
+          <label>Phone *</label>
+          <input 
+            type="tel" 
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            required 
+          />
+        </div>
       </div>
-      <div className="form-group"><label>Email *</label><input type="email" required /></div>
       <div className="form-group">
-        <label>How did you hear about us?</label>
-        <select required>
+        <label>Email *</label>
+        <input 
+          type="email" 
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          required 
+        />
+      </div>
+      <div className="form-group">
+        <label>How did you hear about us? *</label>
+        <select 
+          name="source"
+          value={formData.source}
+          onChange={handleChange}
+          required
+        >
           <option value="">Select Option</option>
           <option value="instagram">Instagram</option>
           <option value="google">Google Search</option>
@@ -226,7 +409,9 @@ function WorkshopBookingForm({ workshop, triggerNotify }) {
       </div>
       <div className="form-summary">
         <p className="total-price">Total: <span>{workshop.price}</span></p>
-        <button type="submit" className="submit-btn">Pay & Confirm</button>
+        <button type="submit" className="submit-btn" disabled={loading}>
+          {loading ? "Processing..." : "Pay & Confirm"}
+        </button>
       </div>
     </form>
   );

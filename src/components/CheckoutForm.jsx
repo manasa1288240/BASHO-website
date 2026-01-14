@@ -78,6 +78,7 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
 
     try {
       // Create order
+      console.log('📦 Creating order for amount:', total);
       const orderRes = await fetch("http://localhost:5000/api/payment/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -89,18 +90,21 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
       });
 
       if (!orderRes.ok) {
+        const errorText = await orderRes.text();
+        console.error('❌ Server error response:', errorText);
         throw new Error(`Server error: ${orderRes.status} ${orderRes.statusText}`);
       }
 
       const orderData = await orderRes.json();
-      if (!orderData.success) throw new Error(orderData.error || "Failed to create order");
+      console.log('✅ Order created:', orderData);
+      if (!orderData.success) throw new Error(orderData.message || orderData.error || "Failed to create order");
 
       // Open Razorpay checkout
       const options = {
-        key: "rzp_test_S1ra8fUDoBRjlX",
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_S2dB2rrkK9f1cG",
         amount: orderData.amount,
         currency: orderData.currency,
-        order_id: orderData.orderId,
+        order_id: orderData.id,
         name: "BASHO",
         description: "Product Purchase",
         prefill: {
@@ -110,6 +114,7 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
         },
         handler: async (response) => {
           try {
+            console.log('💳 Payment completed, verifying...', response);
             const verifyRes = await fetch("http://localhost:5000/api/payment/verify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -126,14 +131,15 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
             });
 
             const verifyData = await verifyRes.json();
+            console.log('✅ Verification response:', verifyData);
             if (verifyData.success) {
               setOrderPlaced(true);
             } else {
-              alert("Payment verification failed: " + verifyData.error);
+              alert("Payment verification failed: " + (verifyData.message || verifyData.error));
             }
           } catch (err) {
-            console.error(err);
-            alert("Error verifying payment");
+            console.error('❌ Verification error:', err);
+            alert("Error verifying payment: " + err.message);
           }
           setLoading(false);
         },
@@ -146,9 +152,16 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
       };
 
       const rzp = new window.Razorpay(options);
+      
+      rzp.on('payment.failed', function (response) {
+        console.error('🔴 Payment failed:', response.error);
+        setLoading(false);
+        alert('Payment failed: ' + (response.error.description || 'Unknown error'));
+      });
+      
       rzp.open();
     } catch (err) {
-      console.error(err);
+      console.error('🔴 Checkout error:', err);
       alert("Error: " + err.message);
       setLoading(false);
     }
