@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
+import { useCardStackScroll } from "../hooks/useCardStackScroll";
 import workshopImg from "../assets/workshop.jpg";
 
 export default function Workshops() {
+  const containerRef = useCardStackScroll();
+
   const workshops = [
     {
       img: workshopImg,
@@ -31,9 +34,9 @@ export default function Workshops() {
         Learn the meditative art of pottery in our hands-on classes
       </p>
 
-      <div className="collection-scroll">
+      <div className="collection-scroll card-stack-container" ref={containerRef}>
         {workshops.map((workshop, index) => (
-          <div key={index} className="collection-card">
+          <div key={index} className="collection-card card-stack-item">
             <img src={workshop.img} alt={workshop.title} />
 
             <div className="collection-info">

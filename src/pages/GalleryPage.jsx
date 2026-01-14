@@ -84,7 +84,7 @@ const GalleryPage = () => {
         </div>
 
         {/* GALLERY */}
-        <div className="masonry-container">
+        <div className={`masonry-container ${activeTab === "event" ? "event-grid" : ""}`}>
           {visibleImages.map((img, index) => (
             <motion.div
               key={index}
