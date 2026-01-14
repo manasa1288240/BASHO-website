@@ -131,12 +131,13 @@
 .image-frame {
   position: relative;
   width: 100%;
-  max-width: 420px; /* Limits size on large screens */
+  max-width: 350px; /* Limits size on large screens */
   aspect-ratio: 4 / 5; /* Maintains consistent proportions */
   background: #f0ede9;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+  margin-top: 80px;
 }
 
 .philosophy-image {
