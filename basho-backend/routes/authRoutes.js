@@ -9,6 +9,96 @@ const JWT_SECRET = process.env.JWT_SECRET || "replace_me_in_env";
 const router = express.Router();
 
 /**
+ * SIGN IN (email + password)
+ * Used for existing users to log in with password
+ */
+router.post("/signin", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password required" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user || !user.password) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    // Issue JWT
+    const token = jwt.sign({ id: user._id, isAdmin: !!user.isAdmin }, JWT_SECRET, { expiresIn: "7d" });
+
+    res.json({
+      message: "Sign in successful",
+      token,
+      user: {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        isAdmin: !!user.isAdmin
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+/**
+ * UPDATE PROFILE (after sign up)
+ * Used to save profile information after OTP verification
+ */
+router.post("/update-profile", async (req, res) => {
+  try {
+    const { email, firstName, lastName, phone, password } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update profile fields
+    user.firstName = firstName || "";
+    user.lastName = lastName || "";
+    user.phone = phone || "";
+
+    // If password is provided, hash it
+    if (password) {
+      user.password = await bcrypt.hash(password, 10);
+    }
+
+    await user.save();
+
+    // Issue JWT
+    const token = jwt.sign({ id: user._id, isAdmin: !!user.isAdmin }, JWT_SECRET, { expiresIn: "7d" });
+
+    res.json({
+      message: "Profile updated successfully",
+      token,
+      user: {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        isAdmin: !!user.isAdmin
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+/**
  * SEND OTP (EMAIL ONLY)
  */
 router.post("/send-otp", async (req, res) => {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ProductList from "../components/admin/ProductList";
 import WorkshopList from "../components/admin/WorkshopList";
 import OrderList from "../components/admin/OrderList";
@@ -8,7 +9,32 @@ import GalleryManager from "../components/admin/GalleryManager";
 import "../styles/admin.css"; 
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("products");
+  const [adminUser, setAdminUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is admin
+    const user = JSON.parse(localStorage.getItem("basho_user") || "{}");
+    const adminToken = localStorage.getItem("admin_token");
+
+    if (!user.isAdmin || !adminToken) {
+      console.log("❌ Not authorized as admin");
+      navigate("/auth");
+      return;
+    }
+
+    setAdminUser(user);
+    setLoading(false);
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("basho_user");
+    localStorage.removeItem("basho_token");
+    localStorage.removeItem("admin_token");
+    navigate("/auth");
+  };
 
   const [stats, setStats] = useState({
     totalRevenue: "₹45,231",
@@ -16,6 +42,10 @@ export default function AdminDashboard() {
     workshopSignups: "24",
     gstCollected: "₹8,141"
   });
+
+  if (loading) {
+    return <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>;
+  }
 
   return (
     <div className="admin-wrapper">
@@ -54,6 +84,12 @@ export default function AdminDashboard() {
           >
             <span className="icon">🖼️</span> Gallery & Testimonials
           </button>
+          <button 
+            className="nav-item logout-btn"
+            onClick={handleLogout}
+          >
+            <span className="icon">🚪</span> Logout
+          </button>
         </nav>
       </aside>
 
@@ -61,7 +97,14 @@ export default function AdminDashboard() {
         <header className="admin-top-bar">
           <h1>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Management</h1>
           <div className="admin-profile">
-            <span>Shivangi (Admin)</span>
+            <span>{adminUser?.email || "Admin"}</span>
+            <button 
+              className="logout-btn-small"
+              onClick={handleLogout}
+              title="Logout"
+            >
+              🚪
+            </button>
           </div>
         </header>
 
