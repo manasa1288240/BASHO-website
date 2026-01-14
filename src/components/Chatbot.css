@@ -201,6 +201,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  overflow: visible;
 }
 
 .chatbot-toggle-area {
@@ -217,6 +218,7 @@
   justify-content: flex-end;
   gap: 15px; /* Adjust this to move it further away */
   position: relative;
+  overflow: visible;
 }
 
 .chatbot-dialogue-bubble {
@@ -228,7 +230,13 @@
   font-size: 14px;
   font-weight: 500;
   border: 1.5px solid #d4a373;
-  white-space: nowrap;
+  white-space: normal;
+  width: auto;
+  max-width: none;
+  min-width: 200px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  overflow: visible;
   position: relative; /* Needed for the arrow */
   animation: sideFloat 3s ease-in-out infinite;
 }

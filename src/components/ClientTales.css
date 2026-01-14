@@ -73,7 +73,7 @@
   transform: scale(1.25);
 }
 
-/* -------- RESPONSIVE -------- */
+/* -------- RESPONSIVE CAROUSEL -------- */
 
 @media (max-width: 768px) {
   .carousel-viewport {
@@ -84,3 +84,189 @@
     padding: 2rem;
   }
 }
+
+/* ====== VIDEO TESTIMONIALS SECTION - PORTRAIT REEL ====== */
+
+.video-testimonials {
+  background: #ffffff;
+  padding: 5rem 2rem;
+  text-align: center;
+}
+
+.video-title {
+  font-size: 2.6rem;
+  font-weight: 400;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.video-subtitle {
+  font-size: 0.95rem;
+  color: #777;
+  margin-bottom: 3.5rem;
+}
+
+/* REEL DISPLAY CONTAINER - CENTERED WITH ARROWS */
+
+.reel-display-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* PORTRAIT REEL CARD */
+
+.reel-card {
+  width: 100%;
+  max-width: 380px;
+  aspect-ratio: 9 / 16;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #faf7f2;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.reel-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-height: 600px;
+}
+
+.reel-embed {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.reel-embed .instagram-media {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 100%;
+  border: none !important;
+}
+
+/* NAVIGATION BUTTONS */
+
+.reel-nav-btn {
+  background: var(--primary);
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 2rem;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(139, 102, 66, 0.2);
+}
+
+.reel-nav-btn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 8px 24px rgba(139, 102, 66, 0.3);
+}
+
+.reel-nav-btn:active {
+  transform: scale(0.95);
+}
+
+/* REEL INFO - REMOVED */
+
+/* ====== RESPONSIVE DESIGN ====== */
+
+@media (max-width: 768px) {
+  .video-testimonials {
+    padding: 3rem 1.5rem;
+  }
+
+  .video-title {
+    font-size: 2rem;
+  }
+
+  .video-subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .reel-display-container {
+    gap: 2rem;
+  }
+
+  .reel-card {
+    max-width: 320px;
+  }
+
+  .reel-nav-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-testimonials {
+    padding: 2.5rem 1rem;
+  }
+
+  .video-title {
+    font-size: 1.8rem;
+  }
+
+  .video-subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+  }
+
+  .reel-display-container {
+    gap: 1.5rem;
+  }
+
+  .reel-card {
+    max-width: 280px;
+  }
+
+  .reel-nav-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.6rem;
+  }
+
+  .reel-counter {
+    font-size: 0.85rem;
+  }
+
+  .reel-title {
+    font-size: 0.95rem;
+  }
+}
+
