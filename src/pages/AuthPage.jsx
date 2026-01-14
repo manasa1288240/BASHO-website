@@ -44,23 +44,38 @@ export default function AuthPage() {
       return;
     }
 
-    // Check if user exists and has password
     setLoading(true);
     try {
-      const res = await axios.get(`http://localhost:5000/api/auth/admin-exists?email=${signInData.email}`);
-      
-      if (!res.data.exists) {
-        setMessage("Email not found. Please sign up instead.");
-        setLoading(false);
-        return;
-      }
+      // Check if this is an admin account
+      console.log('📧 Checking email:', signInData.email);
+      const checkRes = await axios.post("http://localhost:5000/api/auth/check-admin-email", {
+        email: signInData.email,
+      });
 
-      // Check if user has password (can sign in)
-      // For now, we'll proceed to password step
-      setStep("password");
+      console.log('✅ Email check response:', checkRes.data);
+
+      if (checkRes.data.isAdmin) {
+        // Admin: proceed to password step
+        console.log("🔐 Admin email detected, requesting password...");
+        setStep("password");
+      } else if (checkRes.data.exists) {
+        // Regular user: proceed to password
+        console.log("👤 Regular user detected");
+        setStep("password");
+      } else {
+        // New email: not found
+        setMessage("Email not found. Please sign up instead.");
+      }
       setLoading(false);
     } catch (err) {
-      setMessage("Error checking email. Please try again.");
+      console.error('❌ Email check error:', err.message);
+      console.error('Error response:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+      
+      // Fallback: still proceed to password step in case of error
+      // This allows user to continue even if the check fails
+      console.warn('⚠️ Proceeding to password step despite error');
+      setStep("password");
       setLoading(false);
     }
   };
@@ -91,6 +106,7 @@ export default function AuthPage() {
       window.dispatchEvent(new Event("basho-login"));
 
       if (user.isAdmin) {
+        console.log("🔐 Admin signed in, redirecting to admin panel...");
         navigate("/admin");
       } else {
         navigate("/");
@@ -121,7 +137,9 @@ export default function AuthPage() {
     setLoading(true);
     try {
       // Check if email already exists
-      const checkRes = await axios.get(`http://localhost:5000/api/auth/admin-exists?email=${signUpEmail}`);
+      const checkRes = await axios.post("http://localhost:5000/api/auth/check-admin-email", {
+        email: signUpEmail,
+      });
       
       if (checkRes.data.exists) {
         setMessage("Email already registered. Please sign in instead.");
