@@ -129,3 +129,117 @@ form {
   color: #b00020;
   text-align: center;
 }
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 768px) {
+  .auth-modal {
+    width: 90%;
+    max-width: 420px;
+    padding: 30px 24px;
+    border-radius: 16px;
+  }
+
+  .auth-close {
+    top: 14px;
+    right: 14px;
+    font-size: 20px;
+  }
+
+  .auth-title {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+
+  .auth-subtitle {
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+
+  .auth-input {
+    padding: 12px 14px;
+    font-size: 14px;
+    margin-bottom: 14px;
+    border-radius: 10px;
+  }
+
+  .auth-btn {
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+
+  .otp-boxes {
+    gap: 8px;
+    margin: 16px 0 24px 0;
+  }
+
+  .otp-input {
+    width: 44px;
+    height: 52px;
+    font-size: 20px;
+    border-radius: 8px;
+  }
+
+  .auth-error {
+    margin-top: 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-modal {
+    width: 95%;
+    max-width: 100%;
+    padding: 24px 18px;
+    border-radius: 14px;
+  }
+
+  .auth-close {
+    top: 12px;
+    right: 12px;
+    font-size: 18px;
+  }
+
+  .auth-title {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .auth-subtitle {
+    font-size: 12px;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+
+  .auth-input {
+    padding: 10px 12px;
+    font-size: 13px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+  }
+
+  .auth-btn {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .otp-boxes {
+    gap: 6px;
+    margin: 14px 0 20px 0;
+  }
+
+  .otp-input {
+    width: 40px;
+    height: 48px;
+    font-size: 18px;
+    border-radius: 6px;
+    border-width: 1px;
+  }
+
+  .auth-error {
+    margin-top: 10px;
+    font-size: 11px;
+  }
+}

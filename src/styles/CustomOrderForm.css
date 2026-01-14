@@ -77,3 +77,138 @@ button[type="submit"] {
   font-size: 0.95rem;
   color: #371d15;
 }
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 1024px) {
+  .form-container {
+    padding: 1.75rem;
+    max-width: 550px;
+  }
+
+  .close-btn {
+    top: 0.75rem;
+    right: 0.75rem;
+    font-size: 1.3rem;
+  }
+
+  form input,
+  form select,
+  form textarea {
+    padding: 0.45rem;
+  }
+
+  button[type="submit"] {
+    padding: 0.65rem 1.3rem;
+    font-size: 0.95rem;
+  }
+
+  .form-group-checkboxes label {
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-container {
+    padding: 1.5rem;
+    max-width: 100%;
+    width: 90%;
+    border-radius: 10px;
+    max-height: 85vh;
+  }
+
+  .close-btn {
+    top: 0.6rem;
+    right: 0.6rem;
+    font-size: 1.2rem;
+  }
+
+  form label,
+  form fieldset {
+    margin-bottom: 0.85rem;
+  }
+
+  form input,
+  form select,
+  form textarea {
+    padding: 0.4rem;
+    font-size: 0.9rem;
+  }
+
+  button[type="submit"] {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    width: 100%;
+  }
+
+  .acknowledge {
+    font-size: 0.85rem;
+  }
+
+  .form-group-checkboxes {
+    gap: 8px;
+  }
+
+  .form-group-checkboxes label {
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-container {
+    padding: 1.25rem;
+    width: 95%;
+    border-radius: 8px;
+    max-height: 80vh;
+  }
+
+  .close-btn {
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  form label,
+  form fieldset {
+    margin-bottom: 0.75rem;
+  }
+
+  form input,
+  form select,
+  form textarea {
+    padding: 0.35rem;
+    font-size: 0.85rem;
+    border-radius: 4px;
+  }
+
+  form textarea {
+    min-height: 80px;
+    resize: vertical;
+    max-height: 200px;
+  }
+
+  button[type="submit"] {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    width: 100%;
+    border-radius: 6px;
+  }
+
+  .acknowledge {
+    font-size: 0.8rem;
+    margin-top: 0.75rem;
+  }
+
+  .form-group-checkboxes {
+    gap: 6px;
+    flex-direction: column;
+  }
+
+  .form-group-checkboxes label {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+    gap: 4px;
+  }
+}

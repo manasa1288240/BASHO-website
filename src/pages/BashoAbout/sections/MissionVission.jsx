@@ -24,8 +24,8 @@ const MissionVision = () => {
         viewport={{ once: true, amount: 0.25 }}
       >
         {/* Header */}
-        <motion.div variants={itemVariants} className="text-center mb-20">
-          <h2 className="text-[#3D342E] text-5xl md:text-6xl mb-6 font-medium">
+        <motion.div variants={itemVariants} className="basho-mission-header">
+          <h2 className="basho-mission-title">
             Our Guiding Stars
           </h2>
           <div className="section-divider"></div>
@@ -38,7 +38,7 @@ const MissionVision = () => {
               title: "MISSION",
               icon: <Target className="w-7 h-7" />,
               text:
-                "To thoughtfully craft ceramic pieces that serve as enduring companions in everyday life — quiet yet powerful reminders of Wabi-Sabi.Each creation honors the beauty of imperfection, the honesty of natural materials, and the marks left by time, touch, and process. Through intentional form, texture, and restraint, our work invites slower living, mindful rituals, and a deeper appreciation for the imperfect moments that shape contemporary life."
+                "To thoughtfully craft ceramic pieces that serve as enduring companions in everyday life — quiet yet powerful reminders of Wabi-Sabi. Each creation honors the beauty of imperfection, the honesty of natural materials, and the marks left by time, touch, and process. Through intentional form, texture, and restraint, our work invites slower living, mindful rituals, and a deeper appreciation for the imperfect moments that shape contemporary life."
             },
             {
               title: "VISION",
@@ -48,20 +48,10 @@ const MissionVision = () => {
             }
           ].map((item, i) => (
             <motion.div 
-  key={i}
-  variants={itemVariants}
-  className="
-    basho-gold-plate 
-    basho-gold-plate--small
-    rounded-[28px] 
-    p-10 
-    flex 
-    flex-col 
-    items-center 
-    text-center
-  "
->
-
+              key={i}
+              variants={itemVariants}
+              className="basho-mission-plate"
+            >
               <div className="basho-mission-plate-inner">
                 <div className="basho-mission-plate-header">
                   {item.icon}
@@ -76,16 +66,15 @@ const MissionVision = () => {
           ))}
         </div>
 
-        {/* Core Values — untouched */}
+        {/* Core Values */}
         <motion.h3
-  variants={itemVariants}
-  className="basho-core-values-heading"
->
-  Core Values
-</motion.h3>
+          variants={itemVariants}
+          className="basho-core-values-heading"
+        >
+          Core Values
+        </motion.h3>
 
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="basho-core-values-grid">
           {[
             { title: "Authenticity", icon: <Flower2 />, sub: "Every crack tells a story" },
             { title: "Sustainability", icon: <Sprout />, sub: "Time is the best craftsman" },
@@ -94,10 +83,9 @@ const MissionVision = () => {
             <motion.div
               key={i}
               variants={itemVariants}
-              className="bg-[#FAF7F4] rounded-[28px] p-8 flex flex-col items-center text-center shadow-sm border border-white/60"
+              className="basho-gold-plate basho-gold-plate--value"
             >
-              <div className="basho-gold-icon">{val.icon}
-              </div>
+              <div className="basho-gold-icon">{val.icon}</div>
               <h4 className="basho-gold-title">{val.title}</h4>
               <p className="basho-gold-body basho-gold-body--small">{val.sub}</p>
             </motion.div>

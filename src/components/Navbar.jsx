@@ -9,6 +9,7 @@ export default function Navbar() {
   const [textColor, setTextColor] = useState("#222");
   const [user, setUser] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { wishlist, cart } = useShop();
 
   useEffect(() => {
@@ -79,6 +80,18 @@ export default function Navbar() {
       <div className="navbar-container">
         <img src={logo} alt="Basho Logo" className="logo" />
 
+        {/* Hamburger Menu Button - Mobile Only */}
+        <button 
+          className="hamburger-menu" 
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          style={{ color: textColor }}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        {/* Desktop Nav Links */}
         <ul className="nav-links">
           <li><Link to="/" style={{ color: textColor }}>Home</Link></li>
           <li><Link to="/products" style={{ color: textColor }}>Products</Link></li>
@@ -196,6 +209,32 @@ export default function Navbar() {
             )}
           </li>
         </ul>
+
+        {/* Mobile Sidebar Menu */}
+        <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`} style={{ backgroundColor: bgColor }}>
+          <ul className="mobile-menu-links">
+            <li><Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
+            <li><Link to="/products" onClick={() => setMobileMenuOpen(false)}>Products</Link></li>
+            <li><Link to="/workshops" onClick={() => setMobileMenuOpen(false)}>Workshops</Link></li>
+            <li><Link to="/about-basho" onClick={() => setMobileMenuOpen(false)}>About</Link></li>
+            <li><Link to="/gallery" onClick={() => setMobileMenuOpen(false)}>Gallery</Link></li>
+            <li>
+              <Link to="/wishlist" onClick={() => setMobileMenuOpen(false)}>
+                ❤️ Wishlist ({wishlist.length})
+              </Link>
+            </li>
+            <li>
+              <Link to="/cart" onClick={() => setMobileMenuOpen(false)}>
+                🛒 Cart ({cart.reduce((sum, item) => sum + (item.qty || 1), 0)})
+              </Link>
+            </li>
+            {!user ? (
+              <li><a href="#" onClick={(e) => { e.preventDefault(); navigate("/auth"); setMobileMenuOpen(false); }}>Account</a></li>
+            ) : (
+              <li><a href="#" onClick={(e) => { e.preventDefault(); logout(); setMobileMenuOpen(false); }}>Logout</a></li>
+            )}
+          </ul>
+        </div>
       </div>
     </nav>
   );

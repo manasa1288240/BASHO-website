@@ -6,3 +6,16 @@
   padding: 0;
   padding-top: 80px;
 }
+
+/* Mobile responsiveness for root padding */
+@media (max-width: 768px) {
+  #root {
+    padding-top: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  #root {
+    padding-top: 50px;
+  }
+}

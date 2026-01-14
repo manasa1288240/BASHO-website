@@ -182,6 +182,86 @@ section.fade-in-visible {
   height: 22px;
 }
 
+/* ===== HAMBURGER MENU ===== */
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.hamburger-menu span {
+  width: 24px;
+  height: 2px;
+  background-color: currentColor;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  display: block;
+}
+
+.hamburger-menu.open span:nth-child(1) {
+  transform: rotate(45deg) translate(10px, 10px);
+}
+
+.hamburger-menu.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* ===== MOBILE MENU ===== */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  background: rgba(250, 247, 242, 0.98);
+  backdrop-filter: blur(10px);
+  transform-origin: top;
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+  z-index: 999;
+  border-bottom: 1px solid var(--border);
+}
+
+.mobile-menu.open {
+  transform: scaleY(1);
+}
+
+.mobile-menu-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+}
+
+.mobile-menu-links li {
+  padding: 0;
+}
+
+.mobile-menu-links li a {
+  display: block;
+  padding: 1rem 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  font-weight: 450;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: background 0.2s ease;
+}
+
+.mobile-menu-links li a:hover {
+  background: rgba(61, 53, 43, 0.05);
+  color: var(--accent-dark);
+}
+
 .nav-links li a.active {
   color: var(--accent);
 }
@@ -888,140 +968,581 @@ section h2::after {
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
+
+/* TABLET BREAKPOINT (1024px and below) */
 @media (max-width: 1024px) {
+  .navbar-container {
+    padding: 0 2rem;
+    height: 70px;
+  }
+
+  .logo {
+    height: 70px;
+  }
+
+  .nav-links {
+    gap: 2.5rem;
+    font-size: 0.8rem;
+  }
+
+  .nav-icon-svg {
+    width: 20px;
+    height: 20px;
+  }
+
   section {
     padding: 4rem 1.5rem;
   }
-  
+
+  section h2 {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .hero-subtitle {
+    font-size: clamp(0.95rem, 2vw, 1.3rem);
+  }
+
   .products-grid,
   .workshops-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 0 1rem;
   }
-  
+
+  #journey .grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2.5rem;
+  }
+
+  #journey img {
+    height: 300px;
+  }
+
   .footer-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 3rem;
+    gap: 2.5rem;
   }
-  
+
   .footer-brand {
     grid-column: 1 / -1;
     padding-right: 0;
     text-align: center;
   }
-  
+
   .brand-tagline {
     margin-left: auto;
     margin-right: auto;
   }
-  
+
   .social-links {
     justify-content: center;
   }
-}
 
-@media (max-width: 768px) {
-  .navbar-container {
-    padding: 0 1.5rem;
-  }
-
-  .nav-links {
-    gap: 1.5rem;
-  }
-
-  .hero h1 {
-    font-size: 4.5rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.2rem;
-  }
-  
-  .products-grid,
-  .workshops-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    max-width: 500px;
-  }
-  
-  #journey .grid {
-    grid-template-columns: 1fr;
-  }
-  
-  #journey img {
-    height: 300px;
-  }
-  
-  .footer-modern {
-    padding: 3rem 1.5rem 2rem;
-  }
-  
-  .footer-grid {
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
-  }
-  
-  .footer-brand {
-    text-align: center;
-  }
-  
-  .brand-name {
-    font-size: 2.8rem;
-  }
-  
-  .footer-column {
-    text-align: center;
-  }
-  
-  .footer-heading::after {
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  
-  .footer-links a:hover {
-    transform: translateX(0);
-  }
-}
-
-@media (max-width: 480px) {
-  .nav-links {
-    gap: 1rem;
+  .cta-button {
+    padding: 1rem 2.5rem;
     font-size: 0.8rem;
   }
 
-  .hero h1 {
+  .more-button {
+    padding: 0.8rem 2rem;
+    font-size: 0.8rem;
+  }
+
+  .footer-modern {
+    padding: 4rem 1.5rem 2rem;
+  }
+
+  .brand-name {
     font-size: 3rem;
+  }
+}
+
+/* MOBILE BREAKPOINT (768px and below) */
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 0 1.25rem;
+    height: 60px;
+  }
+
+  .logo {
+    height: 60px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .hamburger-menu {
+    display: flex;
+  }
+
+  .mobile-menu {
+    display: block;
+    top: 60px;
+  }
+
+  .nav-icon-count {
+    font-size: 0.55rem;
+  }
+
+  .nav-icon-svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  section {
+    padding: 3.5rem 1.25rem;
+  }
+
+  section h2 {
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+    padding-bottom: 1rem;
+  }
+
+  section h2::after {
+    width: 70px;
+  }
+
+  .hero {
+    min-height: 500px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    margin-bottom: 0.75rem;
   }
 
   .hero-subtitle {
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+    margin-bottom: 1.5rem;
   }
-  
-  section {
-    padding: 3rem 1rem;
-  }
-  
-  section h2 {
-    font-size: 2.2rem;
-  }
-  
-  .products-grid,
-  .workshops-grid {
-    gap: 1rem;
+
+  .hero-content {
     padding: 0 1rem;
   }
-  
+
+  .cta-button {
+    padding: 0.9rem 2rem;
+    font-size: 0.75rem;
+  }
+
+  .products-grid,
+  .workshops-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    max-width: 100%;
+    padding: 0;
+    margin: 1.5rem 0 2rem;
+  }
+
+  .product-card,
+  .workshop-card {
+    margin: 0 auto;
+    max-width: 400px;
+  }
+
+  .product-image-wrapper,
+  .workshop-image-wrapper {
+    height: 220px;
+  }
+
   .product-info,
   .workshop-info {
     padding: 1rem;
   }
-  
-  .cta-button {
-    padding: 1rem 2rem;
+
+  .product-info h3,
+  .workshop-info h3 {
+    font-size: 1.1rem;
   }
-  
+
+  .product-description,
+  .workshop-description {
+    font-size: 0.9rem;
+  }
+
+  .card-button {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.75rem;
+  }
+
+  #journey {
+    padding: 3.5rem 1.25rem;
+  }
+
+  #journey .grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 1rem;
+  }
+
+  #journey img {
+    height: 280px;
+  }
+
+  #journey h2 {
+    text-align: center;
+  }
+
+  #journey h2::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #journey p {
+    font-size: 1rem;
+  }
+
+  .collection-scroll {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 1.25rem 1rem;
+  }
+
+  .collection-card img {
+    height: 180px;
+  }
+
+  .collection-info h3 {
+    font-size: 1rem;
+  }
+
   .more-button {
-    padding: 0.8rem 1.5rem;
+    padding: 0.75rem 1.75rem;
+    font-size: 0.75rem;
+  }
+
+  .footer-modern {
+    padding: 3rem 1.25rem 1.5rem;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .footer-brand {
+    text-align: center;
+    padding-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  .brand-name {
+    font-size: 2.4rem;
+  }
+
+  .brand-tagline {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+  }
+
+  .footer-column {
+    text-align: center;
+  }
+
+  .footer-heading::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .footer-links a {
+    display: inline;
+  }
+
+  .footer-links a:hover {
+    transform: translateX(0);
+  }
+
+  .social-links {
+    justify-content: center;
+  }
+
+  .social-icon {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* SMALL MOBILE BREAKPOINT (480px and below) */
+@media (max-width: 480px) {
+  .navbar-container {
+    padding: 0 1rem;
+    height: 50px;
+  }
+
+  .logo {
+    height: 50px;
+  }
+
+  .nav-links {
+    gap: 0.75rem;
+    font-size: 0.65rem;
+  }
+
+  .nav-icon-count {
+    font-size: 0.5rem;
+    line-height: 1;
+  }
+
+  .nav-icon-svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  section {
+    padding: 2.5rem 1rem;
+  }
+
+  section h2 {
+    font-size: clamp(1.4rem, 3vw, 1.8rem);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  section h2::after {
+    width: 50px;
+    height: 1.5px;
+  }
+
+  .content-container {
+    padding: 0 1rem;
+  }
+
+  .hero {
+    min-height: 400px;
+    padding: 2rem 1rem;
+  }
+
+  .hero-content {
+    padding: 0;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+    margin-bottom: 1rem;
+    letter-spacing: 0.05em;
+  }
+
+  .cta-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+  }
+
+  .product-card,
+  .workshop-card {
+    margin: 0;
+    max-width: 100%;
+  }
+
+  .products-grid,
+  .workshops-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0;
+    margin: 1rem 0 1.5rem;
+  }
+
+  .product-image-wrapper,
+  .workshop-image-wrapper {
+    height: 200px;
+  }
+
+  .product-info,
+  .workshop-info {
+    padding: 0.85rem;
+  }
+
+  .product-info h3,
+  .workshop-info h3 {
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .product-price,
+  .workshop-duration {
+    font-size: 0.95rem;
+  }
+
+  .product-description,
+  .workshop-description {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-button {
+    padding: 0.6rem 1rem;
+    font-size: 0.7rem;
+  }
+
+  #journey {
+    padding: 2.5rem 1rem;
+  }
+
+  #journey .grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 0.75rem;
+  }
+
+  #journey img {
+    height: 240px;
+  }
+
+  #journey h2 {
+    text-align: center;
+  }
+
+  #journey p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .collection-section {
+    padding: 2.5rem 1rem;
+  }
+
+  .collection-scroll {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.5rem 1rem 0.75rem;
+  }
+
+  .collection-card {
+    border-radius: 14px;
+  }
+
+  .collection-card img {
+    height: 160px;
+  }
+
+  .collection-info {
+    padding: 1rem;
+  }
+
+  .collection-info h3 {
+    font-size: 0.95rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .collection-price {
+    font-size: 0.85rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .collection-info p {
+    font-size: 0.9rem;
+  }
+
+  .more-button {
+    padding: 0.65rem 1.5rem;
+    font-size: 0.7rem;
+    margin-top: 1.5rem;
+  }
+
+  .footer-modern {
+    padding: 2.5rem 1rem 1rem;
+  }
+
+  .footer-container {
+    max-width: 100%;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .footer-brand {
+    margin-bottom: 0.5rem;
+  }
+
+  .brand-name {
+    font-size: 2rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .brand-subtitle {
+    font-size: 0.7rem;
+    margin-bottom: 1rem;
+  }
+
+  .brand-tagline {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .social-links {
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  .social-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  .footer-column {
+    text-align: center;
+  }
+
+  .footer-heading {
+    font-size: 0.7rem;
+    margin-bottom: 1rem;
+    letter-spacing: 0.12em;
+  }
+
+  .footer-heading::after {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 25px;
+  }
+
+  .footer-content {
+    gap: 1rem;
+  }
+
+  .contact-label {
+    font-size: 0.75rem;
+  }
+
+  .contact-detail {
+    font-size: 0.9rem;
+  }
+
+  .footer-links {
+    gap: 0.85rem;
+  }
+
+  .footer-links li {
+    font-size: 0.9rem;
+  }
+
+  .footer-links a:hover {
+    transform: translateX(0);
+  }
+
+  .footer-bottom {
+    padding-top: 2rem;
+    margin-top: 1.5rem;
+  }
+
+  .copyright {
+    font-size: 0.75rem;
   }
 }
 /* ===============================
