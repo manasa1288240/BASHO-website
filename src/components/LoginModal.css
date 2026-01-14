@@ -30,3 +30,58 @@
 .login-actions .secondary {
   background: #ccc;
 }
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 768px) {
+  .login-modal {
+    width: 90%;
+    max-width: 300px;
+    padding: 20px;
+  }
+
+  .login-modal input {
+    padding: 7px;
+    font-size: 14px;
+  }
+
+  .login-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .login-actions button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-modal {
+    width: 95%;
+    max-width: 280px;
+    padding: 16px;
+  }
+
+  .login-modal h2 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+
+  .login-modal input {
+    padding: 6px;
+    font-size: 13px;
+    margin: 6px 0;
+  }
+
+  .login-actions {
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .login-actions button {
+    padding: 7px 10px;
+    font-size: 0.85rem;
+  }
+}
