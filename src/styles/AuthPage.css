@@ -516,6 +516,8 @@
 
 .choice-icon {
   font-size: 2.5rem;
+  color: #7c4a33;
+  stroke-width: 1.5;
 }
 
 .choice-label {

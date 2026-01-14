@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Lock, Sparkles } from "lucide-react";
 import Footer from "../components/Footer";
 import "../styles/AuthPage.css";
 
@@ -275,7 +276,7 @@ export default function AuthPage() {
                       setStep("email");
                     }}
                   >
-                    <span className="choice-icon">🔐</span>
+                    <Lock className="choice-icon" size={32} />
                     <span className="choice-label">Sign In</span>
                     <span className="choice-desc">Use your password</span>
                   </button>
@@ -287,7 +288,7 @@ export default function AuthPage() {
                       setStep("email");
                     }}
                   >
-                    <span className="choice-icon">✨</span>
+                    <Sparkles className="choice-icon" size={32} />
                     <span className="choice-label">Sign Up</span>
                     <span className="choice-desc">Create new account</span>
                   </button>
