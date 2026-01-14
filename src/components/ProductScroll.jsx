@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
+import { useCardStackScroll } from "../hooks/useCardStackScroll";
 import pot1 from "../assets/pot1.png";
 import pot2 from "../assets/pot2.png";
 import pot3 from "../assets/pot3.png";
 
 export default function ProductScroll() {
+  const containerRef = useCardStackScroll();
+
   const products = [
     { img: pot1, name: "Ceramic Bowl", price: "$48" },
     { img: pot2, name: "Tea Cup Set", price: "$65" },
@@ -18,9 +21,9 @@ export default function ProductScroll() {
       </p>
 
       {/* 🔥 HORIZONTAL SCROLL CONTAINER */}
-      <div className="products-scroll">
+      <div className="products-scroll card-stack-container" ref={containerRef}>
         {products.map((product, index) => (
-          <div key={index} className="product-card scroll-card">
+          <div key={index} className="product-card scroll-card card-stack-item">
             <div className="product-image-wrapper">
               <img
                 src={product.img}
@@ -37,7 +40,7 @@ export default function ProductScroll() {
         ))}
 
         {/* ⭐ CUSTOM ORDER CARD */}
-        <Link to="/products#custom-order" className="product-card scroll-card custom-order-card">
+        <Link to="/products#custom-order" className="product-card scroll-card custom-order-card card-stack-item">
 
           <div className="product-image-wrapper">
             <img

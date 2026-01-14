@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import CustomOrderForm from "../components/CustomOrderForm";
+import LoginAlert from "../components/LoginAlert";
 import featuredProducts from "../data/products";
 import { useShop } from "../context/ShopContext";
 import pot3 from "../assets/pot3.png";
 import "../styles/ProductsPage.css";
-import LoginModal from "../components/LoginModal";
 
 
 
@@ -15,24 +15,22 @@ export default function ProductsPage() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [showCustomForm, setShowCustomForm] = useState(false);
+  const [showLoginAlert, setShowLoginAlert] = useState(false);
   const { wishlist, cart, toggleWishlist, addToCart } = useShop();
   const location = useLocation();
-  const [showLoginModal, setShowLoginModal] = useState(false);
-const [pendingAction, setPendingAction] = useState(null);
+  const navigate = useNavigate();
 
-const isLoggedIn = () => {
-  return !!localStorage.getItem("basho_user");
-};
+  const isLoggedIn = () => {
+    return !!localStorage.getItem("basho_user");
+  };
 
-const requireLogin = (action) => {
-  if (!isLoggedIn()) {
-    alert("Login is required to perform this action");
-    setPendingAction(() => action);
-    setShowLoginModal(true);
-    return;
-  }
-  action();
-};
+  const requireLogin = (action) => {
+    if (!isLoggedIn()) {
+      setShowLoginAlert(true);
+      return;
+    }
+    action();
+  };
 
 
   // ✅ ALWAYS RETURN A VALID IMAGE
@@ -225,19 +223,16 @@ const requireLogin = (action) => {
       {showCustomForm && (
         <CustomOrderForm onClose={() => setShowCustomForm(false)} />
       )}
-      {showLoginModal && (
-  <LoginModal
-    onClose={() => {
-      setShowLoginModal(false);
-      setPendingAction(null);
-    }}
-    onSuccess={() => {
-      if (pendingAction) pendingAction();
-      setPendingAction(null);
-    }}
-  />
-)}
 
+      {showLoginAlert && (
+        <LoginAlert
+          onClose={() => setShowLoginAlert(false)}
+          onConfirm={() => {
+            setShowLoginAlert(false);
+            navigate("/auth");
+          }}
+        />
+      )}
 
       <Footer />
     </div>

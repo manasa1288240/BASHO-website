@@ -1105,4 +1105,44 @@ section h2::after {
   color: #fff;
 }
 
+/* ===== CARD STACK SCROLL EFFECT ===== */
+.card-stack-container {
+  position: relative;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
 
+.card-stack-item {
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              opacity 0.4s ease-out,
+              box-shadow 0.4s ease-out;
+  transform-origin: center center;
+  will-change: transform, opacity, box-shadow;
+  transform: scale(0.85);
+  opacity: 0.65;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.card-stack-item:hover {
+  transform: scale(1.05) !important;
+  opacity: 1 !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18) !important;
+}
+
+.products-scroll .scroll-card {
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              opacity 0.4s ease-out, 
+              box-shadow 0.4s ease-out;
+}
+
+.collection-scroll .collection-card {
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              opacity 0.4s ease-out, 
+              box-shadow 0.4s ease-out;
+}
+
+.action-section .action-card {
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              opacity 0.4s ease-out, 
+              box-shadow 0.4s ease-out;
+}

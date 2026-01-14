@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
+import LoginAlert from "../components/LoginAlert";
 import workshopsData from "../data/workshops";
 import "../styles/WorkshopsPage.css";
 
@@ -35,9 +37,15 @@ function isFullyBooked(workshop) {
 export default function WorkshopsPage() {
   const [selectedWorkshop, setSelectedWorkshop] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [showLoginAlert, setShowLoginAlert] = useState(false);
+  const navigate = useNavigate();
 
   const triggerNotify = (msg, type = "info") => {
     setNotification({ msg, type });
+  };
+
+  const isLoggedIn = () => {
+    return !!localStorage.getItem("basho_user");
   };
 
   const activeWorkshops = workshopsData
@@ -102,8 +110,22 @@ export default function WorkshopsPage() {
           workshop={selectedWorkshop}
           onClose={() => setSelectedWorkshop(null)}
           triggerNotify={triggerNotify}
+          isLoggedIn={isLoggedIn}
+          setShowLoginAlert={setShowLoginAlert}
         />
       )}
+
+      {showLoginAlert && (
+        <LoginAlert
+          onClose={() => setShowLoginAlert(false)}
+          onConfirm={() => {
+            setShowLoginAlert(false);
+            setSelectedWorkshop(null);
+            navigate("/auth");
+          }}
+        />
+      )}
+
       <Footer />
     </div>
   );
@@ -152,10 +174,24 @@ function WorkshopCard({ workshop, onClick }) {
   );
 }
 
-function WorkshopModal({ workshop, onClose, triggerNotify }) {
+function WorkshopModal({ workshop, onClose, triggerNotify, isLoggedIn, setShowLoginAlert }) {
   const [showBookingForm, setShowBookingForm] = useState(false);
   const closed = isBookingClosed(workshop);
   const full = isFullyBooked(workshop);
+
+  const handleBookClick = () => {
+    if (!isLoggedIn()) {
+      setShowLoginAlert(true);
+      return;
+    }
+    if (closed) {
+      triggerNotify("Booking closed 30 mins before start.", "error");
+    } else if (full) {
+      triggerNotify("Sorry, this workshop is fully booked!", "error");
+    } else {
+      setShowBookingForm(true);
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -172,11 +208,7 @@ function WorkshopModal({ workshop, onClose, triggerNotify }) {
                   <div className="modal-footer-btn-container">
                     <button 
                       className={`book-now-btn ${(closed || full) ? 'disabled-btn' : ''}`}
-                      onClick={() => {
-                        if (closed) triggerNotify("Booking closed 30 mins before start.", "error");
-                        else if (full) triggerNotify("Sorry, this workshop is fully booked!", "error");
-                        else setShowBookingForm(true);
-                      }}
+                      onClick={handleBookClick}
                     >
                       {closed ? "Booking Closed" : full ? "Sold Out" : "Book This Workshop"}
                     </button>

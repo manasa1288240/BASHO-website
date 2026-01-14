@@ -1,0 +1,111 @@
+.login-alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.login-alert-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 90%;
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.login-alert-header {
+  background: linear-gradient(135deg, #8b7355 0%, #a0826d 100%);
+  padding: 24px;
+  text-align: center;
+}
+
+.login-alert-header h2 {
+  margin: 0;
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.login-alert-body {
+  padding: 24px;
+  text-align: center;
+}
+
+.login-alert-body p {
+  margin: 0;
+  color: #333;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.login-alert-actions {
+  display: flex;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #eee;
+}
+
+.login-alert-btn-cancel,
+.login-alert-btn-confirm {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-alert-btn-cancel {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.login-alert-btn-cancel:hover {
+  background-color: #e0e0e0;
+}
+
+.login-alert-btn-confirm {
+  background: linear-gradient(135deg, #8b7355 0%, #a0826d 100%);
+  color: white;
+}
+
+.login-alert-btn-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(139, 115, 85, 0.3);
+}
+
+.login-alert-btn-confirm:active {
+  transform: translateY(0);
+}
