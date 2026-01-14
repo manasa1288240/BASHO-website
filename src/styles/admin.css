@@ -54,6 +54,8 @@
 .admin-nav-links {
   padding: 20px 0;
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .nav-item {
@@ -87,6 +89,18 @@
   border-left: 4px solid var(--accent-gold);
 }
 
+.nav-item.logout-btn {
+  margin-top: auto;
+  color: #ef4444;
+  border-top: 1px solid #2d3748;
+  border-left: none;
+}
+
+.nav-item.logout-btn:hover {
+  background-color: #7f1d1d;
+  color: #fca5a5;
+}
+
 /* --- 4. MAIN CONTENT AREA --- */
 .admin-main-view {
   flex: 1;
@@ -112,6 +126,24 @@
   font-size: 0.9rem;
   color: var(--text-muted);
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logout-btn-small {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.logout-btn-small:hover {
+  background-color: #fee2e2;
+  transform: scale(1.1);
 }
 
 /* --- 5. STATS CARDS --- */

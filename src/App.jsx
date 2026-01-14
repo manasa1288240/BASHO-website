@@ -3,6 +3,7 @@ import {
   Routes,
   Route,
   useLocation,
+  Navigate,
 } from "react-router-dom";
 
 import { useAppEffects } from "./AppEffects";
@@ -26,13 +27,24 @@ import WishlistPage from "./pages/WishlistPage";
 import CartPage from "./pages/CartPage";
 import GalleryPage from "./pages/GalleryPage";
 import AuthPage from "./pages/AuthPage";
-import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 
 /* -------- CLIENT TALES -------- */
 import ClientTales from "./components/ClientTales";
 
 import "./index.css";
+
+/* -------- PROTECTED ROUTE -------- */
+function ProtectedAdminRoute({ children }) {
+  const user = JSON.parse(localStorage.getItem("basho_user") || "{}");
+  const adminToken = localStorage.getItem("admin_token");
+  
+  if (!user.isAdmin || !adminToken) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return children;
+}
 
 /* ---------------- HOME PAGE ---------------- */
 function HomePage() {
@@ -69,9 +81,15 @@ function AppRoutes() {
         {/* ✅ CLIENT TALES PAGE */}
         <Route path="/client-tales" element={<ClientTales />} />
 
-        {/* -------- ADMIN -------- */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        {/* -------- ADMIN (Protected Route) -------- */}
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedAdminRoute>
+              <AdminDashboard />
+            </ProtectedAdminRoute>
+          } 
+        />
       </Routes>
     </div>
   );

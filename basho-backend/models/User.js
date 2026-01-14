@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    // Password is optional (used for admin account)
+    // Password is optional (used for admin account and sign in users)
     password: {
       type: String,
     },
@@ -18,6 +18,24 @@ const userSchema = new mongoose.Schema(
     },
     otp: String,
     otpExpiresAt: Date,
+
+    // User profile information
+    firstName: {
+      type: String,
+      default: ""
+    },
+    lastName: {
+      type: String,
+      default: ""
+    },
+    phone: {
+      type: String,
+      default: ""
+    },
+    profilePhoto: {
+      type: String,
+      default: ""
+    },
 
     // Wishlist: list of product IDs
     wishlist: [
