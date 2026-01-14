@@ -9,6 +9,31 @@ const JWT_SECRET = process.env.JWT_SECRET || "replace_me_in_env";
 const router = express.Router();
 
 /**
+ * CHECK IF EMAIL IS ADMIN (used for frontend to decide flow)
+ */
+router.post("/check-admin-email", async (req, res) => {
+  try {
+    console.log("🔍 CHECK-ADMIN-EMAIL called with:", req.body);
+    
+    const { email } = req.body;
+    if (!email) {
+      console.log("⚠️  No email provided");
+      return res.status(400).json({ isAdmin: false, exists: false });
+    }
+
+    const user = await User.findOne({ email });
+    console.log(`✅ Found user for ${email}:`, { exists: !!user, isAdmin: user?.isAdmin });
+    
+    const isAdmin = user && user.isAdmin ? true : false;
+    
+    res.json({ isAdmin, exists: !!user });
+  } catch (err) {
+    console.error("❌ Error in check-admin-email:", err.message);
+    res.status(500).json({ error: "Server error", message: err.message });
+  }
+});
+
+/**
  * SIGN IN (email + password)
  * Used for existing users to log in with password
  */
