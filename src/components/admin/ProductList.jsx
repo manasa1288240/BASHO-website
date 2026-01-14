@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ProductForm from "./ProductForm";
 
-const API_BASE = "/api/admin/products";
+const API_BASE = "http://localhost:5000/api/admin/products";
 
 function authHeader() {
   const t = localStorage.getItem("admin_token");

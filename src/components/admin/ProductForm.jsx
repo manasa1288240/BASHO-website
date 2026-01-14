@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const API_BASE = "/api/admin/products";
+const API_BASE = "http://localhost:5000/api/admin/products";
 
 function authHeader() {
   const t = localStorage.getItem("admin_token");
@@ -16,7 +16,7 @@ export default function ProductForm({ onSaved, product, onCancel }) {
     gstPercent: "18",
     stock: "",
     images: "",
-    customisable: false,
+    isCustomisable: false,
   });
 
   useEffect(() => {
@@ -26,30 +26,63 @@ export default function ProductForm({ onSaved, product, onCancel }) {
         images: Array.isArray(product.images) ? product.images.join(", ") : product.images,
       });
     } else {
-      setFormData({ name: "", description: "", category: "", price: "", gstPercent: "18", stock: "", images: "", customisable: false });
+      setFormData({ name: "", description: "", category: "", price: "", gstPercent: "18", stock: "", images: "", isCustomisable: false });
     }
   }, [product]);
 
   async function handleSubmit(e) {
     e.preventDefault();
+    console.log("📝 Submitting product form:", formData);
+    console.log("🔐 Auth header:", authHeader());
+    
     const method = product ? "PUT" : "POST";
     const url = product ? `${API_BASE}/${product._id}` : API_BASE;
+    
+    const payload = {
+      ...formData,
+      price: Number(formData.price),
+      stock: Number(formData.stock),
+      gstPercent: Number(formData.gstPercent),
+      images: formData.images.split(",").map((s) => s.trim()).filter(s => s),
+    };
+    
+    console.log("📦 Payload being sent:", JSON.stringify(payload, null, 2));
 
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json", ...authHeader() },
-      body: JSON.stringify({
-        ...formData,
-        images: formData.images.split(",").map((s) => s.trim()),
-      }),
-    });
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json", ...authHeader() },
+        body: JSON.stringify(payload),
+      });
 
-    const data = await res.json();
-    if (data.success) {
-      onSaved();
-      if (!product) setFormData({ name: "", description: "", category: "", price: "", gstPercent: "18", stock: "", images: "", customisable: false });
-    } else {
-      alert(data.message || data.error);
+      console.log("📊 Response status:", res.status, res.statusText);
+      console.log("📄 Response headers:", res.headers);
+      
+      const text = await res.text();
+      console.log("📝 Raw response text:", text);
+      
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error("❌ Failed to parse JSON:", e, "Text was:", text);
+        alert(`Server error (${res.status}): ${text || "No response"}`);
+        return;
+      }
+      
+      console.log("✅ Product response:", data);
+      
+      if (data.success) {
+        alert(`Product ${product ? "updated" : "added"} successfully!`);
+        onSaved();
+        if (!product) setFormData({ name: "", description: "", category: "", price: "", gstPercent: "18", stock: "", images: "", isCustomisable: false });
+      } else {
+        console.error("❌ Product error:", data);
+        alert(data.message || data.error || "Failed to save product");
+      }
+    } catch (err) {
+      console.error("❌ Product submission error:", err);
+      alert("Error saving product: " + err.message);
     }
   }
 
@@ -109,6 +142,17 @@ export default function ProductForm({ onSaved, product, onCancel }) {
           value={formData.stock} 
           onChange={(e) => setFormData({ ...formData, stock: e.target.value })} 
           required 
+        />
+      </div>
+
+      <div>
+        <label>GST % (Default: 18)</label>
+        <input 
+          type="number" 
+          value={formData.gstPercent} 
+          onChange={(e) => setFormData({ ...formData, gstPercent: e.target.value })} 
+          min="0"
+          max="100"
         />
       </div>
 
