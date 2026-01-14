@@ -6,6 +6,9 @@ import featuredProducts from "../data/products";
 import { useShop } from "../context/ShopContext";
 import pot3 from "../assets/pot3.png";
 import "../styles/ProductsPage.css";
+import LoginModal from "../components/LoginModal";
+
+
 
 export default function ProductsPage() {
   const [products, setProducts] = useState(featuredProducts);
@@ -14,6 +17,23 @@ export default function ProductsPage() {
   const [showCustomForm, setShowCustomForm] = useState(false);
   const { wishlist, cart, toggleWishlist, addToCart } = useShop();
   const location = useLocation();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+const [pendingAction, setPendingAction] = useState(null);
+
+const isLoggedIn = () => {
+  return !!localStorage.getItem("basho_user");
+};
+
+const requireLogin = (action) => {
+  if (!isLoggedIn()) {
+    alert("Login is required to perform this action");
+    setPendingAction(() => action);
+    setShowLoginModal(true);
+    return;
+  }
+  action();
+};
+
 
   // ✅ ALWAYS RETURN A VALID IMAGE
   const getProductImage = (product) => {
@@ -159,14 +179,20 @@ export default function ProductsPage() {
                 <button
                   type="button"
                   className={`wishlist-btn ${inWishlist ? "active" : ""}`}
-                  onClick={() => toggleWishlist(product)}
+                  onClick={() =>
+  requireLogin(() => toggleWishlist(product))
+}
+
                 >
                   {inWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
                 </button>
                 <button
                   type="button"
                   className={`cart-btn ${inCart ? "active" : ""}`}
-                  onClick={() => addToCart(product)}
+                  onClick={() =>
+  requireLogin(() => addToCart(product))
+}
+
                 >
                   {inCart ? "Add More" : "Add to Cart"}
                 </button>
@@ -199,6 +225,19 @@ export default function ProductsPage() {
       {showCustomForm && (
         <CustomOrderForm onClose={() => setShowCustomForm(false)} />
       )}
+      {showLoginModal && (
+  <LoginModal
+    onClose={() => {
+      setShowLoginModal(false);
+      setPendingAction(null);
+    }}
+    onSuccess={() => {
+      if (pendingAction) pendingAction();
+      setPendingAction(null);
+    }}
+  />
+)}
+
 
       <Footer />
     </div>

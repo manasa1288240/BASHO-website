@@ -1,0 +1,32 @@
+.login-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.login-modal {
+  background: white;
+  padding: 24px;
+  width: 320px;
+  border-radius: 8px;
+}
+
+.login-modal input {
+  width: 100%;
+  margin: 8px 0;
+  padding: 8px;
+}
+
+.login-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.login-actions .secondary {
+  background: #ccc;
+}

@@ -4,6 +4,8 @@ import { useShop } from "../context/ShopContext";
 import featuredProducts from "../data/products";
 import pot3 from "../assets/pot3.png";
 import "../styles/CartWishlist.css";
+import LoginModal from "../components/LoginModal";
+
 
 const WishlistPage = () => {
   const navigate = useNavigate();
@@ -44,9 +46,12 @@ const WishlistPage = () => {
   );
 
   const handleMoveToCart = (product) => {
+  requireLogin(() => {
     addToCart(product);
     toggleWishlist(product);
-  };
+  });
+};
+
 
   const handleRemove = (product) => {
     toggleWishlist(product);
