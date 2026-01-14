@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 // Use the correct API endpoint for your customers
-const API_BASE = "/api/admin/customers";
+const API_BASE = "http://localhost:5000/api/admin/customers";
 
 function authHeader() {
   const t = localStorage.getItem("admin_token");

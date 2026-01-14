@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const API_BASE = "/api/admin/workshop-events";
+const API_BASE = "http://localhost:5000/api/admin/workshop-events";
 
 function authHeader() {
   const t = localStorage.getItem("admin_token");

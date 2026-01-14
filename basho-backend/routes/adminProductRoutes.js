@@ -36,11 +36,20 @@ router.get("/:id", async (req, res) => {
 // CREATE product
 router.post("/", async (req, res) => {
   try {
+    console.log("📝 Creating product with data:", req.body);
     const data = req.body;
+    
+    // Validate required fields
+    if (!data.name || !data.category || !data.price) {
+      return res.status(400).json({ success: false, message: "Missing required fields: name, category, price" });
+    }
+    
     const product = new Product(data);
     await product.save();
+    console.log("✅ Product created:", product);
     res.status(201).json({ success: true, product });
   } catch (err) {
+    console.error("❌ Product creation error:", err.message, err);
     res.status(400).json({ success: false, error: err.message });
   }
 });
