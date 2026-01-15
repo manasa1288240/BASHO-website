@@ -129,3 +129,13 @@ connectDB()
     console.error("❌ Database connection failed:", err);
     process.exit(1);
   });
+
+  import cors from "cors";
+
+app.use(cors({
+  origin: [
+    "https://basho-website-j56l.vercel.app"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
