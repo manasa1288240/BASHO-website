@@ -4,7 +4,10 @@ import "./ActionSection.css";
 export default function Modal({ type, close }) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
+  // ✅ Backend base URL (works in Vercel + local)
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   // State to hold form values
   const [formData, setFormData] = useState({});
 
@@ -19,9 +22,10 @@ export default function Modal({ type, close }) {
 
     try {
       // Choose the correct endpoint based on the modal type
-      const endpoint = type === "event" 
-        ? "http://localhost:5000/api/workshops/submit-event" // Update with your actual route
-        : "http://localhost:5000/api/workshops/host-event";
+      const endpoint =
+        type === "event"
+          ? `${API_URL}/api/workshops/submit-event`
+          : `${API_URL}/api/workshops/host-event`;
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -47,7 +51,9 @@ export default function Modal({ type, close }) {
   return (
     <div className="modal-backdrop">
       <div className="modal-box">
-        <button className="close-btn" onClick={close}>×</button>
+        <button className="close-btn" onClick={close}>
+          ×
+        </button>
 
         {!submitted ? (
           <>
@@ -58,20 +64,84 @@ export default function Modal({ type, close }) {
             <form className="modal-form" onSubmit={handleSubmit}>
               {type === "event" ? (
                 <>
-                  <input name="userName" type="text" placeholder="Your Name" required onChange={handleChange} />
-                  <input name="eventTitle" type="text" placeholder="Event Name" required onChange={handleChange} />
-                  <input name="location" type="text" placeholder="Location / Place" required onChange={handleChange} />
-                  <input name="eventDate" type="datetime-local" required onChange={handleChange} />
-                  <input name="eventType" type="text" placeholder="Type of Event" required onChange={handleChange} />
-                  <input name="userEmail" type="email" placeholder="Your Email" required onChange={handleChange} />
+                  <input
+                    name="userName"
+                    type="text"
+                    placeholder="Your Name"
+                    required
+                    onChange={handleChange}
+                  />
+                  <input
+                    name="eventTitle"
+                    type="text"
+                    placeholder="Event Name"
+                    required
+                    onChange={handleChange}
+                  />
+                  <input
+                    name="location"
+                    type="text"
+                    placeholder="Location / Place"
+                    required
+                    onChange={handleChange}
+                  />
+                  <input
+                    name="eventDate"
+                    type="datetime-local"
+                    required
+                    onChange={handleChange}
+                  />
+                  <input
+                    name="eventType"
+                    type="text"
+                    placeholder="Type of Event"
+                    required
+                    onChange={handleChange}
+                  />
+                  <input
+                    name="userEmail"
+                    type="email"
+                    placeholder="Your Email"
+                    required
+                    onChange={handleChange}
+                  />
                 </>
               ) : (
                 <>
-                  <input name="name" type="text" placeholder="Your Name" required onChange={handleChange} />
-                  <input name="brand" type="text" placeholder="Brand / Organization" required onChange={handleChange} />
-                  <textarea name="details" placeholder="How would you like to collaborate?" required onChange={handleChange} />
-                  <input name="phone" type="tel" placeholder="Phone Number" required onChange={handleChange} />
-                  <input name="email" type="email" placeholder="Email Address" required onChange={handleChange} />
+                  <input
+                    name="name"
+                    type="text"
+                    placeholder="Your Name"
+                    required
+                    onChange={handleChange}
+                  />
+                  <input
+                    name="brand"
+                    type="text"
+                    placeholder="Brand / Organization"
+                    required
+                    onChange={handleChange}
+                  />
+                  <textarea
+                    name="details"
+                    placeholder="How would you like to collaborate?"
+                    required
+                    onChange={handleChange}
+                  />
+                  <input
+                    name="phone"
+                    type="tel"
+                    placeholder="Phone Number"
+                    required
+                    onChange={handleChange}
+                  />
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="Email Address"
+                    required
+                    onChange={handleChange}
+                  />
                 </>
               )}
 
@@ -88,7 +158,9 @@ export default function Modal({ type, close }) {
                 ? "Your event request has been successfully submitted. We’ve sent a confirmation email to you."
                 : "Your collaboration request has been successfully submitted. Check your inbox for a confirmation."}
             </p>
-            <button className="submit-btn" onClick={close}>Close</button>
+            <button className="submit-btn" onClick={close}>
+              Close
+            </button>
           </div>
         )}
       </div>
