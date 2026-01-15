@@ -7,12 +7,16 @@ import "../styles/AuthPage.css";
 
 export default function AuthPage() {
   const navigate = useNavigate();
+
+  // ✅ Backend base URL (works in Vercel + local if you set .env)
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   const [authMode, setAuthMode] = useState("choice"); // choice | signin | signup
   const [step, setStep] = useState("email"); // email | password (signin) | otp | profile (signup)
-  
+
   // Sign In State
   const [signInData, setSignInData] = useState({ email: "", password: "" });
-  
+
   // Sign Up State
   const [signUpEmail, setSignUpEmail] = useState("");
   const [signUpData, setSignUpData] = useState({
@@ -20,9 +24,9 @@ export default function AuthPage() {
     lastName: "",
     phone: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const otpRefs = useRef([]);
@@ -48,12 +52,16 @@ export default function AuthPage() {
     setLoading(true);
     try {
       // Check if this is an admin account
-      console.log('📧 Checking email:', signInData.email);
-      const checkRes = await axios.post("http://localhost:5000/api/auth/check-admin-email", {
-        email: signInData.email,
-      });
+      console.log("📧 Checking email:", signInData.email);
 
-      console.log('✅ Email check response:', checkRes.data);
+      const checkRes = await axios.post(
+        `${API_URL}/api/auth/check-admin-email`,
+        {
+          email: signInData.email,
+        }
+      );
+
+      console.log("✅ Email check response:", checkRes.data);
 
       if (checkRes.data.isAdmin) {
         // Admin: proceed to password step
@@ -69,13 +77,12 @@ export default function AuthPage() {
       }
       setLoading(false);
     } catch (err) {
-      console.error('❌ Email check error:', err.message);
-      console.error('Error response:', err.response?.data);
-      console.error('Error status:', err.response?.status);
-      
+      console.error("❌ Email check error:", err.message);
+      console.error("Error response:", err.response?.data);
+      console.error("Error status:", err.response?.status);
+
       // Fallback: still proceed to password step in case of error
-      // This allows user to continue even if the check fails
-      console.warn('⚠️ Proceeding to password step despite error');
+      console.warn("⚠️ Proceeding to password step despite error");
       setStep("password");
       setLoading(false);
     }
@@ -92,7 +99,7 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/signin", {
+      const res = await axios.post(`${API_URL}/api/auth/signin`, {
         email: signInData.email,
         password: signInData.password,
       });
@@ -138,10 +145,13 @@ export default function AuthPage() {
     setLoading(true);
     try {
       // Check if email already exists
-      const checkRes = await axios.post("http://localhost:5000/api/auth/check-admin-email", {
-        email: signUpEmail,
-      });
-      
+      const checkRes = await axios.post(
+        `${API_URL}/api/auth/check-admin-email`,
+        {
+          email: signUpEmail,
+        }
+      );
+
       if (checkRes.data.exists) {
         setMessage("Email already registered. Please sign in instead.");
         setLoading(false);
@@ -149,10 +159,10 @@ export default function AuthPage() {
       }
 
       // Send OTP
-      await axios.post("http://localhost:5000/api/auth/send-otp", {
+      await axios.post(`${API_URL}/api/auth/send-otp`, {
         email: signUpEmail,
       });
-      
+
       setStep("otp");
       setLoading(false);
     } catch (err) {
@@ -171,7 +181,7 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/auth/verify-otp", {
+      await axios.post(`${API_URL}/api/auth/verify-otp`, {
         email: signUpEmail,
         otp,
       });
@@ -189,7 +199,12 @@ export default function AuthPage() {
     e.preventDefault();
     setMessage("");
 
-    if (!signUpData.firstName || !signUpData.lastName || !signUpData.phone || !signUpData.password) {
+    if (
+      !signUpData.firstName ||
+      !signUpData.lastName ||
+      !signUpData.phone ||
+      !signUpData.password
+    ) {
       setMessage("Please fill in all fields");
       return;
     }
@@ -206,7 +221,7 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/update-profile", {
+      const res = await axios.post(`${API_URL}/api/auth/update-profile`, {
         email: signUpEmail,
         firstName: signUpData.firstName,
         lastName: signUpData.lastName,
@@ -239,7 +254,13 @@ export default function AuthPage() {
     setAuthMode("choice");
     setStep("email");
     setSignUpEmail("");
-    setSignUpData({ firstName: "", lastName: "", phone: "", password: "", confirmPassword: "" });
+    setSignUpData({
+      firstName: "",
+      lastName: "",
+      phone: "",
+      password: "",
+      confirmPassword: "",
+    });
     setMessage("");
   };
 
@@ -254,8 +275,8 @@ export default function AuthPage() {
             </p>
             <div className="branding-divider"></div>
             <p className="branding-description">
-              Join our community to explore handcrafted pottery,
-              exclusive workshops, and timeless ceramics.
+              Join our community to explore handcrafted pottery, exclusive
+              workshops, and timeless ceramics.
             </p>
           </div>
         </div>
@@ -266,7 +287,9 @@ export default function AuthPage() {
             {authMode === "choice" && (
               <>
                 <h2 className="auth-title">Welcome Back</h2>
-                <p className="auth-subtitle">Choose how you'd like to proceed</p>
+                <p className="auth-subtitle">
+                  Choose how you'd like to proceed
+                </p>
 
                 <div className="auth-choice-buttons">
                   <button
@@ -314,7 +337,10 @@ export default function AuthPage() {
                           placeholder="your@email.com"
                           value={signInData.email}
                           onChange={(e) => {
-                            setSignInData({ ...signInData, email: e.target.value });
+                            setSignInData({
+                              ...signInData,
+                              email: e.target.value,
+                            });
                             setMessage("");
                           }}
                           disabled={loading}
@@ -341,7 +367,9 @@ export default function AuthPage() {
                 {step === "password" && (
                   <>
                     <h2 className="auth-title">Enter Password</h2>
-                    <p className="auth-subtitle">Password for {signInData.email}</p>
+                    <p className="auth-subtitle">
+                      Password for {signInData.email}
+                    </p>
 
                     <form onSubmit={handleSignInPasswordSubmit} noValidate>
                       <div className="form-group">
@@ -353,7 +381,10 @@ export default function AuthPage() {
                           placeholder="••••••••"
                           value={signInData.password}
                           onChange={(e) => {
-                            setSignInData({ ...signInData, password: e.target.value });
+                            setSignInData({
+                              ...signInData,
+                              password: e.target.value,
+                            });
                             setMessage("");
                           }}
                           disabled={loading}
@@ -429,7 +460,11 @@ export default function AuthPage() {
                   <>
                     <h2 className="auth-title">Verify Email</h2>
                     <p className="auth-subtitle">
-                      Code sent to <strong>{signUpEmail.split("@")[0]}•••@{signUpEmail.split("@")[1]}</strong>
+                      Code sent to{" "}
+                      <strong>
+                        {signUpEmail.split("@")[0]}•••@
+                        {signUpEmail.split("@")[1]}
+                      </strong>
                     </p>
 
                     <div className="otp-container">
@@ -492,7 +527,10 @@ export default function AuthPage() {
                             placeholder="John"
                             value={signUpData.firstName}
                             onChange={(e) => {
-                              setSignUpData({ ...signUpData, firstName: e.target.value });
+                              setSignUpData({
+                                ...signUpData,
+                                firstName: e.target.value,
+                              });
                               setMessage("");
                             }}
                             disabled={loading}
@@ -506,7 +544,10 @@ export default function AuthPage() {
                             placeholder="Doe"
                             value={signUpData.lastName}
                             onChange={(e) => {
-                              setSignUpData({ ...signUpData, lastName: e.target.value });
+                              setSignUpData({
+                                ...signUpData,
+                                lastName: e.target.value,
+                              });
                               setMessage("");
                             }}
                             disabled={loading}
@@ -522,7 +563,10 @@ export default function AuthPage() {
                           placeholder="+91 9999999999"
                           value={signUpData.phone}
                           onChange={(e) => {
-                            setSignUpData({ ...signUpData, phone: e.target.value });
+                            setSignUpData({
+                              ...signUpData,
+                              phone: e.target.value,
+                            });
                             setMessage("");
                           }}
                           disabled={loading}
@@ -537,7 +581,10 @@ export default function AuthPage() {
                           placeholder="••••••••"
                           value={signUpData.password}
                           onChange={(e) => {
-                            setSignUpData({ ...signUpData, password: e.target.value });
+                            setSignUpData({
+                              ...signUpData,
+                              password: e.target.value,
+                            });
                             setMessage("");
                           }}
                           disabled={loading}
@@ -552,7 +599,10 @@ export default function AuthPage() {
                           placeholder="••••••••"
                           value={signUpData.confirmPassword}
                           onChange={(e) => {
-                            setSignUpData({ ...signUpData, confirmPassword: e.target.value });
+                            setSignUpData({
+                              ...signUpData,
+                              confirmPassword: e.target.value,
+                            });
                             setMessage("");
                           }}
                           disabled={loading}

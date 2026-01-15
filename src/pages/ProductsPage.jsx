@@ -8,8 +8,6 @@ import { useShop } from "../context/ShopContext";
 import pot3 from "../assets/pot3.png";
 import "../styles/ProductsPage.css";
 
-
-
 export default function ProductsPage() {
   const [products, setProducts] = useState(featuredProducts);
   const [activeFilter, setActiveFilter] = useState("All");
@@ -19,6 +17,9 @@ export default function ProductsPage() {
   const { wishlist, cart, toggleWishlist, addToCart } = useShop();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // ✅ Backend base URL (works in Vercel + local)
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const isLoggedIn = () => {
     return !!localStorage.getItem("basho_user");
@@ -32,14 +33,11 @@ export default function ProductsPage() {
     action();
   };
 
-
   // ✅ ALWAYS RETURN A VALID IMAGE
   const getProductImage = (product) => {
     if (product.image) return product.image;
 
-    const staticMatch = featuredProducts.find(
-      (p) => p.name === product.name
-    );
+    const staticMatch = featuredProducts.find((p) => p.name === product.name);
     if (staticMatch?.image) return staticMatch.image;
 
     if (Array.isArray(product.images) && product.images.length > 0) {
@@ -52,8 +50,7 @@ export default function ProductsPage() {
   // Helpers for wishlist & cart
   const getProductKey = (product) => product._id || product.id || product.name;
 
-  const isInWishlist = (product) =>
-    wishlist.includes(getProductKey(product));
+  const isInWishlist = (product) => wishlist.includes(getProductKey(product));
 
   const isInCart = (product) =>
     cart.some((item) => item.id === getProductKey(product));
@@ -62,7 +59,7 @@ export default function ProductsPage() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch(`${API_URL}/api/products`);
         if (!res.ok) throw new Error("Failed to fetch products");
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
@@ -74,7 +71,7 @@ export default function ProductsPage() {
     };
 
     loadProducts();
-  }, []);
+  }, [API_URL]);
 
   // Auto-scroll to custom order
   useEffect(() => {
@@ -95,11 +92,9 @@ export default function ProductsPage() {
     const search = searchTerm.toLowerCase();
 
     const matchesCategory =
-      activeFilter === "All" ||
-      category === activeFilter.toLowerCase();
+      activeFilter === "All" || category === activeFilter.toLowerCase();
 
-    const matchesSearch =
-      title.includes(search) || category.includes(search);
+    const matchesSearch = title.includes(search) || category.includes(search);
 
     return matchesCategory && matchesSearch;
   });
@@ -177,20 +172,14 @@ export default function ProductsPage() {
                 <button
                   type="button"
                   className={`wishlist-btn ${inWishlist ? "active" : ""}`}
-                  onClick={() =>
-  requireLogin(() => toggleWishlist(product))
-}
-
+                  onClick={() => requireLogin(() => toggleWishlist(product))}
                 >
                   {inWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
                 </button>
                 <button
                   type="button"
                   className={`cart-btn ${inCart ? "active" : ""}`}
-                  onClick={() =>
-  requireLogin(() => addToCart(product))
-}
-
+                  onClick={() => requireLogin(() => addToCart(product))}
                 >
                   {inCart ? "Add More" : "Add to Cart"}
                 </button>

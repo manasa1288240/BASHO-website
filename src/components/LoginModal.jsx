@@ -2,9 +2,10 @@ import { useState } from "react";
 import axios from "axios";
 import "./LoginModal.css";
 
-const API_BASE = "http://localhost:5000";
-
 export default function LoginModal({ onClose, onSuccess }) {
+  // ✅ Backend base URL (works in Vercel + local)
+  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,7 +30,7 @@ export default function LoginModal({ onClose, onSuccess }) {
       onSuccess?.();
       onClose();
     } catch (err) {
-      alert("Invalid credentials");
+      alert(err.response?.data?.message || "Invalid credentials");
     } finally {
       setLoading(false);
     }
