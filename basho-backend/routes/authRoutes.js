@@ -14,7 +14,7 @@ const router = express.Router();
 router.post("/check-admin-email", async (req, res) => {
   try {
     console.log("🔍 CHECK-ADMIN-EMAIL called with:", req.body);
-    
+
     const { email } = req.body;
     if (!email) {
       console.log("⚠️  No email provided");
@@ -22,14 +22,17 @@ router.post("/check-admin-email", async (req, res) => {
     }
 
     const user = await User.findOne({ email });
-    console.log(`✅ Found user for ${email}:`, { exists: !!user, isAdmin: user?.isAdmin });
-    
+    console.log(`✅ Found user for ${email}:`, {
+      exists: !!user,
+      isAdmin: user?.isAdmin,
+    });
+
     const isAdmin = user && user.isAdmin ? true : false;
-    
-    res.json({ isAdmin, exists: !!user });
+
+    return res.json({ isAdmin, exists: !!user });
   } catch (err) {
     console.error("❌ Error in check-admin-email:", err.message);
-    res.status(500).json({ error: "Server error", message: err.message });
+    return res.status(500).json({ error: "Server error", message: err.message });
   }
 });
 
@@ -55,9 +58,13 @@ router.post("/signin", async (req, res) => {
     }
 
     // Issue JWT
-    const token = jwt.sign({ id: user._id, isAdmin: !!user.isAdmin }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign(
+      { id: user._id, isAdmin: !!user.isAdmin },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-    res.json({
+    return res.json({
       message: "Sign in successful",
       token,
       user: {
@@ -65,12 +72,12 @@ router.post("/signin", async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         phone: user.phone,
-        isAdmin: !!user.isAdmin
+        isAdmin: !!user.isAdmin,
       },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ SIGNIN ERROR:", err);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -81,7 +88,7 @@ router.post("/signin", async (req, res) => {
 router.post("/update-profile", async (req, res) => {
   try {
     const { email, firstName, lastName, phone, password } = req.body;
-    
+
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
     }
@@ -104,9 +111,13 @@ router.post("/update-profile", async (req, res) => {
     await user.save();
 
     // Issue JWT
-    const token = jwt.sign({ id: user._id, isAdmin: !!user.isAdmin }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign(
+      { id: user._id, isAdmin: !!user.isAdmin },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-    res.json({
+    return res.json({
       message: "Profile updated successfully",
       token,
       user: {
@@ -114,21 +125,23 @@ router.post("/update-profile", async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         phone: user.phone,
-        isAdmin: !!user.isAdmin
+        isAdmin: !!user.isAdmin,
       },
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ UPDATE PROFILE ERROR:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
 /**
  * SEND OTP (EMAIL ONLY)
+ * ✅ FIXED: Responds immediately so frontend does NOT stay stuck on "Sending..."
+ * Email will be sent in background.
  */
 router.post("/send-otp", async (req, res) => {
   try {
-    console.log("SEND OTP BODY --->", req.body);
+    console.log("📩 SEND OTP BODY --->", req.body);
 
     const { email } = req.body;
     if (!email) {
@@ -145,16 +158,22 @@ router.post("/send-otp", async (req, res) => {
     user.otpExpiresAt = otpExpiry;
     await user.save();
 
-    await sendEmail({
+    // ✅ Respond immediately so frontend can show OTP screen
+    res.json({ message: "OTP generated" });
+
+    // ✅ Send email in background (won't block request)
+    sendEmail({
       to: email,
       subject: "Your BASHO Login OTP",
       text: `Your OTP is ${otp}. Valid for 5 minutes.`,
-    });
-
-    res.json({ message: "OTP sent to email" });
+    })
+      .then(() => console.log("✅ OTP email sent to:", email))
+      .catch((err) =>
+        console.log("❌ OTP email failed:", err.message || err)
+      );
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ SEND OTP ERROR:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -163,7 +182,7 @@ router.post("/send-otp", async (req, res) => {
  */
 router.post("/verify-otp", async (req, res) => {
   try {
-    console.log("VERIFY OTP BODY --->", req.body);
+    console.log("✅ VERIFY OTP BODY --->", req.body);
 
     const { email, otp } = req.body;
     if (!email || !otp) {
@@ -186,16 +205,20 @@ router.post("/verify-otp", async (req, res) => {
     await user.save();
 
     // Issue JWT (include isAdmin flag)
-    const token = jwt.sign({ id: user._id, isAdmin: !!user.isAdmin }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign(
+      { id: user._id, isAdmin: !!user.isAdmin },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-    res.json({
+    return res.json({
       message: "Login successful",
       token,
       user: { email: user.email, isAdmin: !!user.isAdmin },
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ VERIFY OTP ERROR:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -206,22 +229,31 @@ router.post("/verify-otp", async (req, res) => {
 router.post("/admin-login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: "Email and password required" });
+    if (!email || !password)
+      return res.status(400).json({ message: "Email and password required" });
 
     const user = await User.findOne({ email });
-    if (!user || !user.password) return res.status(401).json({ message: "Invalid credentials" });
+    if (!user || !user.password)
+      return res.status(401).json({ message: "Invalid credentials" });
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: "Invalid credentials" });
 
-    if (!user.isAdmin) return res.status(403).json({ message: "Forbidden: not an admin" });
+    if (!user.isAdmin)
+      return res.status(403).json({ message: "Forbidden: not an admin" });
 
-    const token = jwt.sign({ id: user._id, isAdmin: true }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ id: user._id, isAdmin: true }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
-    res.json({ message: "Admin login successful", token, user: { email: user.email, isAdmin: true } });
+    return res.json({
+      message: "Admin login successful",
+      token,
+      user: { email: user.email, isAdmin: true },
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ ADMIN LOGIN ERROR:", err);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -230,12 +262,18 @@ router.get("/admin-exists", async (req, res) => {
   try {
     const { email } = req.query;
     if (!email) return res.status(400).json({ message: "email query required" });
+
     const user = await User.findOne({ email });
     if (!user) return res.json({ exists: false });
-    return res.json({ exists: true, email: user.email, isAdmin: !!user.isAdmin });
+
+    return res.json({
+      exists: true,
+      email: user.email,
+      isAdmin: !!user.isAdmin,
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ ADMIN EXISTS ERROR:", err);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -243,14 +281,18 @@ router.get("/admin-exists", async (req, res) => {
 router.post("/check-password", async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: "email and password required" });
+    if (!email || !password)
+      return res.status(400).json({ message: "email and password required" });
+
     const user = await User.findOne({ email });
-    if (!user || !user.password) return res.status(404).json({ message: "user or password not found" });
+    if (!user || !user.password)
+      return res.status(404).json({ message: "user or password not found" });
+
     const match = await bcrypt.compare(password, user.password);
     return res.json({ match });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ CHECK PASSWORD ERROR:", err);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
