@@ -26,31 +26,54 @@ import img18 from "../assets/gallery/img18.png";
 
 // PRODUCTS (static)
 const productImages = [
-  img1, img2, img3, img4, img5, img6, img7,
-  img8, img9, img10, img11, img12, img13,
-  img14, img15, img16, img17, img18,
-].map(img => ({ imageUrl: img, type: "product" }));
+  img1,
+  img2,
+  img3,
+  img4,
+  img5,
+  img6,
+  img7,
+  img8,
+  img9,
+  img10,
+  img11,
+  img12,
+  img13,
+  img14,
+  img15,
+  img16,
+  img17,
+  img18,
+].map((img) => ({ imageUrl: img, type: "product" }));
 
 const GalleryPage = () => {
+  // ✅ Backend base URL (works in Vercel + local)
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   const [activeTab, setActiveTab] = useState("all"); // NEW
-  const [workshops, setWorkshops] = useState([]);   // NEW
-  const [events, setEvents] = useState([]);         // NEW
+  const [workshops, setWorkshops] = useState([]); // NEW
+  const [events, setEvents] = useState([]); // NEW
 
   // FETCH from MongoDB
   useEffect(() => {
-    axios.get("http://localhost:5000/api/gallery").then(res => {
-      const workshopImgs = res.data
-        .filter(i => i.category === "workshop")
-        .map(i => ({ imageUrl: i.imageUrl, type: "workshop" }));
+    axios
+      .get(`${API_URL}/api/gallery`)
+      .then((res) => {
+        const workshopImgs = res.data
+          .filter((i) => i.category === "workshop")
+          .map((i) => ({ imageUrl: i.imageUrl, type: "workshop" }));
 
-      const eventImgs = res.data
-        .filter(i => i.category === "event")
-        .map(i => ({ imageUrl: i.imageUrl, type: "event" }));
+        const eventImgs = res.data
+          .filter((i) => i.category === "event")
+          .map((i) => ({ imageUrl: i.imageUrl, type: "event" }));
 
-      setWorkshops(workshopImgs);
-      setEvents(eventImgs);
-    });
-  }, []);
+        setWorkshops(workshopImgs);
+        setEvents(eventImgs);
+      })
+      .catch((err) => {
+        console.error("❌ Failed to load gallery images:", err);
+      });
+  }, [API_URL]);
 
   // COMBINED gallery
   const allImages = [...productImages, ...workshops, ...events];
@@ -58,7 +81,7 @@ const GalleryPage = () => {
   const visibleImages =
     activeTab === "all"
       ? allImages
-      : allImages.filter(img => img.type === activeTab);
+      : allImages.filter((img) => img.type === activeTab);
 
   return (
     <>
@@ -70,7 +93,7 @@ const GalleryPage = () => {
 
         {/* FILTER TABS (NEW) */}
         <div className="gallery-tabs">
-          {["all", "product", "workshop", "event"].map(tab => (
+          {["all", "product", "workshop", "event"].map((tab) => (
             <button
               key={tab}
               className={`gallery-tab ${activeTab === tab ? "active" : ""}`}
@@ -84,7 +107,11 @@ const GalleryPage = () => {
         </div>
 
         {/* GALLERY */}
-        <div className={`masonry-container ${activeTab === "event" ? "event-grid" : ""}`}>
+        <div
+          className={`masonry-container ${
+            activeTab === "event" ? "event-grid" : ""
+          }`}
+        >
           {visibleImages.map((img, index) => (
             <motion.div
               key={index}
