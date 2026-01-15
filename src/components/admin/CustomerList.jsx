@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
-// Use the correct API endpoint for your customers
-const API_BASE = "http://localhost:5000/api/admin/customers";
+// ✅ Use env API url (works in Vercel + local)
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE = `${API_URL}/api/admin/customers`;
 
 function authHeader() {
   const t = localStorage.getItem("admin_token");
@@ -19,41 +20,63 @@ export default function CustomerList() {
       setLoading(true);
       const res = await fetch(API_BASE, { headers: { ...authHeader() } });
       const data = await res.json();
+
       if (data.success) {
-        setCustomers(data.customers);
+        setCustomers(data.customers || []);
+      } else {
+        setCustomers([]);
       }
     } catch (err) {
       console.error("Failed to fetch customers:", err);
+      setCustomers([]);
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => { loadCustomers(); }, []);
+  useEffect(() => {
+    loadCustomers();
+  }, []);
 
-  // 2. SEARCH LOGIC: Combines name and email filtering
-  const filteredCustomers = customers.filter(customer => 
-    customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // 2. SEARCH LOGIC: Combines name and email filtering safely
+  const filteredCustomers = customers.filter((customer) => {
+    const name = (customer.name || "").toLowerCase();
+    const email = (customer.email || "").toLowerCase();
+    const search = searchTerm.toLowerCase();
+
+    return name.includes(search) || email.includes(search);
+  });
 
   return (
     <div className="content-card-pro">
       {/* HEADER SECTION WITH SEARCH BAR */}
-      <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
+      <div
+        className="section-header"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "15px",
+        }}
+      >
         <div>
           <h3>Customer & Student Directory</h3>
-          <p style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
+          <p style={{ fontSize: "13px", color: "#64748b", marginTop: "4px" }}>
             Manage buyers and workshop participants.
           </p>
         </div>
-        
+
         <div className="search-container">
-          <input 
-            type="text" 
-            placeholder="🔍 Search name or email..." 
-            className="status-select" 
-            style={{ width: "300px", padding: "10px 15px", border: "1px solid #e2e8f0" }}
+          <input
+            type="text"
+            placeholder="🔍 Search name or email..."
+            className="status-select"
+            style={{
+              width: "300px",
+              padding: "10px 15px",
+              border: "1px solid #e2e8f0",
+            }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -70,33 +93,55 @@ export default function CustomerList() {
             <th>Total Orders</th>
             <th>Total Spent</th>
             <th>Type</th>
-            <th style={{ textAlign: 'right' }}>Actions</th>
+            <th style={{ textAlign: "right" }}>Actions</th>
           </tr>
         </thead>
         <tbody>
           {loading ? (
-            <tr><td colSpan="7" style={{ textAlign: 'center', padding: '40px' }}>Loading directory...</td></tr>
+            <tr>
+              <td colSpan="7" style={{ textAlign: "center", padding: "40px" }}>
+                Loading directory...
+              </td>
+            </tr>
           ) : filteredCustomers.length > 0 ? (
             filteredCustomers.map((c) => (
               <tr key={c._id}>
-                <td style={{ fontWeight: '600', color: '#1e293b' }}>{c.name}</td>
-                <td>
-                  <div style={{ fontSize: '13px' }}>{c.email}</div>
-                  <div style={{ fontSize: '11px', color: '#94a3b8' }}>{c.phone || "+91-XXXXXXXXXX"}</div>
+                <td style={{ fontWeight: "600", color: "#1e293b" }}>
+                  {c.name || "Unnamed"}
                 </td>
-                <td style={{ fontSize: '13px' }}>{new Date(c.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-                <td>{c.orderCount || 0} Orders</td>
-                <td style={{ fontWeight: '700', color: '#0f172a' }}>₹{c.totalSpent?.toLocaleString() || 0}</td>
                 <td>
-                  <span className={`status-pill ${c.isStudent ? 'status-shipped' : 'in-stock'}`}>
+                  <div style={{ fontSize: "13px" }}>{c.email || "No email"}</div>
+                  <div style={{ fontSize: "11px", color: "#94a3b8" }}>
+                    {c.phone || "+91-XXXXXXXXXX"}
+                  </div>
+                </td>
+                <td style={{ fontSize: "13px" }}>
+                  {c.createdAt
+                    ? new Date(c.createdAt).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "-"}
+                </td>
+                <td>{c.orderCount || 0} Orders</td>
+                <td style={{ fontWeight: "700", color: "#0f172a" }}>
+                  ₹{c.totalSpent?.toLocaleString() || 0}
+                </td>
+                <td>
+                  <span
+                    className={`status-pill ${
+                      c.isStudent ? "status-shipped" : "in-stock"
+                    }`}
+                  >
                     {c.isStudent ? "Student" : "Buyer"}
                   </span>
                 </td>
-                <td style={{ textAlign: 'right' }}>
-                  <button 
-                    className="edit-link" 
+                <td style={{ textAlign: "right" }}>
+                  <button
+                    className="edit-link"
                     onClick={() => alert(`Opening profile for ${c.name}...`)}
-                    style={{ fontWeight: '600' }}
+                    style={{ fontWeight: "600" }}
                   >
                     View Detail
                   </button>
@@ -105,12 +150,17 @@ export default function CustomerList() {
             ))
           ) : (
             <tr>
-              <td colSpan="7" style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>
-                {searchTerm ? (
-                  `No customers found matching "${searchTerm}"`
-                ) : (
-                  "No customers registered yet. New buyers will appear here automatically."
-                )}
+              <td
+                colSpan="7"
+                style={{
+                  textAlign: "center",
+                  padding: "60px",
+                  color: "#94a3b8",
+                }}
+              >
+                {searchTerm
+                  ? `No customers found matching "${searchTerm}"`
+                  : "No customers registered yet. New buyers will appear here automatically."}
               </td>
             </tr>
           )}

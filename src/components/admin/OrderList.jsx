@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
-const API_BASE = "http://localhost:5000/api/admin/orders";
+// ✅ Use env API url (works in Vercel + local)
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE = `${API_URL}/api/admin/orders`;
 
 function authHeader() {
   const t = localStorage.getItem("admin_token");
@@ -13,9 +15,10 @@ export default function OrderList() {
 
   async function loadOrders() {
     try {
+      setLoading(true);
       const res = await fetch(API_BASE, { headers: { ...authHeader() } });
       const data = await res.json();
-      if (data.success) setOrders(data.orders);
+      if (data.success) setOrders(data.orders || []);
     } catch (err) {
       console.error("Order load failed:", err);
     } finally {
@@ -23,15 +26,24 @@ export default function OrderList() {
     }
   }
 
-  useEffect(() => { loadOrders(); }, []);
+  useEffect(() => {
+    loadOrders();
+  }, []);
 
   async function handleStatusChange(orderId, newStatus) {
-    const res = await fetch(`${API_BASE}/${orderId}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...authHeader() },
-      body: JSON.stringify({ shippingStatus: newStatus }),
-    });
-    if (res.ok) loadOrders();
+    try {
+      const res = await fetch(`${API_BASE}/${orderId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...authHeader() },
+        body: JSON.stringify({ shippingStatus: newStatus }),
+      });
+
+      if (res.ok) loadOrders();
+      else alert("Failed to update status");
+    } catch (err) {
+      console.error("Status update failed:", err);
+      alert("Failed to update status");
+    }
   }
 
   return (
@@ -51,35 +63,69 @@ export default function OrderList() {
             <th>Shipping Control</th>
           </tr>
         </thead>
+
         <tbody>
-          {orders.length > 0 ? (
+          {loading ? (
+            <tr>
+              <td
+                colSpan="6"
+                style={{ textAlign: "center", padding: "50px", color: "#94a3b8" }}
+              >
+                Loading orders...
+              </td>
+            </tr>
+          ) : orders.length > 0 ? (
             orders.map((order) => {
+              const totalAmount = Number(order.totalAmount || 0);
+
               // Automatic GST calculation for your records
-              const gstValue = (order.totalAmount * 0.18).toFixed(2);
-              const baseValue = (order.totalAmount - gstValue).toFixed(2);
+              const gstValue = (totalAmount * 0.18).toFixed(2);
 
               return (
                 <tr key={order._id}>
-                  <td><code style={{color: '#64748b'}}>#{order._id.slice(-6).toUpperCase()}</code></td>
                   <td>
-                    <div style={{ fontWeight: '600' }}>{order.customerName}</div>
-                    <div style={{ fontSize: '11px', color: '#94a3b8' }}>{order.shippingAddress?.city || "Local Pickup"}</div>
+                    <code style={{ color: "#64748b" }}>
+                      #{String(order._id || "").slice(-6).toUpperCase()}
+                    </code>
                   </td>
+
+                  <td>
+                    <div style={{ fontWeight: "600" }}>
+                      {order.customerName || "Customer"}
+                    </div>
+                    <div style={{ fontSize: "11px", color: "#94a3b8" }}>
+                      {order.shippingAddress?.city || "Local Pickup"}
+                    </div>
+                  </td>
+
                   <td>{order.items?.length || 0} Units</td>
+
                   <td>
-                    <div style={{ fontWeight: '700' }}>₹{order.totalAmount}</div>
-                    <div style={{ fontSize: '10px', color: '#10b981' }}>GST (18%): ₹{gstValue}</div>
+                    <div style={{ fontWeight: "700" }}>₹{totalAmount}</div>
+                    <div style={{ fontSize: "10px", color: "#10b981" }}>
+                      GST (18%): ₹{gstValue}
+                    </div>
                   </td>
+
                   <td>
-                    <span className={`status-pill ${order.paymentStatus === 'Paid' ? 'status-paid' : 'status-pending'}`}>
-                      {order.paymentStatus || 'Pending'}
+                    <span
+                      className={`status-pill ${
+                        order.paymentStatus === "Paid"
+                          ? "status-paid"
+                          : "status-pending"
+                      }`}
+                    >
+                      {order.paymentStatus || "Pending"}
                     </span>
                   </td>
+
                   <td>
-                    <select 
+                    <select
                       className="status-select"
                       value={order.shippingStatus || "Processing"}
-                      onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                      onChange={(e) =>
+                        handleStatusChange(order._id, e.target.value)
+                      }
                     >
                       <option value="Processing">⏳ Processing</option>
                       <option value="Shipped">🚚 Shipped</option>
@@ -92,8 +138,12 @@ export default function OrderList() {
             })
           ) : (
             <tr>
-              <td colSpan="6" style={{ textAlign: 'center', padding: '50px', color: '#94a3b8' }}>
-                No orders found. Once customers buy your pottery, they will appear here.
+              <td
+                colSpan="6"
+                style={{ textAlign: "center", padding: "50px", color: "#94a3b8" }}
+              >
+                No orders found. Once customers buy your pottery, they will
+                appear here.
               </td>
             </tr>
           )}
