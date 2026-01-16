@@ -16,6 +16,7 @@ const cartRoutes = require("./routes/cartRoutes");
 const chatbotRoutes = require("./routes/chatbotRoutes");
 const galleryRoutes = require("./routes/galleryRoutes");
 const adminProductRoutes = require("./routes/adminProductRoutes");
+const adminWorkshopRoutes = require("./routes/adminWorkshopRoutes");
 
 const app = express();
 
@@ -102,6 +103,7 @@ app.use("/api/gallery", galleryRoutes);
 
 // Admin APIs
 app.use("/api/admin/products", adminProductRoutes);
+app.use("/api/admin/workshop-events", adminWorkshopRoutes);
 
 /* -------------------- ERROR HANDLER -------------------- */
 app.use((err, req, res, next) => {

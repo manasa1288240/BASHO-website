@@ -35,10 +35,39 @@ function isFullyBooked(workshop) {
 /* ================================================= */
 
 export default function WorkshopsPage() {
+  const [workshops, setWorkshops] = useState([]);
   const [selectedWorkshop, setSelectedWorkshop] = useState(null);
   const [notification, setNotification] = useState(null);
   const [showLoginAlert, setShowLoginAlert] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch workshops from backend
+    const fetchWorkshops = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/workshops/published");
+        const data = await response.json();
+        
+        if (data.success && data.workshops) {
+          console.log("✅ Workshops loaded from database:", data.workshops);
+          setWorkshops(data.workshops);
+        } else {
+          // Fallback to hardcoded data if API fails
+          console.warn("⚠️ Failed to fetch from API, using hardcoded data");
+          setWorkshops(workshopsData);
+        }
+      } catch (err) {
+        console.error("❌ Error fetching workshops:", err);
+        // Fallback to hardcoded data
+        setWorkshops(workshopsData);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorkshops();
+  }, []);
 
   const triggerNotify = (msg, type = "info") => {
     setNotification({ msg, type });
@@ -48,14 +77,18 @@ export default function WorkshopsPage() {
     return !!localStorage.getItem("basho_user");
   };
 
-  const activeWorkshops = workshopsData
+  const activeWorkshops = workshops
     .filter(w => !isCompleted(w) && !w.isCustom)
     .sort((a, b) => getStartDateTime(a) - getStartDateTime(b));
 
-  const completedWorkshops = workshopsData
+  const completedWorkshops = workshops
     .filter(w => isCompleted(w) && !w.isCustom);
 
-  const customWorkshop = workshopsData.find(w => w.isCustom);
+  const customWorkshop = workshops.find(w => w.isCustom);
+
+  if (loading) {
+    return <div className="workshops-page"><p>Loading workshops...</p></div>;
+  }
 
   return (
     <div className="workshops-page">

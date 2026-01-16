@@ -262,6 +262,12 @@ section.fade-in-visible {
   color: var(--accent-dark);
 }
 
+.mobile-menu-links li a.chatbot-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .nav-links li a.active {
   color: var(--accent);
 }

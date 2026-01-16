@@ -13,6 +13,12 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("products");
   const [adminUser, setAdminUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalRevenue: "₹0",
+    activeOrders: "0",
+    workshopSignups: "0",
+    gstCollected: "₹0"
+  });
 
   useEffect(() => {
     // Check if user is admin
@@ -27,7 +33,72 @@ export default function AdminDashboard() {
 
     setAdminUser(user);
     setLoading(false);
+    
+    // Fetch dashboard stats
+    fetchDashboardStats();
   }, [navigate]);
+
+  const fetchDashboardStats = async () => {
+    try {
+      const adminToken = localStorage.getItem("admin_token");
+      
+      // Fetch users to get order data
+      const usersRes = await fetch("http://localhost:5000/api/auth/all-users", {
+        headers: {
+          "Authorization": `Bearer ${adminToken}`
+        }
+      });
+      
+      const usersData = await usersRes.json();
+      const users = usersData.users || [];
+      
+      // Calculate total revenue and active orders
+      let totalRevenue = 0;
+      let activeOrders = 0;
+      let totalGST = 0;
+      
+      users.forEach(user => {
+        if (user.orders && user.orders.length > 0) {
+          activeOrders += user.orders.length;
+          user.orders.forEach(order => {
+            if (order.items) {
+              order.items.forEach(item => {
+                if (item.product && item.product.price) {
+                  const itemPrice = item.product.price * item.qty;
+                  totalRevenue += itemPrice;
+                  
+                  // Calculate GST
+                  const gstPercent = item.product.gstPercent || 18;
+                  totalGST += (itemPrice * gstPercent) / 100;
+                }
+              });
+            }
+          });
+        }
+      });
+      
+      // Fetch workshops count
+      const workshopsRes = await fetch("http://localhost:5000/api/admin/workshops", {
+        headers: {
+          "Authorization": `Bearer ${adminToken}`
+        }
+      });
+      
+      const workshopsData = await workshopsRes.json();
+      const workshopCount = Array.isArray(workshopsData) ? workshopsData.length : 0;
+      
+      // Update stats
+      setStats({
+        totalRevenue: `₹${totalRevenue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
+        activeOrders: activeOrders.toString(),
+        workshopSignups: workshopCount.toString(),
+        gstCollected: `₹${totalGST.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
+      });
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      // Keep default values if fetch fails
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("basho_user");
@@ -35,13 +106,6 @@ export default function AdminDashboard() {
     localStorage.removeItem("admin_token");
     navigate("/auth");
   };
-
-  const [stats, setStats] = useState({
-    totalRevenue: "₹45,231",
-    activeOrders: "12",
-    workshopSignups: "24",
-    gstCollected: "₹8,141"
-  });
 
   if (loading) {
     return <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>;

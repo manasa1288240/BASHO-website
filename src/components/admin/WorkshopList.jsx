@@ -13,9 +13,11 @@ export default function WorkshopList() {
     title: "", 
     description: "", 
     date: "", 
+    time: "",
+    duration: "",
     price: "", 
     image: "", 
-    category: "", // Changed to empty string for text input
+    category: "",
     capacity: "10"
   });
 
@@ -30,18 +32,46 @@ export default function WorkshopList() {
   useEffect(() => { load(); }, []);
 
   const handleSave = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  
+  // Validation: Ensure required fields aren't empty
+  if (!formData.title || !formData.category || !formData.date || !formData.price) {
+    alert("Please fill required fields: Title, Category, Date, Price");
+    return;
+  }
+
+  // Transform data: Convert strings from inputs into Numbers for the Schema
+  const submissionData = {
+    ...formData,
+    price: Number(formData.price),
+    capacity: Number(formData.capacity) || 10
+  };
+
+  try {
     const res = await fetch(API_BASE, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...authHeader() },
-      body: JSON.stringify(formData)
+      headers: { 
+        "Content-Type": "application/json", 
+        ...authHeader() 
+      },
+      body: JSON.stringify(submissionData) // Use the transformed data
     });
-    if (res.ok) {
-      alert("Workshop Saved!");
-      setFormData({ title: "", description: "", date: "", price: "", image: "", category: "", capacity: "10" });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      alert("✅ Workshop Saved Successfully!");
+      setFormData({ title: "", description: "", date: "", time: "", duration: "", price: "", image: "", category: "", capacity: "10" });
       load();
+    } else {
+      // This will now show the specific error message from the backend catch block
+      alert("Error: " + (data.error || "Failed to save workshop"));
     }
-  };
+  } catch (err) {
+    console.error("Save error:", err);
+    alert("Connection Error: Check if your backend is running on Port 5000");
+  }
+};
 
   return (
     <div className="content-card-pro">
@@ -80,6 +110,15 @@ export default function WorkshopList() {
           <input type="date" value={formData.date} required
             onChange={e => setFormData({...formData, date: e.target.value})} />
 
+          <label>Time</label>
+          <input type="time" value={formData.time}
+            onChange={e => setFormData({...formData, time: e.target.value})} />
+
+          <label>Duration</label>
+          <input type="text" value={formData.duration}
+            onChange={e => setFormData({...formData, duration: e.target.value})}
+            placeholder="e.g. 2 hours" />
+
           <label>Capacity (Seats)</label>
           <input type="number" value={formData.capacity} 
             onChange={e => setFormData({...formData, capacity: e.target.value})} />
@@ -104,6 +143,8 @@ export default function WorkshopList() {
             <th>Title</th>
             <th>Category</th>
             <th>Date</th>
+            <th>Time</th>
+            <th>Duration</th>
             <th>Price + GST</th>
             <th>Capacity</th>
             <th>Actions</th>
@@ -115,6 +156,8 @@ export default function WorkshopList() {
             return (
               <tr key={w._id}>
                 <td style={{ fontWeight: '600' }}>{w.title}</td>
+                <td>{w.time || '-'}</td>
+                <td>{w.duration || '-'}</td>
                 <td><span className="badge-category">{w.category}</span></td>
                 <td>{new Date(w.date).toLocaleDateString()}</td>
                 <td>₹{w.price} <small style={{color:'green'}}>(+₹{gst})</small></td>
