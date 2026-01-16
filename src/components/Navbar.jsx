@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { useShop } from "../context/ShopContext";
+import ChatbotModal from "./ChatbotModal";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function Navbar() {
   const [user, setUser] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [chatbotOpen, setChatbotOpen] = useState(false);
   const { wishlist, cart } = useShop();
 
   useEffect(() => {
@@ -228,6 +230,11 @@ export default function Navbar() {
                 🛒 Cart ({cart.reduce((sum, item) => sum + (item.qty || 1), 0)})
               </Link>
             </li>
+            <li>
+              <a href="#" onClick={(e) => { e.preventDefault(); setChatbotOpen(true); setMobileMenuOpen(false); }} className="chatbot-nav-link">
+                💬 Ask BASHO AI
+              </a>
+            </li>
             {!user ? (
               <li><a href="#" onClick={(e) => { e.preventDefault(); navigate("/auth"); setMobileMenuOpen(false); }}>Account</a></li>
             ) : (
@@ -236,6 +243,9 @@ export default function Navbar() {
           </ul>
         </div>
       </div>
+
+      {/* Chatbot Modal for Mobile */}
+      {chatbotOpen && <ChatbotModal onClose={() => setChatbotOpen(false)} />}
     </nav>
   );
 }
