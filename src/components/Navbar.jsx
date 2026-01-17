@@ -73,8 +73,14 @@ export default function Navbar() {
 
   const logout = () => {
     localStorage.removeItem("basho_user");
+
+    localStorage.removeItem("basho_cart");
+    localStorage.removeItem("cart");
+
     setUser(null);
     setShowMenu(false);
+
+    window.dispatchEvent(new Event("basho-clear-cart"));
   };
 
   return (
@@ -82,9 +88,8 @@ export default function Navbar() {
       <div className="navbar-container">
         <img src={logo} alt="Basho Logo" className="logo" />
 
-        {/* Hamburger Menu Button - Mobile Only */}
-        <button 
-          className="hamburger-menu" 
+        <button
+          className="hamburger-menu"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           style={{ color: textColor }}
         >
@@ -93,7 +98,6 @@ export default function Navbar() {
           <span></span>
         </button>
 
-        {/* Desktop Nav Links */}
         <ul className="nav-links">
           <li><Link to="/" style={{ color: textColor }}>Home</Link></li>
           <li><Link to="/products" style={{ color: textColor }}>Products</Link></li>
@@ -101,7 +105,6 @@ export default function Navbar() {
           <li><Link to="/about-basho" style={{ color: textColor }}>About Basho</Link></li>
           <li><Link to="/gallery" style={{ color: textColor }}>Gallery</Link></li>
 
-          {/* ❤️ Wishlist */}
           <li>
             <Link to="/wishlist" style={{ color: textColor }} className="nav-icon-link">
               <span className="nav-icon-count">{wishlist.length}</span>
@@ -124,7 +127,6 @@ export default function Navbar() {
             </Link>
           </li>
 
-          {/* 🛒 Cart */}
           <li>
             <Link to="/cart" style={{ color: textColor }} className="nav-icon-link">
               <span className="nav-icon-count">
@@ -148,7 +150,6 @@ export default function Navbar() {
             </Link>
           </li>
 
-          {/* 👤 Account */}
           <li className="account-nav" style={{ position: "relative" }}>
             <a href="#" onClick={handleAccountClick}>
               {!user ? (
@@ -212,7 +213,6 @@ export default function Navbar() {
           </li>
         </ul>
 
-        {/* Mobile Sidebar Menu */}
         <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`} style={{ backgroundColor: bgColor }}>
           <ul className="mobile-menu-links">
             <li><Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
@@ -231,20 +231,49 @@ export default function Navbar() {
               </Link>
             </li>
             <li>
-              <a href="#" onClick={(e) => { e.preventDefault(); setChatbotOpen(true); setMobileMenuOpen(false); }} className="chatbot-nav-link">
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setChatbotOpen(true);
+                  setMobileMenuOpen(false);
+                }}
+                className="chatbot-nav-link"
+              >
                 💬 Ask BASHO AI
               </a>
             </li>
             {!user ? (
-              <li><a href="#" onClick={(e) => { e.preventDefault(); navigate("/auth"); setMobileMenuOpen(false); }}>Account</a></li>
+              <li>
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate("/auth");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  Account
+                </a>
+              </li>
             ) : (
-              <li><a href="#" onClick={(e) => { e.preventDefault(); logout(); setMobileMenuOpen(false); }}>Logout</a></li>
+              <li>
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    logout();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  Logout
+                </a>
+              </li>
             )}
           </ul>
         </div>
       </div>
 
-      {/* Chatbot Modal for Mobile */}
       {chatbotOpen && <ChatbotModal onClose={() => setChatbotOpen(false)} />}
     </nav>
   );
