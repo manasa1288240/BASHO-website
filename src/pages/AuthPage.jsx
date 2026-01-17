@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Lock, Sparkles } from "lucide-react";
+import { Lock, Sparkles, Eye, EyeOff } from "lucide-react";
 import Footer from "../components/Footer";
 import "../styles/AuthPage.css";
 
@@ -11,8 +11,8 @@ export default function AuthPage() {
   // ✅ Backend base URL (works in Vercel + local if you set .env)
   const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
-  const [authMode, setAuthMode] = useState("choice"); // choice | signin | signup
-  const [step, setStep] = useState("email"); // email | password (signin) | otp | profile (signup)
+  const [authMode, setAuthMode] = useState("choice"); // choice | signin | signup | forgot-password
+  const [step, setStep] = useState("email"); // email | password (signin) | otp | profile (signup) | verify-email (forgot) | new-password (forgot)
 
   // Sign In State
   const [signInData, setSignInData] = useState({ email: "", password: "" });
@@ -29,7 +29,20 @@ export default function AuthPage() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [showSignInPassword, setShowSignInPassword] = useState(false);
+  const [showSignUpPassword, setShowSignUpPassword] = useState(false);
+  const [showSignUpConfirmPassword, setShowSignUpConfirmPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+  
+  // Forgot Password State
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [forgotPasswordOtp, setForgotPasswordOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  
   const otpRefs = useRef([]);
+  const forgotOtpRefs = useRef([]);
   const emailInputRef = useRef(null);
   const signInInputRef = useRef(null);
 
@@ -243,6 +256,122 @@ export default function AuthPage() {
     }
   };
 
+  /* ================== FORGOT PASSWORD FLOWS ================== */
+
+  const handleForgotPasswordEmailSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    if (!forgotPasswordEmail) {
+      setMessage("Please enter your email");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotPasswordEmail)) {
+      setMessage("Please enter a valid email");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Check if email exists
+      const checkRes = await axios.post(
+        `${API_URL}/api/auth/check-admin-email`,
+        {
+          email: forgotPasswordEmail,
+        }
+      );
+
+      if (!checkRes.data.exists) {
+        setMessage("Email not registered");
+        setLoading(false);
+        return;
+      }
+
+      // Send OTP
+      await axios.post(`${API_URL}/api/auth/send-otp`, {
+        email: forgotPasswordEmail,
+      });
+
+      setStep("verify-email");
+      setLoading(false);
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Failed to send OTP");
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPasswordOtpVerify = async () => {
+    const otp = forgotOtpRefs.current.map((el) => el?.value).join("");
+
+    if (otp.length !== 6) {
+      setMessage("Please enter 6-digit OTP");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await axios.post(`${API_URL}/api/auth/verify-otp`, {
+        email: forgotPasswordEmail,
+        otp,
+      });
+
+      // OTP verified, move to new password step
+      setStep("new-password");
+      setLoading(false);
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Invalid OTP");
+      setLoading(false);
+    }
+  };
+
+  const handleResetPasswordSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    if (!newPassword || !confirmNewPassword) {
+      setMessage("Please fill in all fields");
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setMessage("Passwords do not match");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setMessage("Password must be at least 6 characters");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await axios.post(`${API_URL}/api/auth/reset-password`, {
+        email: forgotPasswordEmail,
+        newPassword: newPassword,
+      });
+
+      setMessage("Password reset successfully!");
+      setTimeout(() => {
+        resetForgotPassword();
+      }, 1500);
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Failed to reset password");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetForgotPassword = () => {
+    setAuthMode("choice");
+    setStep("email");
+    setForgotPasswordEmail("");
+    setForgotPasswordOtp("");
+    setNewPassword("");
+    setConfirmNewPassword("");
+    setMessage("");
+  };
+
   const resetSignIn = () => {
     setAuthMode("choice");
     setStep("email");
@@ -315,6 +444,18 @@ export default function AuthPage() {
                     <span className="choice-label">Sign Up</span>
                     <span className="choice-desc">Create new account</span>
                   </button>
+
+                  <button
+                    className="auth-choice-btn forgot-btn"
+                    onClick={() => {
+                      setAuthMode("forgot-password");
+                      setStep("email");
+                    }}
+                  >
+                    <Lock className="choice-icon" size={32} />
+                    <span className="choice-label">Forgot Password?</span>
+                    <span className="choice-desc">Reset your password</span>
+                  </button>
                 </div>
               </>
             )}
@@ -374,22 +515,32 @@ export default function AuthPage() {
                     <form onSubmit={handleSignInPasswordSubmit} noValidate>
                       <div className="form-group">
                         <label>Password</label>
-                        <input
-                          ref={signInInputRef}
-                          type="password"
-                          className="auth-input"
-                          placeholder="••••••••"
-                          value={signInData.password}
-                          onChange={(e) => {
-                            setSignInData({
-                              ...signInData,
-                              password: e.target.value,
-                            });
-                            setMessage("");
-                          }}
-                          disabled={loading}
-                          autoFocus
-                        />
+                        <div className="password-input-wrapper">
+                          <input
+                            ref={signInInputRef}
+                            type={showSignInPassword ? "text" : "password"}
+                            className="auth-input"
+                            placeholder="••••••••"
+                            value={signInData.password}
+                            onChange={(e) => {
+                              setSignInData({
+                                ...signInData,
+                                password: e.target.value,
+                              });
+                              setMessage("");
+                            }}
+                            disabled={loading}
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            className="password-toggle-btn"
+                            onClick={() => setShowSignInPassword(!showSignInPassword)}
+                            disabled={loading}
+                          >
+                            {showSignInPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
                       </div>
 
                       <button className="auth-btn" disabled={loading}>
@@ -398,6 +549,19 @@ export default function AuthPage() {
                     </form>
 
                     {message && <p className="auth-error">{message}</p>}
+
+                    <button
+                      className="forgot-password-link"
+                      type="button"
+                      onClick={() => {
+                        setAuthMode("forgot-password");
+                        setStep("email");
+                        setMessage("");
+                      }}
+                      disabled={loading}
+                    >
+                      Forgot Password?
+                    </button>
 
                     <button
                       className="auth-back-btn"
@@ -575,38 +739,58 @@ export default function AuthPage() {
 
                       <div className="form-group">
                         <label>Password *</label>
-                        <input
-                          type="password"
-                          className="auth-input"
-                          placeholder="••••••••"
-                          value={signUpData.password}
-                          onChange={(e) => {
-                            setSignUpData({
-                              ...signUpData,
-                              password: e.target.value,
-                            });
-                            setMessage("");
-                          }}
-                          disabled={loading}
-                        />
+                        <div className="password-input-wrapper">
+                          <input
+                            type={showSignUpPassword ? "text" : "password"}
+                            className="auth-input"
+                            placeholder="••••••••"
+                            value={signUpData.password}
+                            onChange={(e) => {
+                              setSignUpData({
+                                ...signUpData,
+                                password: e.target.value,
+                              });
+                              setMessage("");
+                            }}
+                            disabled={loading}
+                          />
+                          <button
+                            type="button"
+                            className="password-toggle-btn"
+                            onClick={() => setShowSignUpPassword(!showSignUpPassword)}
+                            disabled={loading}
+                          >
+                            {showSignUpPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
                       </div>
 
                       <div className="form-group">
                         <label>Confirm Password *</label>
-                        <input
-                          type="password"
-                          className="auth-input"
-                          placeholder="••••••••"
-                          value={signUpData.confirmPassword}
-                          onChange={(e) => {
-                            setSignUpData({
-                              ...signUpData,
-                              confirmPassword: e.target.value,
-                            });
-                            setMessage("");
-                          }}
-                          disabled={loading}
-                        />
+                        <div className="password-input-wrapper">
+                          <input
+                            type={showSignUpConfirmPassword ? "text" : "password"}
+                            className="auth-input"
+                            placeholder="••••••••"
+                            value={signUpData.confirmPassword}
+                            onChange={(e) => {
+                              setSignUpData({
+                                ...signUpData,
+                                confirmPassword: e.target.value,
+                              });
+                              setMessage("");
+                            }}
+                            disabled={loading}
+                          />
+                          <button
+                            type="button"
+                            className="password-toggle-btn"
+                            onClick={() => setShowSignUpConfirmPassword(!showSignUpConfirmPassword)}
+                            disabled={loading}
+                          >
+                            {showSignUpConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
                       </div>
 
                       <button className="auth-btn" disabled={loading}>
@@ -620,6 +804,191 @@ export default function AuthPage() {
                       className="auth-back-btn"
                       onClick={() => {
                         setStep("otp");
+                        setMessage("");
+                      }}
+                      disabled={loading}
+                    >
+                      ← Back
+                    </button>
+                  </>
+                )}
+              </>
+            )}
+
+            {/* FORGOT PASSWORD FLOW */}
+            {authMode === "forgot-password" && (
+              <>
+                {step === "email" && (
+                  <>
+                    <h2 className="auth-title">Reset Password</h2>
+                    <p className="auth-subtitle">Enter your registered email</p>
+
+                    <form onSubmit={handleForgotPasswordEmailSubmit} noValidate>
+                      <div className="form-group">
+                        <label>Email *</label>
+                        <input
+                          ref={emailInputRef}
+                          type="email"
+                          className="auth-input"
+                          placeholder="your@email.com"
+                          value={forgotPasswordEmail}
+                          onChange={(e) => {
+                            setForgotPasswordEmail(e.target.value);
+                            setMessage("");
+                          }}
+                          disabled={loading}
+                          autoFocus
+                        />
+                      </div>
+
+                      <button className="auth-btn" disabled={loading}>
+                        {loading ? "Sending OTP..." : "Send OTP"}
+                      </button>
+                    </form>
+
+                    {message && <p className="auth-error">{message}</p>}
+
+                    <button
+                      className="auth-back-btn"
+                      onClick={resetForgotPassword}
+                      disabled={loading}
+                    >
+                      ← Back
+                    </button>
+                  </>
+                )}
+
+                {step === "verify-email" && (
+                  <>
+                    <h2 className="auth-title">Verify Email</h2>
+                    <p className="auth-subtitle">
+                      Enter the OTP sent to <br />
+                      <strong>{forgotPasswordEmail}</strong>
+                    </p>
+
+                    <div className="otp-boxes">
+                      {[...Array(6)].map((_, i) => (
+                        <input
+                          key={i}
+                          ref={(el) => (forgotOtpRefs.current[i] = el)}
+                          className="otp-input"
+                          maxLength="1"
+                          inputMode="numeric"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              handleForgotPasswordOtpVerify();
+                            }
+                            if (
+                              e.key === "Backspace" &&
+                              !e.currentTarget.value &&
+                              i > 0
+                            ) {
+                              forgotOtpRefs.current[i - 1].focus();
+                            }
+                          }}
+                          onChange={(e) => {
+                            if (e.currentTarget.value && i < 5) {
+                              forgotOtpRefs.current[i + 1].focus();
+                            }
+                          }}
+                          disabled={loading}
+                        />
+                      ))}
+                    </div>
+
+                    <button
+                      className="auth-btn"
+                      onClick={handleForgotPasswordOtpVerify}
+                      disabled={loading}
+                    >
+                      {loading ? "Verifying..." : "Verify OTP"}
+                    </button>
+
+                    {message && <p className="auth-error">{message}</p>}
+
+                    <button
+                      className="auth-back-btn"
+                      onClick={() => {
+                        setStep("email");
+                        setMessage("");
+                        forgotOtpRefs.current = [];
+                      }}
+                      disabled={loading}
+                    >
+                      ← Back
+                    </button>
+                  </>
+                )}
+
+                {step === "new-password" && (
+                  <>
+                    <h2 className="auth-title">Create New Password</h2>
+                    <p className="auth-subtitle">Set a new password for your account</p>
+
+                    <form onSubmit={handleResetPasswordSubmit} noValidate>
+                      <div className="form-group">
+                        <label>New Password *</label>
+                        <div className="password-input-wrapper">
+                          <input
+                            type={showNewPassword ? "text" : "password"}
+                            className="auth-input"
+                            placeholder="••••••••"
+                            value={newPassword}
+                            onChange={(e) => {
+                              setNewPassword(e.target.value);
+                              setMessage("");
+                            }}
+                            disabled={loading}
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            className="password-toggle-btn"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            disabled={loading}
+                          >
+                            {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label>Confirm Password *</label>
+                        <div className="password-input-wrapper">
+                          <input
+                            type={showConfirmNewPassword ? "text" : "password"}
+                            className="auth-input"
+                            placeholder="••••••••"
+                            value={confirmNewPassword}
+                            onChange={(e) => {
+                              setConfirmNewPassword(e.target.value);
+                              setMessage("");
+                            }}
+                            disabled={loading}
+                          />
+                          <button
+                            type="button"
+                            className="password-toggle-btn"
+                            onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                            disabled={loading}
+                          >
+                            {showConfirmNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <button className="auth-btn" disabled={loading}>
+                        {loading ? "Resetting..." : "Reset Password"}
+                      </button>
+                    </form>
+
+                    {message && <p className="auth-error">{message}</p>}
+
+                    <button
+                      className="auth-back-btn"
+                      onClick={() => {
+                        setStep("verify-email");
                         setMessage("");
                       }}
                       disabled={loading}
