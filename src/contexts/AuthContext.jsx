@@ -36,7 +36,6 @@ export const AuthProvider = ({ children }) => {
     setPendingAction(null);
   };
 
-  // USER OTP LOGIN (UNCHANGED LOGIC)
   const sendOtp = async (contact) => {
     const requestId = "req_" + Date.now();
     const otp = "1234";
@@ -61,7 +60,6 @@ export const AuthProvider = ({ children }) => {
       throw new Error("Invalid OTP");
     }
 
-    // 👇 DEFAULT USER ROLE
     const newUser = {
       id: "user_" + Date.now(),
       contact: stored.contact,
@@ -91,8 +89,15 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("basho_token");
     localStorage.removeItem("basho_user");
+
+    localStorage.removeItem("cart");
+    localStorage.removeItem("basho_cart");
+    localStorage.removeItem("basho_cart_items");
+
     setToken(null);
     setUser(null);
+
+    window.dispatchEvent(new Event("basho-clear-cart"));
   };
 
   return (
