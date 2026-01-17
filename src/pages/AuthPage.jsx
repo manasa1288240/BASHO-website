@@ -444,18 +444,6 @@ export default function AuthPage() {
                     <span className="choice-label">Sign Up</span>
                     <span className="choice-desc">Create new account</span>
                   </button>
-
-                  <button
-                    className="auth-choice-btn forgot-btn"
-                    onClick={() => {
-                      setAuthMode("forgot-password");
-                      setStep("email");
-                    }}
-                  >
-                    <Lock className="choice-icon" size={32} />
-                    <span className="choice-label">Forgot Password?</span>
-                    <span className="choice-desc">Reset your password</span>
-                  </button>
                 </div>
               </>
             )}

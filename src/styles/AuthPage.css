@@ -300,14 +300,6 @@
   cursor: not-allowed;
 }
 
-.auth-choice-btn.forgot-btn {
-  background: linear-gradient(135deg, #e8d4b8 0%, #f0e6d2 100%);
-}
-
-.auth-choice-btn.forgot-btn:hover {
-  background: linear-gradient(135deg, #dfc4a8 0%, #e7d6c2 100%);
-  box-shadow: 0 8px 24px rgba(184, 134, 11, 0.2);
-}
 
 /* ===============================
    OTP SECTION
