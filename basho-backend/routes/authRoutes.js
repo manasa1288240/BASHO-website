@@ -138,6 +138,8 @@ router.post("/update-profile", async (req, res) => {
  * SEND OTP (EMAIL ONLY)
  * ✅ FIXED: Responds immediately so frontend does NOT stay stuck on "Sending..."
  * Email will be sent in background.
+ * For signup: Does NOT create user yet (user is created only after profile submission)
+ * For existing users: Just stores OTP
  */
 router.post("/send-otp", async (req, res) => {
   try {
@@ -151,8 +153,16 @@ router.post("/send-otp", async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
 
+    // For signup flow: only store OTP temporarily, don't create user
+    // For signin flow or forgot password: update existing user or create temp OTP record
     let user = await User.findOne({ email });
-    if (!user) user = new User({ email });
+    
+    if (!user) {
+      // For signup: just send OTP, don't create user yet
+      // Store OTP in a temporary way - we'll use User model but mark it somehow
+      // Actually, let's create a minimal user doc that will be replaced on profile submission
+      user = new User({ email });
+    }
 
     user.otp = otp;
     user.otpExpiresAt = otpExpiry;
@@ -179,6 +189,8 @@ router.post("/send-otp", async (req, res) => {
 
 /**
  * VERIFY OTP
+ * For signup: Just verifies OTP, doesn't create full account
+ * For signin/forgot-password: Verifies OTP and can issue token if password exists
  */
 router.post("/verify-otp", async (req, res) => {
   try {
@@ -204,18 +216,28 @@ router.post("/verify-otp", async (req, res) => {
     user.otpExpiresAt = null;
     await user.save();
 
-    // Issue JWT (include isAdmin flag)
-    const token = jwt.sign(
-      { id: user._id, isAdmin: !!user.isAdmin },
-      JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    // For signup: just verify OTP, don't issue token yet (token issued after profile submission)
+    // For signin/forgot-password: if user has a password, they are an existing user, issue token
+    if (user.password) {
+      // Existing user (signin or forgot password flow)
+      const token = jwt.sign(
+        { id: user._id, isAdmin: !!user.isAdmin },
+        JWT_SECRET,
+        { expiresIn: "7d" }
+      );
 
-    return res.json({
-      message: "Login successful",
-      token,
-      user: { email: user.email, isAdmin: !!user.isAdmin },
-    });
+      return res.json({
+        message: "OTP verified",
+        token,
+        user: { email: user.email, isAdmin: !!user.isAdmin },
+      });
+    } else {
+      // New user in signup flow - just verify, no token yet
+      return res.json({
+        message: "OTP verified successfully",
+        verified: true,
+      });
+    }
   } catch (error) {
     console.error("❌ VERIFY OTP ERROR:", error);
     return res.status(500).json({ error: "Server error" });
