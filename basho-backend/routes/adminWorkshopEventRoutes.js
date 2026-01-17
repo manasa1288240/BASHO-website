@@ -52,6 +52,27 @@ router.post("/", async (req, res) => {
   }
 });
 
+/* -------------------- UPDATE WORKSHOP (EDIT) -------------------- */
+router.put("/:id", async (req, res) => {
+  try {
+    const updated = await WorkshopEvent.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!updated) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Workshop not found" });
+    }
+
+    res.json({ success: true, workshop: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 /* -------------------- DELETE WORKSHOP -------------------- */
 router.delete("/:id", async (req, res) => {
   try {
