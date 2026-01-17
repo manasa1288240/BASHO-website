@@ -4,7 +4,7 @@ import axios from "axios";
 // FIXED: Exporting the context directly
 export const ShopContext = createContext(null);
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = "https://basho-backend.onrender.com";
 
 export function ShopProvider({ children }) {
   const [wishlist, setWishlist] = useState(() => {

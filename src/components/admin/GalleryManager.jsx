@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 // ✅ Works in Vercel + Local
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 const API_BASE = `${API_URL}/api/gallery`;
 
 export default function GalleryManager() {

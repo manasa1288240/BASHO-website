@@ -26,7 +26,7 @@ export const loadRazorpay = () => {
 };
 
 // ✅ VITE backend URL (works in local + Vercel)
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
 // ✅ VITE razorpay key (frontend)
 const RAZORPAY_KEY =

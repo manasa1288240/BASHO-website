@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 // ✅ Use env API url (works in Vercel + local)
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 const API_BASE = `${API_URL}/api/admin/customers`;
 
 function authHeader() {

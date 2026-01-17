@@ -9,7 +9,7 @@ export default function AuthPage() {
   const navigate = useNavigate();
 
   // ✅ Backend base URL (works in Vercel + local if you set .env)
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
   const [authMode, setAuthMode] = useState("choice"); // choice | signin | signup
   const [step, setStep] = useState("email"); // email | password (signin) | otp | profile (signup)

@@ -12,7 +12,7 @@ const WishlistPage = () => {
   const [products, setProducts] = useState(featuredProducts);
 
   // ✅ Backend base URL (works in Vercel + local)
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
   // ✅ Login modal control (since you imported LoginModal)
   const [showLoginModal, setShowLoginModal] = useState(false);
