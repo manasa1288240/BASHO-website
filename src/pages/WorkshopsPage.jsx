@@ -116,7 +116,7 @@ export default function WorkshopsPage() {
     duration: "Flexible",
     price: "Custom",
     image:
-      "https://images.unsplash.com/photo-1600369672770-985fd30004eb?auto=format&fit=crop&w=1200&q=60",
+      "https://res.cloudinary.com/ddcxodbaa/image/upload/v1768402259/workshop4_etmk2f.png",
     maxParticipants: 0,
     bookedSeats: 0,
     isCustom: true,

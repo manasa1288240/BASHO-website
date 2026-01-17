@@ -3,7 +3,7 @@ const WorkshopEvent = require("../models/WorkshopEvent");
 
 const router = express.Router();
 
-// GET all workshop events
+/* -------------------- GET ALL WORKSHOPS -------------------- */
 router.get("/", async (req, res) => {
   try {
     const workshops = await WorkshopEvent.find().sort({ date: 1 });
@@ -13,11 +13,20 @@ router.get("/", async (req, res) => {
   }
 });
 
-// CREATE workshop event
+/* -------------------- CREATE WORKSHOP -------------------- */
 router.post("/", async (req, res) => {
   try {
-    const { title, description, date, price, image, category, capacity } =
-      req.body;
+    const {
+      title,
+      description,
+      date,
+      time,
+      duration,
+      price,
+      image,
+      category,
+      capacity,
+    } = req.body;
 
     if (!title || !date || !price || !category) {
       return res
@@ -29,6 +38,8 @@ router.post("/", async (req, res) => {
       title,
       description,
       date,
+      time,
+      duration,
       price,
       image,
       category,
@@ -41,7 +52,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// DELETE workshop event
+/* -------------------- DELETE WORKSHOP -------------------- */
 router.delete("/:id", async (req, res) => {
   try {
     const deleted = await WorkshopEvent.findByIdAndDelete(req.params.id);
