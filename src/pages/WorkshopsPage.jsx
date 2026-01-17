@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import LoginAlert from "../components/LoginAlert";
-import workshopsData from "../data/workshops";
 import "../styles/WorkshopsPage.css";
 
 /* ================================================= */
@@ -24,7 +23,7 @@ function isCompleted(workshop) {
 function isBookingClosed(workshop) {
   const start = getStartDateTime(workshop);
   if (!start) return false;
-  return new Date() > new Date(start.getTime() - 30 * 60 * 1000); // 30 mins
+  return new Date() > new Date(start.getTime() - 30 * 60 * 1000);
 }
 
 function isFullyBooked(workshop) {
@@ -39,10 +38,14 @@ export default function WorkshopsPage() {
   const [selectedWorkshop, setSelectedWorkshop] = useState(null);
   const [notification, setNotification] = useState(null);
   const [showLoginAlert, setShowLoginAlert] = useState(false);
+
+  const [workshopsData, setWorkshopsData] = useState([]);
+  const [loadingWorkshops, setLoadingWorkshops] = useState(true);
+
   const navigate = useNavigate();
 
-  // ✅ Backend base URL (works in Vercel + local)
-  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
   const triggerNotify = (msg, type = "info") => {
     setNotification({ msg, type });
@@ -52,15 +55,92 @@ export default function WorkshopsPage() {
     return !!localStorage.getItem("basho_user");
   };
 
+  useEffect(() => {
+    async function fetchWorkshops() {
+      try {
+        const res = await fetch(`${API_URL}/api/admin/workshop-events`);
+        const data = await res.json();
+
+        if (data.success) {
+          const formatted = (data.workshops || []).map((w) => ({
+            id: w._id,
+            title: w.title,
+            description: w.description || "",
+            date: new Date(w.date).toLocaleDateString(),
+            time: "Flexible",
+            location: "BASHO Studio",
+            duration: "2 hrs",
+            price: `₹${w.price}`,
+            image: w.image || "/placeholder.jpg",
+            maxParticipants: Number(w.capacity || 10),
+            bookedSeats: 0,
+            isCustom: false,
+          }));
+
+          setWorkshopsData(formatted);
+        } else {
+          setWorkshopsData([]);
+        }
+      } catch (err) {
+        console.error("Failed to load workshops:", err);
+        setWorkshopsData([]);
+      } finally {
+        setLoadingWorkshops(false);
+      }
+    }
+
+    fetchWorkshops();
+  }, [API_URL]);
+
   const activeWorkshops = workshopsData
     .filter((w) => !isCompleted(w) && !w.isCustom)
-    .sort((a, b) => getStartDateTime(a) - getStartDateTime(b));
+    .sort((a, b) => {
+      const da = getStartDateTime(a);
+      const db = getStartDateTime(b);
+      if (!da || !db) return 0;
+      return da - db;
+    });
 
   const completedWorkshops = workshopsData.filter(
     (w) => isCompleted(w) && !w.isCustom
   );
 
-  const customWorkshop = workshopsData.find((w) => w.isCustom);
+  const customWorkshop = {
+    id: "custom-workshop",
+    title: "Custom Pottery Experience",
+    description:
+      "Want a private session? Choose a one-on-one class, pottery date, or group event.",
+    date: "Flexible",
+    time: "Flexible",
+    location: "BASHO Studio",
+    duration: "Flexible",
+    price: "Custom",
+    image:
+      "https://images.unsplash.com/photo-1600369672770-985fd30004eb?auto=format&fit=crop&w=1200&q=60",
+    maxParticipants: 0,
+    bookedSeats: 0,
+    isCustom: true,
+  };
+
+  if (loadingWorkshops) {
+    return (
+      <div className="workshops-page">
+        <div className="featured-header">
+          <div className="featured-container">
+            <div className="featured-subtitle">Learn & Create</div>
+            <h1 className="featured-title">POTTERY WORKSHOPS</h1>
+            <div className="featured-divider"></div>
+          </div>
+        </div>
+
+        <p style={{ textAlign: "center", marginTop: "30px" }}>
+          Loading workshops...
+        </p>
+
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="workshops-page">
@@ -91,12 +171,10 @@ export default function WorkshopsPage() {
             />
           ))}
 
-          {customWorkshop && (
-            <WorkshopCard
-              workshop={customWorkshop}
-              onClick={() => setSelectedWorkshop(customWorkshop)}
-            />
-          )}
+          <WorkshopCard
+            workshop={customWorkshop}
+            onClick={() => setSelectedWorkshop(customWorkshop)}
+          />
         </div>
       </section>
 
@@ -312,7 +390,6 @@ function WorkshopBookingForm({ workshop, triggerNotify, API_URL }) {
     try {
       triggerNotify("Creating payment order...", "info");
 
-      // Extract numeric price
       const priceText = workshop.price.replace(/[^\d]/g, "");
       const amount = parseInt(priceText);
 

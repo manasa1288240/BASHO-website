@@ -17,6 +17,9 @@ const chatbotRoutes = require("./routes/chatbotRoutes");
 const galleryRoutes = require("./routes/galleryRoutes");
 const adminProductRoutes = require("./routes/adminProductRoutes");
 
+// ✅ NEW: ADMIN WORKSHOP EVENTS ROUTE
+const adminWorkshopEventRoutes = require("./routes/adminWorkshopEventRoutes");
+
 const app = express();
 
 // ========== CRITICAL MIDDLEWARE ==========
@@ -26,7 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 // ✅ CORS (keep only ONE)
 app.use(
   cors({
-    origin: "*", // later we can restrict
+    origin: "*",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -82,15 +85,36 @@ app.post("/api/payment/test-simple", (req, res) => {
 });
 
 /* -------------------- API ROUTES -------------------- */
+
+// Workshop bookings + Razorpay
 app.use("/api/workshops", workshopRoutes);
+
+// Products
 app.use("/api/products", productRoutes);
+
+// Auth
 app.use("/api/auth", authRoutes);
+
+// Payments
 app.use("/api/payment", paymentRoutes);
+
+// Wishlist
 app.use("/api/wishlist", wishlistRoutes);
+
+// Cart
 app.use("/api/cart", cartRoutes);
+
+// Chatbot
 app.use("/api/chatbot", chatbotRoutes);
+
+// Gallery
 app.use("/api/gallery", galleryRoutes);
+
+// Admin products
 app.use("/api/admin/products", adminProductRoutes);
+
+// ✅ NEW: Admin workshop events (for WorkshopList.jsx)
+app.use("/api/admin/workshop-events", adminWorkshopEventRoutes);
 
 /* -------------------- ERROR HANDLER -------------------- */
 app.use((err, req, res, next) => {
