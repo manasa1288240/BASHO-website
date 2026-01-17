@@ -2,57 +2,55 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import "./ClientTales.css";
 
-const videoReels = [
-  {
-    id: 1,
-    reelUrl:
-      "https://www.instagram.com/reel/DGAYFhoopSx/?igsh=MXFqdWl3bzZ0dWV3dA==",
-  },
-  {
-    id: 2,
-    reelUrl: "https://www.instagram.com/reel/DGF7sIsoqs-/?igsh=cHY5ZTRnbHdyYmlx",
-  },
-  {
-    id: 3,
-    reelUrl: "https://www.instagram.com/reel/DG7KPPGTL6h/?igsh=MTRiNDVuOGt2N28xMQ==",
-  },
-  {
-    id: 4,
-    reelUrl: "https://www.instagram.com/reel/DHsYbQsRmnb/?igsh=MTM3MmF2aHV6ajVtaA==",
-  },
-];
+const API_URL =
+  import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
 export default function ClientTales() {
-  const [reviews, setReviews] = useState([]);
   const [index, setIndex] = useState(0);
   const [hovered, setHovered] = useState(false);
+
+  const [reviews, setReviews] = useState([]);
+  const [videoReels, setVideoReels] = useState([]);
 
   const [activeReelIndex, setActiveReelIndex] = useState(0);
   const videoSectionRef = useRef(null);
 
-  const API_URL =
-    import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
-
-  /* ✅ FETCH TESTIMONIALS FROM MONGODB */
+  /* -------------------- LOAD WRITTEN TESTIMONIALS -------------------- */
   useEffect(() => {
-    async function loadTestimonials() {
+    const loadWritten = async () => {
       try {
         const res = await fetch(`${API_URL}/api/admin/testimonials`);
         const data = await res.json();
 
         if (data.success) {
           setReviews(data.testimonials || []);
-        } else {
-          setReviews([]);
         }
       } catch (err) {
-        console.error("Failed to load testimonials:", err);
-        setReviews([]);
+        console.error("Failed to load written testimonials:", err);
       }
-    }
+    };
 
-    loadTestimonials();
-  }, [API_URL]);
+    loadWritten();
+  }, []);
+
+  /* -------------------- LOAD VIDEO TESTIMONIALS -------------------- */
+  useEffect(() => {
+    const loadVideo = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/admin/video-testimonials`);
+        const data = await res.json();
+
+        if (data.success) {
+          setVideoReels(data.reels || []);
+          setActiveReelIndex(0);
+        }
+      } catch (err) {
+        console.error("Failed to load video testimonials:", err);
+      }
+    };
+
+    loadVideo();
+  }, []);
 
   /* 🔁 AUTO SCROLL EVERY 3s */
   useEffect(() => {
@@ -64,7 +62,7 @@ export default function ClientTales() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [hovered, reviews]);
+  }, [hovered, reviews.length]);
 
   /* 📜 LOAD INSTAGRAM EMBED SCRIPT */
   useEffect(() => {
@@ -93,7 +91,10 @@ export default function ClientTales() {
 
   /* 👁️ PROCESS INSTAGRAM EMBEDS WHEN ACTIVE REEL CHANGES */
   useEffect(() => {
+    if (!videoReels.length) return;
+
     const reel = videoReels[activeReelIndex];
+    if (!reel) return;
 
     const reelEmbed = document.querySelector(".reel-embed");
     if (!reelEmbed) return;
@@ -121,51 +122,50 @@ export default function ClientTales() {
       clearTimeout(timer1);
       clearTimeout(timer2);
     };
-  }, [activeReelIndex]);
+  }, [activeReelIndex, videoReels]);
 
   const next = () => {
     if (!reviews.length) return;
-    setIndex((index + 1) % reviews.length);
+    setIndex((prev) => (prev + 1) % reviews.length);
   };
 
   const prev = () => {
     if (!reviews.length) return;
-    setIndex((index - 1 + reviews.length) % reviews.length);
+    setIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
   };
 
-  const nextReel = () =>
+  const nextReel = () => {
+    if (!videoReels.length) return;
     setActiveReelIndex((prev) => (prev + 1) % videoReels.length);
+  };
 
-  const prevReel = () =>
+  const prevReel = () => {
+    if (!videoReels.length) return;
     setActiveReelIndex((prev) => (prev - 1 + videoReels.length) % videoReels.length);
+  };
 
   return (
     <>
+      {/* WRITTEN TESTIMONIALS */}
       <section className="client-tales">
         <h1 className="client-title">Client Tales</h1>
         <p className="client-subtitle">Words shared from the Basho community</p>
 
-        <div className="carousel-wrapper">
-          <button className="arrow left" onClick={prev}>
-            ‹
-          </button>
+        {!reviews.length ? (
+          <p style={{ textAlign: "center", opacity: 0.7 }}>
+            No testimonials added yet.
+          </p>
+        ) : (
+          <div className="carousel-wrapper">
+            <button className="arrow left" onClick={prev}>
+              ‹
+            </button>
 
-          <div
-            className="carousel-viewport"
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-          >
-            {!reviews.length ? (
-              <div className="testimonial-card">
-                <p className="testimonial-text">
-                  “No testimonials yet. Be the first to share your Basho experience!”
-                </p>
-                <div className="testimonial-author">
-                  <strong>BASHO</strong>
-                  <span>Community</span>
-                </div>
-              </div>
-            ) : (
+            <div
+              className="carousel-viewport"
+              onMouseEnter={() => setHovered(true)}
+              onMouseLeave={() => setHovered(false)}
+            >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={index}
@@ -184,45 +184,54 @@ export default function ClientTales() {
                   </div>
                 </motion.div>
               </AnimatePresence>
-            )}
-          </div>
+            </div>
 
-          <button className="arrow right" onClick={next}>
-            ›
-          </button>
-        </div>
+            <button className="arrow right" onClick={next}>
+              ›
+            </button>
+          </div>
+        )}
       </section>
 
+      {/* VIDEO TESTIMONIALS */}
       <section className="video-testimonials" ref={videoSectionRef}>
         <h2 className="video-title">Video Testimonials</h2>
         <p className="video-subtitle">Watch what our Basho community shared</p>
 
-        <div className="reel-display-container">
-          <button
-            className="reel-nav-btn reel-nav-prev"
-            onClick={prevReel}
-            aria-label="Previous reel"
-          >
-            ‹
-          </button>
-
-          <div className="reel-card">
-            <div
-              className="reel-content"
-              style={{ animation: "fadeInScale 0.4s ease-in-out forwards" }}
+        {!videoReels.length ? (
+          <p style={{ textAlign: "center", opacity: 0.7 }}>
+            No video testimonials added yet.
+          </p>
+        ) : (
+          <div className="reel-display-container">
+            <button
+              className="reel-nav-btn reel-nav-prev"
+              onClick={prevReel}
+              aria-label="Previous reel"
             >
-              <div className="reel-embed" />
-            </div>
-          </div>
+              ‹
+            </button>
 
-          <button
-            className="reel-nav-btn reel-nav-next"
-            onClick={nextReel}
-            aria-label="Next reel"
-          >
-            ›
-          </button>
-        </div>
+            <div className="reel-card">
+              <div
+                className="reel-content"
+                style={{
+                  animation: "fadeInScale 0.4s ease-in-out forwards",
+                }}
+              >
+                <div className="reel-embed" />
+              </div>
+            </div>
+
+            <button
+              className="reel-nav-btn reel-nav-next"
+              onClick={nextReel}
+              aria-label="Next reel"
+            >
+              ›
+            </button>
+          </div>
+        )}
       </section>
     </>
   );
