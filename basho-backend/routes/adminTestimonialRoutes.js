@@ -3,7 +3,7 @@ const Testimonial = require("../models/Testimonial");
 
 const router = express.Router();
 
-// GET all testimonials
+/* -------------------- GET ALL TESTIMONIALS -------------------- */
 router.get("/", async (req, res) => {
   try {
     const testimonials = await Testimonial.find().sort({ createdAt: -1 });
@@ -13,9 +13,11 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ADD testimonial
+/* -------------------- ADD TESTIMONIAL -------------------- */
 router.post("/", async (req, res) => {
   try {
+    console.log("TESTIMONIAL BODY:", req.body);
+
     const { name, role, message, rating, image } = req.body;
 
     if (!name || !message) {
@@ -38,7 +40,26 @@ router.post("/", async (req, res) => {
   }
 });
 
-// DELETE testimonial
+/* -------------------- UPDATE TESTIMONIAL (EDIT) -------------------- */
+router.put("/:id", async (req, res) => {
+  try {
+    const updated = await Testimonial.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+
+    if (!updated) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Testimonial not found" });
+    }
+
+    res.json({ success: true, testimonial: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/* -------------------- DELETE TESTIMONIAL -------------------- */
 router.delete("/:id", async (req, res) => {
   try {
     const deleted = await Testimonial.findByIdAndDelete(req.params.id);
