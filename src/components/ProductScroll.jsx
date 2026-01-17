@@ -8,9 +8,9 @@ export default function ProductScroll() {
   const containerRef = useCardStackScroll();
 
   const products = [
-    { img: pot1, name: "Ceramic Bowl", price: "$48" },
-    { img: pot2, name: "Tea Cup Set", price: "$65" },
-    { img: pot3, name: "Vase Collection", price: "$85" },
+    { img: pot1, name: "Handmade with love, shaped with soul.", price: "" },
+    { img: pot2, name: "Every piece is imperfectly perfect — just like art.", price: "" },
+    { img: pot3, name: "Crafted slowly, treasured forever.", price: "" },
   ];
 
   return (
