@@ -17,8 +17,14 @@ const chatbotRoutes = require("./routes/chatbotRoutes");
 const galleryRoutes = require("./routes/galleryRoutes");
 const adminProductRoutes = require("./routes/adminProductRoutes");
 
-// ✅ NEW: ADMIN WORKSHOP EVENTS ROUTE
+// ✅ ADMIN WORKSHOP EVENTS ROUTE
 const adminWorkshopEventRoutes = require("./routes/adminWorkshopEventRoutes");
+
+// ✅ ADMIN TESTIMONIAL ROUTE
+const adminTestimonialRoutes = require("./routes/adminTestimonialRoutes");
+
+// ✅ ADMIN VIDEO TESTIMONIAL ROUTE
+const adminVideoTestimonialRoutes = require("./routes/adminVideoTestimonialRoutes");
 
 const app = express();
 
@@ -26,7 +32,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ CORS (keep only ONE)
+// ✅ CORS
 app.use(
   cors({
     origin: "*",
@@ -59,7 +65,9 @@ app.get("/", (req, res) => {
 app.get("/api/test-env", (req, res) => {
   res.json({
     razorpayKeyId: process.env.RAZORPAY_KEY_ID ? "✅ Present" : "❌ Missing",
-    razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET ? "✅ Present" : "❌ Missing",
+    razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET
+      ? "✅ Present"
+      : "❌ Missing",
     nodeEnv: process.env.NODE_ENV || "Not set",
     port: process.env.PORT || "5000 (default)",
   });
@@ -113,8 +121,14 @@ app.use("/api/gallery", galleryRoutes);
 // Admin products
 app.use("/api/admin/products", adminProductRoutes);
 
-// ✅ NEW: Admin workshop events (for WorkshopList.jsx)
+// Admin workshop events
 app.use("/api/admin/workshop-events", adminWorkshopEventRoutes);
+
+// Admin written testimonials
+app.use("/api/admin/testimonials", adminTestimonialRoutes);
+
+// ✅ Admin video testimonials (Instagram reels)
+app.use("/api/admin/video-testimonials", adminVideoTestimonialRoutes);
 
 /* -------------------- ERROR HANDLER -------------------- */
 app.use((err, req, res, next) => {
