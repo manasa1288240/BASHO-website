@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 
-// FIXED: Exporting the context directly
 export const ShopContext = createContext(null);
 
 const API_BASE = "https://basho-backend.onrender.com";
@@ -12,7 +11,9 @@ export function ShopProvider({ children }) {
     try {
       const stored = localStorage.getItem("basho_wishlist");
       return stored ? JSON.parse(stored) : [];
-    } catch { return []; }
+    } catch {
+      return [];
+    }
   });
 
   const [cart, setCart] = useState(() => {
@@ -20,7 +21,9 @@ export function ShopProvider({ children }) {
     try {
       const stored = localStorage.getItem("basho_cart");
       return stored ? JSON.parse(stored) : [];
-    } catch { return []; }
+    } catch {
+      return [];
+    }
   });
 
   const [history, setHistory] = useState(() => {
@@ -28,7 +31,9 @@ export function ShopProvider({ children }) {
     try {
       const stored = localStorage.getItem("basho_history");
       return stored ? JSON.parse(stored) : [];
-    } catch { return []; }
+    } catch {
+      return [];
+    }
   });
 
   const getCurrentUserEmail = () => {
@@ -38,7 +43,9 @@ export function ShopProvider({ children }) {
       if (!raw) return null;
       const parsed = JSON.parse(raw);
       return parsed?.email || null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   };
 
   useEffect(() => {
@@ -54,12 +61,14 @@ export function ShopProvider({ children }) {
         ]);
 
         if (Array.isArray(cartRes.data?.cart)) {
-          setCart(cartRes.data.cart.map((item) => ({
-            id: item.product._id,
-            name: item.product.name,
-            price: item.product.price,
-            qty: item.qty,
-          })));
+          setCart(
+            cartRes.data.cart.map((item) => ({
+              id: item.product._id,
+              name: item.product.name,
+              price: item.product.price,
+              qty: item.qty,
+            }))
+          );
         }
 
         if (Array.isArray(wishlistRes.data?.wishlist)) {
@@ -85,7 +94,23 @@ export function ShopProvider({ children }) {
         console.error("[Shop] Failed to sync state from server", err);
       }
     };
+
     loadFromServer();
+  }, []);
+
+  useEffect(() => {
+    const onLogout = () => {
+      setCart([]);
+      setWishlist([]);
+      setHistory([]);
+
+      localStorage.removeItem("basho_cart");
+      localStorage.removeItem("basho_wishlist");
+      localStorage.removeItem("basho_history");
+    };
+
+    window.addEventListener("basho:logout", onLogout);
+    return () => window.removeEventListener("basho:logout", onLogout);
   }, []);
 
   const getProductKey = (product) => product._id || product.id || product.name;
@@ -93,122 +118,152 @@ export function ShopProvider({ children }) {
   const toggleWishlist = async (product) => {
     const id = getProductKey(product);
     if (!id) return;
-    setWishlist((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+
+    setWishlist((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+
     const email = getCurrentUserEmail();
     if (!email) return;
+
     try {
       await axios.post(`${API_BASE}/api/wishlist/toggle`, { email, productId: id });
-    } catch (err) { console.error("[Shop] Failed to toggle wishlist", err); }
+    } catch (err) {
+      console.error("[Shop] Failed to toggle wishlist", err);
+    }
   };
 
   const addToCart = async (product) => {
     const id = getProductKey(product);
     if (!id) return;
+
     setCart((prev) => {
       const existing = prev.find((item) => item.id === id);
-      if (existing) return prev.map((item) => item.id === id ? { ...item, qty: item.qty + 1 } : item);
+      if (existing)
+        return prev.map((item) =>
+          item.id === id ? { ...item, qty: item.qty + 1 } : item
+        );
+
       return [...prev, { id, name: product.title || product.name, price: product.price, qty: 1 }];
     });
+
     const email = getCurrentUserEmail();
     if (!email) return;
+
     try {
       await axios.post(`${API_BASE}/api/cart/add`, { email, productId: id });
-    } catch (err) { console.error("[Shop] Failed to add to cart", err); }
+    } catch (err) {
+      console.error("[Shop] Failed to add to cart", err);
+    }
   };
 
-  // ADDED: increase quantity
-const increaseQty = async (id) => {
-  setCart(prev =>
-    prev.map(item =>
-      item.id === id
-        ? { ...item, qty: item.qty + 1 }
-        : item
-    )
-  );
+  const increaseQty = async (id) => {
+    setCart((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, qty: item.qty + 1 } : item))
+    );
 
-  const email = getCurrentUserEmail();
-  if (!email) return;
+    const email = getCurrentUserEmail();
+    if (!email) return;
 
-  try {
-    await axios.post(`${API_BASE}/api/cart/add`, { email, productId: id });
-  } catch (err) {
-    console.error("[Shop] Failed to increase qty", err);
-  }
-};
-
-// ADDED: decrease quantity
-const decreaseQty = async (id) => {
-  let removed = false;
-
-  setCart(prev =>
-    prev
-      .map(item => {
-        if (item.id !== id) return item;
-        if (item.qty === 1) {
-          removed = true;
-          return null;
-        }
-        return { ...item, qty: item.qty - 1 };
-      })
-      .filter(Boolean)
-  );
-
-  const email = getCurrentUserEmail();
-  if (!email) return;
-
-  try {
-    if (removed) {
-      await axios.post(`${API_BASE}/api/cart/remove`, { email, productId: id });
-    } else {
-      await axios.post(`${API_BASE}/api/cart/decrease`, { email, productId: id });
+    try {
+      await axios.post(`${API_BASE}/api/cart/add`, { email, productId: id });
+    } catch (err) {
+      console.error("[Shop] Failed to increase qty", err);
     }
-  } catch (err) {
-    console.error("[Shop] Failed to decrease qty", err);
-  }
-};
+  };
 
+  const decreaseQty = async (id) => {
+    let removed = false;
+
+    setCart((prev) =>
+      prev
+        .map((item) => {
+          if (item.id !== id) return item;
+          if (item.qty === 1) {
+            removed = true;
+            return null;
+          }
+          return { ...item, qty: item.qty - 1 };
+        })
+        .filter(Boolean)
+    );
+
+    const email = getCurrentUserEmail();
+    if (!email) return;
+
+    try {
+      if (removed) {
+        await axios.post(`${API_BASE}/api/cart/remove`, { email, productId: id });
+      } else {
+        await axios.post(`${API_BASE}/api/cart/decrease`, { email, productId: id });
+      }
+    } catch (err) {
+      console.error("[Shop] Failed to decrease qty", err);
+    }
+  };
 
   const removeFromCart = async (id) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
+
     const email = getCurrentUserEmail();
     if (!email) return;
+
     try {
       await axios.post(`${API_BASE}/api/cart/remove`, { email, productId: id });
-    } catch (err) { console.error("[Shop] Failed to remove from cart", err); }
+    } catch (err) {
+      console.error("[Shop] Failed to remove from cart", err);
+    }
   };
 
   const markAsPurchased = async (id) => {
     let purchasedItem = null;
+
     setCart((prevCart) => {
       const item = prevCart.find((i) => i.id === id);
       if (!item) return prevCart;
+
       purchasedItem = item;
-      setHistory((prevHistory) => [...prevHistory, { ...item, purchasedAt: new Date().toISOString() }]);
+      setHistory((prevHistory) => [
+        ...prevHistory,
+        { ...item, purchasedAt: new Date().toISOString() },
+      ]);
+
       return prevCart.filter((i) => i.id !== id);
     });
+
     const email = getCurrentUserEmail();
     if (!email || !purchasedItem) return;
+
     try {
       await axios.post(`${API_BASE}/api/cart/purchase`, { email, productId: purchasedItem.id });
-    } catch (err) { console.error("[Shop] Failed to record purchase", err); }
+    } catch (err) {
+      console.error("[Shop] Failed to record purchase", err);
+    }
   };
 
-  useEffect(() => { localStorage.setItem("basho_wishlist", JSON.stringify(wishlist)); }, [wishlist]);
-  useEffect(() => { localStorage.setItem("basho_cart", JSON.stringify(cart)); }, [cart]);
-  useEffect(() => { localStorage.setItem("basho_history", JSON.stringify(history)); }, [history]);
+  useEffect(() => {
+    localStorage.setItem("basho_wishlist", JSON.stringify(wishlist));
+  }, [wishlist]);
+
+  useEffect(() => {
+    localStorage.setItem("basho_cart", JSON.stringify(cart));
+  }, [cart]);
+
+  useEffect(() => {
+    localStorage.setItem("basho_history", JSON.stringify(history));
+  }, [history]);
 
   const value = {
-  wishlist,
-  cart,
-  history,
-  toggleWishlist,
-  addToCart,
-  increaseQty,    // ADDED
-  decreaseQty,    // ADDED
-  removeFromCart,
-  markAsPurchased
-};
-
+    wishlist,
+    cart,
+    history,
+    toggleWishlist,
+    addToCart,
+    increaseQty,
+    decreaseQty,
+    removeFromCart,
+    markAsPurchased,
+  };
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;
 }

@@ -73,14 +73,14 @@ export default function Navbar() {
 
   const logout = () => {
     localStorage.removeItem("basho_user");
+    localStorage.removeItem("basho_token");
 
-    localStorage.removeItem("basho_cart");
-    localStorage.removeItem("cart");
+    localStorage.removeItem("basho_cart_v1");
 
     setUser(null);
     setShowMenu(false);
 
-    window.dispatchEvent(new Event("basho-clear-cart"));
+    window.dispatchEvent(new Event("basho:logout"));
   };
 
   return (
@@ -213,7 +213,7 @@ export default function Navbar() {
           </li>
         </ul>
 
-        <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`} style={{ backgroundColor: bgColor }}>
+        <div className={`mobile-menu ${mobileMenuOpen ? "open" : ""}`} style={{ backgroundColor: bgColor }}>
           <ul className="mobile-menu-links">
             <li><Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
             <li><Link to="/products" onClick={() => setMobileMenuOpen(false)}>Products</Link></li>
