@@ -16,14 +16,14 @@ export default function Workshops() {
       description: "A cozy pottery date for two. Create something special together, laugh, get messy, and take home a handmade memory.",
     },
     {
-      img: potter2,
+      img: potter3,
       title: "One-on-One Pottery Session",
       duration: "",
       description:
         "A personalized pottery session just for you. Learn at your own pace with full guidance and create a piece that feels truly yours.",
     },
     {
-      img: potter3,
+      img: potter2,
       title: "Group Pottery Event",
       duration: "",
       description: "Perfect for friends, teams, and celebrations. A fun group pottery experience filled with creativity, bonding, and lots of clay magic.",
