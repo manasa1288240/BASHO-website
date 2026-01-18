@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import ProductList from "../components/admin/ProductList";
 import WorkshopList from "../components/admin/WorkshopList";
 import OrderList from "../components/admin/OrderList";
 import CustomerList from "../components/admin/CustomerList";
-
 import GalleryManager from "../components/admin/GalleryManager";
-import TestimonialManager from "../components/admin/TestimonialManager";
-import VideoTestimonialManager from "../components/admin/VideoTestimonialManager";
-
 import "../styles/admin.css";
+
+const API_URL =
+  import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -19,10 +17,10 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   const [stats, setStats] = useState({
-    totalRevenue: "₹45,231",
-    activeOrders: "12",
-    workshopSignups: "24",
-    gstCollected: "₹8,141",
+    totalRevenue: 0,
+    activeOrders: 0,
+    workshopBookings: 0,
+    gstCollected: 0,
   });
 
   useEffect(() => {
@@ -30,7 +28,6 @@ export default function AdminDashboard() {
     const adminToken = localStorage.getItem("admin_token");
 
     if (!user.isAdmin || !adminToken) {
-      console.log("❌ Not authorized as admin");
       navigate("/auth");
       return;
     }
@@ -45,6 +42,23 @@ export default function AdminDashboard() {
     localStorage.removeItem("admin_token");
     navigate("/auth");
   };
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/admin/stats`);
+        const data = await res.json();
+
+        if (data.success) {
+          setStats(data.stats);
+        }
+      } catch (err) {
+        console.error("Failed to load stats:", err);
+      }
+    };
+
+    loadStats();
+  }, []);
 
   if (loading) {
     return (
@@ -75,14 +89,18 @@ export default function AdminDashboard() {
           </button>
 
           <button
-            className={activeTab === "workshops" ? "nav-item active" : "nav-item"}
+            className={
+              activeTab === "workshops" ? "nav-item active" : "nav-item"
+            }
             onClick={() => setActiveTab("workshops")}
           >
             <span className="icon">🎨</span> Workshops
           </button>
 
           <button
-            className={activeTab === "customers" ? "nav-item active" : "nav-item"}
+            className={
+              activeTab === "customers" ? "nav-item active" : "nav-item"
+            }
             onClick={() => setActiveTab("customers")}
           >
             <span className="icon">👥</span> Customers
@@ -92,25 +110,7 @@ export default function AdminDashboard() {
             className={activeTab === "gallery" ? "nav-item active" : "nav-item"}
             onClick={() => setActiveTab("gallery")}
           >
-            <span className="icon">🖼️</span> Gallery
-          </button>
-
-          <button
-            className={
-              activeTab === "testimonials" ? "nav-item active" : "nav-item"
-            }
-            onClick={() => setActiveTab("testimonials")}
-          >
-            <span className="icon">💬</span> Testimonials
-          </button>
-
-          <button
-            className={
-              activeTab === "videoTestimonials" ? "nav-item active" : "nav-item"
-            }
-            onClick={() => setActiveTab("videoTestimonials")}
-          >
-            <span className="icon">🎥</span> Video Testimonials
+            <span className="icon">🖼️</span> Gallery & Testimonials
           </button>
 
           <button className="nav-item logout-btn" onClick={handleLogout}>
@@ -122,9 +122,7 @@ export default function AdminDashboard() {
       <main className="admin-main-view">
         <header className="admin-top-bar">
           <h1>
-            {activeTab === "videoTestimonials"
-              ? "Video Testimonials Management"
-              : `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Management`}
+            {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Management
           </h1>
 
           <div className="admin-profile">
@@ -142,7 +140,7 @@ export default function AdminDashboard() {
         <section className="stats-container">
           <div className="stat-card-pro">
             <p className="stat-label">Total Revenue</p>
-            <h3 className="stat-value">{stats.totalRevenue}</h3>
+            <h3 className="stat-value">₹{Math.round(stats.totalRevenue)}</h3>
           </div>
 
           <div className="stat-card-pro">
@@ -151,13 +149,13 @@ export default function AdminDashboard() {
           </div>
 
           <div className="stat-card-pro">
-            <p className="stat-label">Workshops</p>
-            <h3 className="stat-value">{stats.workshopSignups}</h3>
+            <p className="stat-label">Workshop Bookings</p>
+            <h3 className="stat-value">{stats.workshopBookings}</h3>
           </div>
 
           <div className="stat-card-pro">
-            <p className="stat-label">GST Handling</p>
-            <h3 className="stat-value">{stats.gstCollected}</h3>
+            <p className="stat-label">GST Collected</p>
+            <h3 className="stat-value">₹{Math.round(stats.gstCollected)}</h3>
           </div>
         </section>
 
@@ -166,10 +164,7 @@ export default function AdminDashboard() {
           {activeTab === "orders" && <OrderList />}
           {activeTab === "workshops" && <WorkshopList />}
           {activeTab === "customers" && <CustomerList />}
-
           {activeTab === "gallery" && <GalleryManager />}
-          {activeTab === "testimonials" && <TestimonialManager />}
-          {activeTab === "videoTestimonials" && <VideoTestimonialManager />}
         </section>
       </main>
     </div>

@@ -26,6 +26,9 @@ const adminTestimonialRoutes = require("./routes/adminTestimonialRoutes");
 // ✅ ADMIN VIDEO TESTIMONIAL ROUTE
 const adminVideoTestimonialRoutes = require("./routes/adminVideoTestimonialRoutes");
 
+// ✅ ADMIN STATS ROUTE
+const adminStatsRoutes = require("./routes/adminStatsRoutes");
+
 const app = express();
 
 // ========== CRITICAL MIDDLEWARE ==========
@@ -127,8 +130,11 @@ app.use("/api/admin/workshop-events", adminWorkshopEventRoutes);
 // Admin written testimonials
 app.use("/api/admin/testimonials", adminTestimonialRoutes);
 
-// ✅ Admin video testimonials (Instagram reels)
+// Admin video testimonials (Instagram reels)
 app.use("/api/admin/video-testimonials", adminVideoTestimonialRoutes);
+
+// ✅ Admin stats (real dashboard numbers)
+app.use("/api/admin/stats", adminStatsRoutes);
 
 /* -------------------- ERROR HANDLER -------------------- */
 app.use((err, req, res, next) => {
