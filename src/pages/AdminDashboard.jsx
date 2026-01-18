@@ -39,7 +39,7 @@ export default function AdminDashboard() {
     navigate("/auth");
   };
 
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalRevenue: "₹45,231",
     activeOrders: "12",
     workshopSignups: "24",
@@ -59,7 +59,8 @@ export default function AdminDashboard() {
     if (activeTab === "customers") return "Customers Management";
     if (activeTab === "gallery") return "Gallery Management";
     if (activeTab === "testimonials") return "Testimonials Management";
-    if (activeTab === "videoTestimonials") return "Video Testimonials Management";
+    if (activeTab === "videoTestimonials")
+      return "Video Testimonials Management";
     if (activeTab === "messages") return "Inquiries";
     if (activeTab === "reviews") return "Customer Reviews";
     return "Admin Dashboard";
@@ -118,7 +119,9 @@ export default function AdminDashboard() {
           </button>
 
           <button
-            className={activeTab === "customers" ? "nav-item active" : "nav-item"}
+            className={
+              activeTab === "customers" ? "nav-item active" : "nav-item"
+            }
             onClick={() => setActiveTab("customers")}
           >
             <span className="icon">👥</span> Customers
@@ -132,7 +135,9 @@ export default function AdminDashboard() {
           </button>
 
           <button
-            className={activeTab === "testimonials" ? "nav-item active" : "nav-item"}
+            className={
+              activeTab === "testimonials" ? "nav-item active" : "nav-item"
+            }
             onClick={() => setActiveTab("testimonials")}
           >
             <span className="icon">💬</span> Testimonials
@@ -140,24 +145,13 @@ export default function AdminDashboard() {
 
           <button
             className={
-              activeTab === "videoTestimonials" ? "nav-item active" : "nav-item"
+              activeTab === "videoTestimonials"
+                ? "nav-item active"
+                : "nav-item"
             }
             onClick={() => setActiveTab("videoTestimonials")}
           >
             <span className="icon">🎥</span> Video Testimonials
-          </button>
-                    <button 
-            className={activeTab === "messages" ? "nav-item active" : "nav-item"}
-            onClick={() => setActiveTab("messages")}
-          >
-            <span className="icon">📧</span> Inquiries
-          </button>
-
-          <button 
-            className={activeTab === "reviews" ? "nav-item active" : "nav-item"}
-            onClick={() => setActiveTab("reviews")}
-          >
-            <span className="icon">⭐</span> Customer Reviews
           </button>
 
           <button
@@ -180,11 +174,7 @@ export default function AdminDashboard() {
           <button className="nav-item logout-btn" onClick={handleLogout}>
             <span className="icon">🚪</span> Logout
           </button>
-<<<<<<< HEAD
-        </nav>
-=======
         </div>
->>>>>>> 717933a184c3ef63cbd3b09ddf1fa579d4dff7fa
       </aside>
 
       {/* MAIN */}
@@ -239,7 +229,9 @@ export default function AdminDashboard() {
           {activeTab === "customers" && <CustomerList />}
           {activeTab === "gallery" && <GalleryManager />}
           {activeTab === "testimonials" && <TestimonialManager />}
-          {activeTab === "videoTestimonials" && <VideoTestimonialManager />}
+          {activeTab === "videoTestimonials" && (
+            <VideoTestimonialManager />
+          )}
           {activeTab === "messages" && <MessageList />}
           {activeTab === "reviews" && <ReviewList />}
         </section>
