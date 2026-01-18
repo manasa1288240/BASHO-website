@@ -1,23 +1,22 @@
 const express = require("express");
-const ContactMessage = require("../models/ContactMessage");
+const Message = require("../models/Message");
 
 const router = express.Router();
 
+// POST message (from frontend contact form)
 router.post("/", async (req, res) => {
   try {
     const { name, email, message } = req.body;
 
     if (!name || !email || !message) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All fields are required" });
+      return res.status(400).json({ success: false, message: "All fields required" });
     }
 
-    const saved = await ContactMessage.create({ name, email, message });
+    const saved = await Message.create({ name, email, message });
 
-    res.status(201).json({ success: true, message: "Message saved", saved });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.json({ success: true, message: "Message saved", data: saved });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 

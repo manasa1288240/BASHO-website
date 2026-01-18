@@ -3,6 +3,7 @@ const Message = require("../models/Message");
 
 const router = express.Router();
 
+// GET all messages (for admin)
 router.get("/", async (req, res) => {
   try {
     const messages = await Message.find().sort({ createdAt: -1 });
