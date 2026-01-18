@@ -4,84 +4,45 @@ import axios from "axios";
 import Footer from "../components/Footer";
 import "./GalleryPage.css";
 
-// PRODUCT images (UNCHANGED)
-import img1 from "../assets/gallery/img1.png";
-import img2 from "../assets/gallery/img2.png";
-import img3 from "../assets/gallery/img3.png";
-import img4 from "../assets/gallery/img4.png";
-import img5 from "../assets/gallery/img5.png";
-import img6 from "../assets/gallery/img6.png";
-import img7 from "../assets/gallery/img7.png";
-import img8 from "../assets/gallery/img8.png";
-import img9 from "../assets/gallery/img9.png";
-import img10 from "../assets/gallery/img10.png";
-import img11 from "../assets/gallery/img11.png";
-import img12 from "../assets/gallery/img12.png";
-import img13 from "../assets/gallery/img13.png";
-import img14 from "../assets/gallery/img14.png";
-import img15 from "../assets/gallery/img15.png";
-import img16 from "../assets/gallery/img16.png";
-import img17 from "../assets/gallery/img17.png";
-import img18 from "../assets/gallery/img18.png";
-
-// PRODUCTS (static)
-const productImages = [
-  img1,
-  img2,
-  img3,
-  img4,
-  img5,
-  img6,
-  img7,
-  img8,
-  img9,
-  img10,
-  img11,
-  img12,
-  img13,
-  img14,
-  img15,
-  img16,
-  img17,
-  img18,
-].map((img) => ({ imageUrl: img, type: "product" }));
-
 const GalleryPage = () => {
-  // ✅ Backend base URL (works in Vercel + local)
-  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
-  const [activeTab, setActiveTab] = useState("all"); // NEW
-  const [workshops, setWorkshops] = useState([]); // NEW
-  const [events, setEvents] = useState([]); // NEW
+  const [activeTab, setActiveTab] = useState("all");
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // FETCH from MongoDB
   useEffect(() => {
-    axios
-      .get(`${API_URL}/api/gallery`)
-      .then((res) => {
-        const workshopImgs = res.data
-          .filter((i) => i.category === "workshop")
-          .map((i) => ({ imageUrl: i.imageUrl, type: "workshop" }));
+    const loadGallery = async () => {
+      try {
+        setLoading(true);
 
-        const eventImgs = res.data
-          .filter((i) => i.category === "event")
-          .map((i) => ({ imageUrl: i.imageUrl, type: "event" }));
+        const res = await axios.get(`${API_URL}/api/gallery`);
 
-        setWorkshops(workshopImgs);
-        setEvents(eventImgs);
-      })
-      .catch((err) => {
+        // Expecting backend to return array like:
+        // [{ imageUrl: "...", category: "product" | "workshop" | "event" }]
+        const mapped = (res.data || []).map((i) => ({
+          _id: i._id,
+          imageUrl: i.imageUrl,
+          type: i.category,
+        }));
+
+        setGalleryImages(mapped);
+      } catch (err) {
         console.error("❌ Failed to load gallery images:", err);
-      });
-  }, [API_URL]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // COMBINED gallery
-  const allImages = [...productImages, ...workshops, ...events];
+    loadGallery();
+  }, [API_URL]);
 
   const visibleImages =
     activeTab === "all"
-      ? allImages
-      : allImages.filter((img) => img.type === activeTab);
+      ? galleryImages
+      : galleryImages.filter((img) => img.type === activeTab);
 
   return (
     <>
@@ -91,7 +52,7 @@ const GalleryPage = () => {
           <p>Every piece unfolds as you scroll</p>
         </div>
 
-        {/* FILTER TABS (NEW) */}
+        {/* FILTER TABS */}
         <div className="gallery-tabs">
           {["all", "product", "workshop", "event"].map((tab) => (
             <button
@@ -106,6 +67,20 @@ const GalleryPage = () => {
           ))}
         </div>
 
+        {/* LOADING */}
+        {loading && (
+          <p style={{ textAlign: "center", opacity: 0.7, marginTop: "30px" }}>
+            Loading gallery...
+          </p>
+        )}
+
+        {/* EMPTY */}
+        {!loading && visibleImages.length === 0 && (
+          <p style={{ textAlign: "center", opacity: 0.7, marginTop: "30px" }}>
+            No images found in this category.
+          </p>
+        )}
+
         {/* GALLERY */}
         <div
           className={`masonry-container ${
@@ -114,7 +89,7 @@ const GalleryPage = () => {
         >
           {visibleImages.map((img, index) => (
             <motion.div
-              key={index}
+              key={img._id || index}
               className="gallery-card"
               initial={{ opacity: 0, y: 80, scale: 0.95 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}

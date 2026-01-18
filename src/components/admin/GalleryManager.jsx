@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
 // ✅ Works in Vercel + Local
-const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
+const API_URL =
+  import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 const API_BASE = `${API_URL}/api/gallery`;
 
 export default function GalleryManager() {
@@ -40,11 +41,16 @@ export default function GalleryManager() {
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) throw new Error("Add failed");
+      if (!res.ok) {
+        const txt = await res.text();
+        console.log("Add failed:", txt);
+        throw new Error("Add failed");
+      }
 
       setFormData({ title: "", imageUrl: "", category: "product" });
       loadGallery();
     } catch (err) {
+      console.error(err);
       alert("Error adding item");
     }
   };
@@ -53,9 +59,16 @@ export default function GalleryManager() {
     if (!window.confirm("Delete this image?")) return;
     try {
       const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Delete failed");
+
+      if (!res.ok) {
+        const txt = await res.text();
+        console.log("Delete failed:", txt);
+        throw new Error("Delete failed");
+      }
+
       loadGallery();
     } catch (err) {
+      console.error(err);
       alert("Error deleting image");
     }
   };
@@ -67,7 +80,6 @@ export default function GalleryManager() {
     const itemCat = item.category?.toLowerCase().trim() || "";
     const selectedFilter = filter.toLowerCase().trim();
 
-    // supports plural/singular matching
     return (
       itemCat === selectedFilter ||
       itemCat === selectedFilter.replace(/s$/, "") ||
@@ -197,6 +209,7 @@ export default function GalleryManager() {
                     "https://via.placeholder.com/200?text=No+Image";
                 }}
               />
+
               <p
                 style={{
                   fontWeight: "bold",
@@ -206,6 +219,7 @@ export default function GalleryManager() {
               >
                 {item.title}
               </p>
+
               <p
                 style={{
                   fontSize: "12px",
@@ -215,6 +229,7 @@ export default function GalleryManager() {
               >
                 {item.category}
               </p>
+
               <button
                 onClick={() => handleDelete(item._id)}
                 style={{
