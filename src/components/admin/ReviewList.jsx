@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 export default function ReviewList() {
   const [reviews, setReviews] = useState([]);
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
   useEffect(() => {
     // Fetching from the Review endpoint

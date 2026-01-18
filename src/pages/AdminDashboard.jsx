@@ -4,14 +4,14 @@ import { useNavigate } from "react-router-dom";
 import ProductList from "../components/admin/ProductList";
 import WorkshopList from "../components/admin/WorkshopList";
 import OrderList from "../components/admin/OrderList";
-import CustomerList from "../components/admin/CustomerList"; 
+import CustomerList from "../components/admin/CustomerList";
 import MessageList from "../components/admin/MessageList";
 import ReviewList from "../components/admin/ReviewList";
-// ✅ STEP 1: Import the new GalleryManager component
-import GalleryManager from "../components/admin/GalleryManager"; 
-import "../styles/admin.css"; 
+import GalleryManager from "../components/admin/GalleryManager";
 import TestimonialManager from "../components/admin/TestimonialManager";
 import VideoTestimonialManager from "../components/admin/VideoTestimonialManager";
+
+import "../styles/admin.css";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -24,7 +24,6 @@ export default function AdminDashboard() {
     const adminToken = localStorage.getItem("admin_token");
 
     if (!user.isAdmin || !adminToken) {
-      console.log("❌ Not authorized as admin");
       navigate("/auth");
       return;
     }
@@ -40,7 +39,6 @@ export default function AdminDashboard() {
     navigate("/auth");
   };
 
-  // Dummy stats (we can make it real later)
   const [stats, setStats] = useState({
     totalRevenue: "₹45,231",
     activeOrders: "12",
@@ -62,17 +60,42 @@ export default function AdminDashboard() {
     if (activeTab === "gallery") return "Gallery Management";
     if (activeTab === "testimonials") return "Testimonials Management";
     if (activeTab === "videoTestimonials") return "Video Testimonials Management";
+    if (activeTab === "messages") return "Inquiries";
+    if (activeTab === "reviews") return "Customer Reviews";
     return "Admin Dashboard";
   };
 
   return (
-    <div className="admin-wrapper">
-      <aside className="admin-sidebar-new">
+    <div
+      className="admin-wrapper"
+      style={{
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
+      {/* SIDEBAR */}
+      <aside
+        className="admin-sidebar-new"
+        style={{
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
         <div className="admin-logo">
           <h2>BASHO ADMIN</h2>
         </div>
 
-        <nav className="admin-nav-links">
+        {/* NAV SCROLL AREA */}
+        <nav
+          className="admin-nav-links"
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            paddingBottom: "14px",
+          }}
+        >
           <button
             className={activeTab === "products" ? "nav-item active" : "nav-item"}
             onClick={() => setActiveTab("products")}
@@ -88,24 +111,19 @@ export default function AdminDashboard() {
           </button>
 
           <button
-            className={
-              activeTab === "workshops" ? "nav-item active" : "nav-item"
-            }
+            className={activeTab === "workshops" ? "nav-item active" : "nav-item"}
             onClick={() => setActiveTab("workshops")}
           >
             <span className="icon">🎨</span> Workshops
           </button>
 
           <button
-            className={
-              activeTab === "customers" ? "nav-item active" : "nav-item"
-            }
+            className={activeTab === "customers" ? "nav-item active" : "nav-item"}
             onClick={() => setActiveTab("customers")}
           >
             <span className="icon">👥</span> Customers
           </button>
 
-          {/* ✅ NEW SEPARATE TAB: Gallery */}
           <button
             className={activeTab === "gallery" ? "nav-item active" : "nav-item"}
             onClick={() => setActiveTab("gallery")}
@@ -113,17 +131,13 @@ export default function AdminDashboard() {
             <span className="icon">🖼️</span> Gallery
           </button>
 
-          {/* ✅ NEW SEPARATE TAB: Testimonials */}
           <button
-            className={
-              activeTab === "testimonials" ? "nav-item active" : "nav-item"
-            }
+            className={activeTab === "testimonials" ? "nav-item active" : "nav-item"}
             onClick={() => setActiveTab("testimonials")}
           >
             <span className="icon">💬</span> Testimonials
           </button>
 
-          {/* ✅ NEW SEPARATE TAB: Video Testimonials */}
           <button
             className={
               activeTab === "videoTestimonials" ? "nav-item active" : "nav-item"
@@ -146,13 +160,41 @@ export default function AdminDashboard() {
             <span className="icon">⭐</span> Customer Reviews
           </button>
 
+          <button
+            className={activeTab === "messages" ? "nav-item active" : "nav-item"}
+            onClick={() => setActiveTab("messages")}
+          >
+            <span className="icon">📧</span> Inquiries
+          </button>
+
+          <button
+            className={activeTab === "reviews" ? "nav-item active" : "nav-item"}
+            onClick={() => setActiveTab("reviews")}
+          >
+            <span className="icon">⭐</span> Customer Reviews
+          </button>
+        </nav>
+
+        {/* LOGOUT FIXED AT BOTTOM */}
+        <div style={{ padding: "12px" }}>
           <button className="nav-item logout-btn" onClick={handleLogout}>
             <span className="icon">🚪</span> Logout
           </button>
+<<<<<<< HEAD
         </nav>
+=======
+        </div>
+>>>>>>> 717933a184c3ef63cbd3b09ddf1fa579d4dff7fa
       </aside>
 
-      <main className="admin-main-view">
+      {/* MAIN */}
+      <main
+        className="admin-main-view"
+        style={{
+          height: "100vh",
+          overflowY: "auto",
+        }}
+      >
         <header className="admin-top-bar">
           <h1>{getHeaderTitle()}</h1>
 
@@ -195,13 +237,11 @@ export default function AdminDashboard() {
           {activeTab === "orders" && <OrderList />}
           {activeTab === "workshops" && <WorkshopList />}
           {activeTab === "customers" && <CustomerList />}
-
-          {/* ✅ Separate tab renders */}
           {activeTab === "gallery" && <GalleryManager />}
-          {activeTab === "messages" && <MessageList />}
-          {activeTab === "reviews" && <ReviewList />}
           {activeTab === "testimonials" && <TestimonialManager />}
           {activeTab === "videoTestimonials" && <VideoTestimonialManager />}
+          {activeTab === "messages" && <MessageList />}
+          {activeTab === "reviews" && <ReviewList />}
         </section>
       </main>
     </div>

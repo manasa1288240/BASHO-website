@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 export default function MessageList() {
   const [messages, setMessages] = useState([]);
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
   useEffect(() => {
     fetch(`${API_URL}/api/admin/messages`)
