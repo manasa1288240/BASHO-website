@@ -39,7 +39,7 @@ export default function AdminDashboard() {
     navigate("/auth");
   };
 
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalRevenue: "₹45,231",
     activeOrders: "12",
     workshopSignups: "24",
@@ -59,7 +59,8 @@ export default function AdminDashboard() {
     if (activeTab === "customers") return "Customers Management";
     if (activeTab === "gallery") return "Gallery Management";
     if (activeTab === "testimonials") return "Testimonials Management";
-    if (activeTab === "videoTestimonials") return "Video Testimonials Management";
+    if (activeTab === "videoTestimonials")
+      return "Video Testimonials Management";
     if (activeTab === "messages") return "Inquiries";
     if (activeTab === "reviews") return "Customer Reviews";
     return "Admin Dashboard";
@@ -118,7 +119,9 @@ export default function AdminDashboard() {
           </button>
 
           <button
-            className={activeTab === "customers" ? "nav-item active" : "nav-item"}
+            className={
+              activeTab === "customers" ? "nav-item active" : "nav-item"
+            }
             onClick={() => setActiveTab("customers")}
           >
             <span className="icon">👥</span> Customers
@@ -132,7 +135,9 @@ export default function AdminDashboard() {
           </button>
 
           <button
-            className={activeTab === "testimonials" ? "nav-item active" : "nav-item"}
+            className={
+              activeTab === "testimonials" ? "nav-item active" : "nav-item"
+            }
             onClick={() => setActiveTab("testimonials")}
           >
             <span className="icon">💬</span> Testimonials
@@ -140,7 +145,9 @@ export default function AdminDashboard() {
 
           <button
             className={
-              activeTab === "videoTestimonials" ? "nav-item active" : "nav-item"
+              activeTab === "videoTestimonials"
+                ? "nav-item active"
+                : "nav-item"
             }
             onClick={() => setActiveTab("videoTestimonials")}
           >
@@ -222,7 +229,9 @@ export default function AdminDashboard() {
           {activeTab === "customers" && <CustomerList />}
           {activeTab === "gallery" && <GalleryManager />}
           {activeTab === "testimonials" && <TestimonialManager />}
-          {activeTab === "videoTestimonials" && <VideoTestimonialManager />}
+          {activeTab === "videoTestimonials" && (
+            <VideoTestimonialManager />
+          )}
           {activeTab === "messages" && <MessageList />}
           {activeTab === "reviews" && <ReviewList />}
         </section>
