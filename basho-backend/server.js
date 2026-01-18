@@ -32,8 +32,12 @@ const adminStatsRoutes = require("./routes/adminStatsRoutes");
 // ✅ ADMIN CUSTOMERS ROUTE
 const adminCustomerRoutes = require("./routes/adminCustomerRoutes");
 
-// ✅ ADMIN ORDERS ROUTE (NEW)
+// ✅ ADMIN ORDERS ROUTE
 const adminOrderRoutes = require("./routes/adminOrderRoutes");
+
+// ✅ NEW: CONTACT + REVIEWS ROUTES
+const contactRoutes = require("./routes/contactRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
 
@@ -98,30 +102,6 @@ app.post("/api/payment/test-simple", (req, res) => {
     created_at: Date.now(),
   });
 });
-// Contact Message Route
-app.post('/api/contact', async (req, res) => {
-  try {
-    const { name, email, message } = req.body;
-    // Assuming you have a Message model
-    const newMessage = new Message({ name, email, message, date: new Date() });
-    await newMessage.save();
-    res.status(200).json({ message: "Success" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Review Route
-app.post('/api/reviews', async (req, res) => {
-  try {
-    const { rating, review } = req.body;
-    const newReview = new Review({ rating, review, date: new Date() });
-    await newReview.save();
-    res.status(200).json({ message: "Success" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 /* -------------------- API ROUTES -------------------- */
 
@@ -149,6 +129,12 @@ app.use("/api/chatbot", chatbotRoutes);
 // Gallery
 app.use("/api/gallery", galleryRoutes);
 
+// ✅ Contact messages
+app.use("/api/contact", contactRoutes);
+
+// ✅ Reviews
+app.use("/api/reviews", reviewRoutes);
+
 // Admin products
 app.use("/api/admin/products", adminProductRoutes);
 
@@ -158,7 +144,7 @@ app.use("/api/admin/workshop-events", adminWorkshopEventRoutes);
 // Admin written testimonials
 app.use("/api/admin/testimonials", adminTestimonialRoutes);
 
-// Admin video testimonials (Instagram reels)
+// Admin video testimonials
 app.use("/api/admin/video-testimonials", adminVideoTestimonialRoutes);
 
 // Admin stats
@@ -167,7 +153,7 @@ app.use("/api/admin/stats", adminStatsRoutes);
 // Admin customers
 app.use("/api/admin/customers", adminCustomerRoutes);
 
-// ✅ Admin orders (Order Tracking tab)
+// Admin orders
 app.use("/api/admin/orders", adminOrderRoutes);
 
 /* -------------------- ERROR HANDLER -------------------- */
