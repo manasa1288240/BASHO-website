@@ -86,7 +86,9 @@ export default function Navbar() {
   return (
     <nav className="navbar" style={{ backgroundColor: bgColor, color: textColor }}>
       <div className="navbar-container">
-        <img src={logo} alt="Basho Logo" className="logo" />
+        <Link to="/" className="logo-link">
+  <img src={logo} alt="Basho Logo" className="logo" />
+</Link>
 
         <button
           className="hamburger-menu"
