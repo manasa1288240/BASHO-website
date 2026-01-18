@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { useShop } from "../context/ShopContext";
+ 
 import ChatbotModal from "./ChatbotModal";
 
 export default function Navbar() {
@@ -106,6 +107,7 @@ export default function Navbar() {
           <li><Link to="/workshops" style={{ color: textColor }}>Workshops</Link></li>
           <li><Link to="/about-basho" style={{ color: textColor }}>About Basho</Link></li>
           <li><Link to="/gallery" style={{ color: textColor }}>Gallery</Link></li>
+          <li><Link to="/contact" style={{ color: textColor }}>Contact Us</Link></li>
 
           <li>
             <Link to="/wishlist" style={{ color: textColor }} className="nav-icon-link">
@@ -222,6 +224,7 @@ export default function Navbar() {
             <li><Link to="/workshops" onClick={() => setMobileMenuOpen(false)}>Workshops</Link></li>
             <li><Link to="/about-basho" onClick={() => setMobileMenuOpen(false)}>About</Link></li>
             <li><Link to="/gallery" onClick={() => setMobileMenuOpen(false)}>Gallery</Link></li>
+            <li><Link to="/contact" onClick={() => setMobileMenuOpen(false)}>Contact Us</Link></li>
             <li>
               <Link to="/wishlist" onClick={() => setMobileMenuOpen(false)}>
                 ❤️ Wishlist ({wishlist.length})

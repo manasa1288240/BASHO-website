@@ -4,13 +4,14 @@ import { useNavigate } from "react-router-dom";
 import ProductList from "../components/admin/ProductList";
 import WorkshopList from "../components/admin/WorkshopList";
 import OrderList from "../components/admin/OrderList";
-import CustomerList from "../components/admin/CustomerList";
-
-import GalleryManager from "../components/admin/GalleryManager";
+import CustomerList from "../components/admin/CustomerList"; 
+import MessageList from "../components/admin/MessageList";
+import ReviewList from "../components/admin/ReviewList";
+// ✅ STEP 1: Import the new GalleryManager component
+import GalleryManager from "../components/admin/GalleryManager"; 
+import "../styles/admin.css"; 
 import TestimonialManager from "../components/admin/TestimonialManager";
 import VideoTestimonialManager from "../components/admin/VideoTestimonialManager";
-
-import "../styles/admin.css";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -135,6 +136,19 @@ export default function AdminDashboard() {
           <button className="nav-item logout-btn" onClick={handleLogout}>
             <span className="icon">🚪</span> Logout
           </button>
+          <button 
+  className={activeTab === "messages" ? "nav-item active" : "nav-item"}
+  onClick={() => setActiveTab("messages")}
+>
+  <span className="icon">📧</span> Inquiries
+</button>
+
+<button 
+  className={activeTab === "reviews" ? "nav-item active" : "nav-item"}
+  onClick={() => setActiveTab("reviews")}
+>
+  <span className="icon">⭐</span> Customer Reviews
+</button>
         </nav>
       </aside>
 
@@ -184,6 +198,8 @@ export default function AdminDashboard() {
 
           {/* ✅ Separate tab renders */}
           {activeTab === "gallery" && <GalleryManager />}
+          {activeTab === "messages" && <MessageList />}
+          {activeTab === "reviews" && <ReviewList />}
           {activeTab === "testimonials" && <TestimonialManager />}
           {activeTab === "videoTestimonials" && <VideoTestimonialManager />}
         </section>
