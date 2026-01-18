@@ -3,13 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import CustomOrderForm from "../components/CustomOrderForm";
 import LoginAlert from "../components/LoginAlert";
-import ProductQuickViewModal from "../components/ProductQuickViewModal";
 import featuredProducts from "../data/products";
 import { useShop } from "../context/ShopContext";
 import pot3 from "../assets/pot3.png";
 import "../styles/ProductsPage.css";
-
-
 
 export default function ProductsPage() {
   const [products, setProducts] = useState(featuredProducts);
@@ -17,10 +14,12 @@ export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showCustomForm, setShowCustomForm] = useState(false);
   const [showLoginAlert, setShowLoginAlert] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const { wishlist, cart, toggleWishlist, addToCart } = useShop();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // ✅ Backend base URL (works in Vercel + local)
+  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
   const isLoggedIn = () => {
     return !!localStorage.getItem("basho_user");
@@ -34,14 +33,11 @@ export default function ProductsPage() {
     action();
   };
 
-
   // ✅ ALWAYS RETURN A VALID IMAGE
   const getProductImage = (product) => {
     if (product.image) return product.image;
 
-    const staticMatch = featuredProducts.find(
-      (p) => p.name === product.name
-    );
+    const staticMatch = featuredProducts.find((p) => p.name === product.name);
     if (staticMatch?.image) return staticMatch.image;
 
     if (Array.isArray(product.images) && product.images.length > 0) {
@@ -54,8 +50,7 @@ export default function ProductsPage() {
   // Helpers for wishlist & cart
   const getProductKey = (product) => product._id || product.id || product.name;
 
-  const isInWishlist = (product) =>
-    wishlist.includes(getProductKey(product));
+  const isInWishlist = (product) => wishlist.includes(getProductKey(product));
 
   const isInCart = (product) =>
     cart.some((item) => item.id === getProductKey(product));
@@ -64,7 +59,7 @@ export default function ProductsPage() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const res = await fetch("https://basho-backend.onrender.com/api/products");
+        const res = await fetch(`${API_URL}/api/products`);
         if (!res.ok) throw new Error("Failed to fetch products");
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
@@ -76,7 +71,7 @@ export default function ProductsPage() {
     };
 
     loadProducts();
-  }, []);
+  }, [API_URL]);
 
   // Auto-scroll to custom order
   useEffect(() => {
@@ -97,18 +92,12 @@ export default function ProductsPage() {
     const search = searchTerm.toLowerCase();
 
     const matchesCategory =
-      activeFilter === "All" ||
-      category === activeFilter.toLowerCase();
+      activeFilter === "All" || category === activeFilter.toLowerCase();
 
-    const matchesSearch =
-      title.includes(search) || category.includes(search);
+    const matchesSearch = title.includes(search) || category.includes(search);
 
     return matchesCategory && matchesSearch;
   });
-
-  const handleProductClick = (product) => {
-    setSelectedProduct(product);
-  };
 
   return (
     <div>
@@ -158,13 +147,13 @@ export default function ProductsPage() {
         {filteredProducts.map((product) => {
           const title = product.title || product.name;
           const imageSrc = getProductImage(product);
+          const inWishlist = isInWishlist(product);
+          const inCart = isInCart(product);
 
           return (
             <div
               key={product._id || product.id || product.name}
               className="product-card"
-              onClick={() => handleProductClick(product)}
-              style={{ cursor: "pointer" }}
             >
               <div className="img-wrap">
                 <img src={imageSrc} alt={title} />
@@ -174,9 +163,26 @@ export default function ProductsPage() {
                 <span className="price">{product.price}</span>
               </div>
 
-              <div className="product-info">
+              <div className="product-meta">
                 <span className="category">{product.category}</span>
                 <h3>{title}</h3>
+              </div>
+
+              <div className="product-actions">
+                <button
+                  type="button"
+                  className={`wishlist-btn ${inWishlist ? "active" : ""}`}
+                  onClick={() => requireLogin(() => toggleWishlist(product))}
+                >
+                  {inWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+                </button>
+                <button
+                  type="button"
+                  className={`cart-btn ${inCart ? "active" : ""}`}
+                  onClick={() => requireLogin(() => addToCart(product))}
+                >
+                  {inCart ? "Add More" : "Add to Cart"}
+                </button>
               </div>
             </div>
           );
@@ -194,23 +200,14 @@ export default function ProductsPage() {
               <p>
                 Looking for something unique?
                 <br />
-                Tell us your idea and we'll craft it.
+                Tell us your idea and we’ll craft it.
               </p>
             </div>
           </div>
-          <div className="product-info">
-            <span className="category">Custom</span>
-            <h3>Custom Order</h3>
-          </div>
+          <span className="category">Custom</span>
+          <h3>Custom Order</h3>
         </div>
       </section>
-
-      {/* Product Quick View Modal */}
-      <ProductQuickViewModal
-        product={selectedProduct}
-        isOpen={!!selectedProduct}
-        onClose={() => setSelectedProduct(null)}
-      />
 
       {showCustomForm && (
         <CustomOrderForm onClose={() => setShowCustomForm(false)} />
@@ -230,4 +227,3 @@ export default function ProductsPage() {
     </div>
   );
 }
-

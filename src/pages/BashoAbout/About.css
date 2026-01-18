@@ -1,5 +1,4 @@
 /* Basho About Page - structured layout using existing design tokens */
-
 .basho-about-page {
     background: var(--bg);
     padding-top: 6rem; /* offset for fixed navbar */
@@ -1258,14 +1257,18 @@
     font-size: 0.85rem;
   }
 
-  .basho-about-founder-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
+ .basho-about-founder-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important; /* Forces equal split */
+    align-items: center !important;             /* Forces vertical center */
+    gap: 4rem !important;
+}
 
-  .basho-founder-header {
-    margin-bottom: 1.5rem;
-  }
+.basho-founder-image-container {
+    max-width: 550px !important;               /* Forces image to be large */
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+}
 
   .basho-founder-title {
     font-size: 1.8rem;
@@ -1276,13 +1279,22 @@
   }
 
   .basho-founder-text-content {
-    gap: 1.25rem;
-  }
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Reduced gap slightly for tighter grouping */
+    justify-content: center;
+}
 
   .basho-founder-intro-text {
-    font-size: 1rem;
-    line-height: 1.6;
-  }
+    font-family: "Playfair Display", serif;
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: #442D1C;
+    opacity: 0.85;
+    margin: 0;
+    /* Keeps the text from stretching too wide */
+    max-width: 550px; 
+}
 
   .basho-founder-quote-card {
     padding: 1.25rem;
@@ -1321,10 +1333,6 @@
     font-size: 0.8rem;
   }
 
-  .basho-founder-image-container {
-    max-width: 240px;
-  }
-
   .basho-about-mission-cards {
     grid-template-columns: 1fr;
     gap: 1.25rem;
@@ -1343,30 +1351,49 @@
   .basho-about-mission-card p {
     font-size: 0.9rem;
   }
+.basho-mission-plate-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem; /* Increase gap for a premium feel */
+    margin-bottom: 5rem;
+}
 
-  .basho-mission-plate-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
+.basho-core-values-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Ensure 3 columns on desktop */
+    gap: 2rem;
+    padding: 0 1rem;
+}
 
   .basho-mission-plate-inner {
-    padding: 2rem 1.5rem;
-    min-height: auto;
-  }
+    background: #fffcf9;
+    padding: 3rem 2.5rem; /* Increased padding for breathing room */
+    border-radius: 30px;
+    /* Soften the shadow: lower the opacity from 0.2/0.3 to 0.06 */
+    box-shadow: 0 4px 2px rgba(246, 239, 230, 0.837) !important; 
+    border: 1px solid rgba(139, 115, 85, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.basho-mission-plate-text {
+    text-align: left; /* Ensures professional alignment */
+    line-height: 1.8;
+    color: #554433;
+    font-size: 1.05rem;
+}
 
   .basho-mission-plate-header {
     flex-direction: column;
     gap: 0.8rem;
+    align-items: center !important;
     margin-bottom: 1.5rem;
   }
 
   .basho-mission-plate-header h3 {
     font-size: 1.3rem;
-  }
-
-  .basho-mission-plate-text {
-    font-size: 0.9rem;
-    line-height: 1.7;
+    text-align: center !important;
   }
 
   .basho-core-values-grid {
@@ -1374,9 +1401,41 @@
     gap: 1.25rem;
   }
 
-  .basho-gold-plate {
-    padding: 1.2rem;
-    border-radius: 20px;
+.basho-gold-plate {
+    background: linear-gradient(145deg, #fffcf9, #f7f0e8);
+    padding: 2.5rem 1.5rem !important; /* Force more height */
+    border-radius: 24px;
+    /* This shadow is much lighter to prevent the "dirty" look */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid rgba(212, 185, 150, 0.25) !important;
+    
+    /* Alignment fix */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important; 
+    justify-content: center !important;
+    text-align: center !important;
+    transition: transform 0.3s ease;
+}
+
+.basho-gold-plate:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(139, 115, 85, 0.1) !important;
+}
+
+.basho-gold-title {
+    font-family: "Playfair Display", serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #442D1C;
+    margin: 1rem 0 0.5rem 0;
+}
+
+.basho-gold-body {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: #8b7355;
   }
 
   .basho-gold-icon {
@@ -1385,16 +1444,79 @@
     margin-bottom: 0.6rem;
   }
 
-  .basho-gold-title {
-    font-size: 1rem;
-  }
-
-  .basho-gold-body {
-    font-size: 0.85rem;
-  }
 
   .basho-core-values-heading {
     font-size: 1.6rem;
     margin: 2rem 0 1.5rem;
   }
+}
+/* Force the desktop layout for larger screens to ensure it doesn't snap to mobile too early */
+@media (min-width: 1025px) {
+    .basho-about-founder-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1.2fr !important; 
+        align-items: center !important;
+        gap: 5rem !important;
+    }
+
+    .basho-founder-image-container {
+        max-width: 500px !important;
+        height: 500px !important; /* Force the height */
+    }
+
+    .basho-founder-carousel-image {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
+}
+
+/* --- MISSION & VISION CARDS --- */
+.basho-mission-plate-inner {
+    background: #fffcf9;
+    /* Soften the heavy shadow you see in the screenshot */
+    box-shadow: 0px 0px 0px rgb(135, 73, 1) !important;
+    border: 1px solid rgba(139, 115, 85, 0.1);
+    padding: 3rem 3.5rem !important;
+    text-align: center !important;
+    align-items: center !important; 
+    border-radius: 30px;
+    transition: all 0.4s ease;
+}
+
+/* --- CORE VALUES (GOLD PLATES) --- */
+.basho-core-values-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important; /* Forces 3 columns */
+    gap: 2rem !important;
+    margin-top: 3rem;
+}
+
+.basho-gold-plate {
+    background: linear-gradient(145deg, #fffcf9, #f7f0e8) !important;
+    /* Remove the 'dirty' look by making shadow very subtle */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid rgba(212, 185, 150, 0.3) !important;
+    
+    /* FIX ALIGNMENT: Center everything perfectly */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 2.5rem 1.5rem !important;
+    min-height: 220px !important;
+}
+
+.basho-gold-title {
+    font-size: 1.1rem !important;
+    margin-top: 1rem !important;
+    line-height: 1.2;
+}
+
+.basho-gold-body {
+    font-size: 0.9rem !important;
+    margin-top: 0.5rem !important;
+    opacity: 0.8;
 }

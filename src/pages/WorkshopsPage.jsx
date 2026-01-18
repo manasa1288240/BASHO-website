@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import LoginAlert from "../components/LoginAlert";
-import workshopsData from "../data/workshops";
 import "../styles/WorkshopsPage.css";
 
 /* ================================================= */
@@ -10,7 +9,8 @@ import "../styles/WorkshopsPage.css";
 /* ================================================= */
 
 function getStartDateTime(workshop) {
-  if (!workshop.date || !workshop.time || workshop.date === "Flexible") return null;
+  if (!workshop.date || !workshop.time || workshop.date === "Flexible")
+    return null;
   const startTime = workshop.time.split("–")[0].trim();
   return new Date(`${workshop.date} ${startTime}`);
 }
@@ -23,7 +23,7 @@ function isCompleted(workshop) {
 function isBookingClosed(workshop) {
   const start = getStartDateTime(workshop);
   if (!start) return false;
-  return new Date() > new Date(start.getTime() - 30 * 60 * 1000); // 30 mins
+  return new Date() > new Date(start.getTime() - 30 * 60 * 1000);
 }
 
 function isFullyBooked(workshop) {
@@ -35,39 +35,17 @@ function isFullyBooked(workshop) {
 /* ================================================= */
 
 export default function WorkshopsPage() {
-  const [workshops, setWorkshops] = useState([]);
   const [selectedWorkshop, setSelectedWorkshop] = useState(null);
   const [notification, setNotification] = useState(null);
   const [showLoginAlert, setShowLoginAlert] = useState(false);
-  const [loading, setLoading] = useState(true);
+
+  const [workshopsData, setWorkshopsData] = useState([]);
+  const [loadingWorkshops, setLoadingWorkshops] = useState(true);
+
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Fetch workshops from backend
-    const fetchWorkshops = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/workshops/published");
-        const data = await response.json();
-        
-        if (data.success && data.workshops) {
-          console.log("✅ Workshops loaded from database:", data.workshops);
-          setWorkshops(data.workshops);
-        } else {
-          // Fallback to hardcoded data if API fails
-          console.warn("⚠️ Failed to fetch from API, using hardcoded data");
-          setWorkshops(workshopsData);
-        }
-      } catch (err) {
-        console.error("❌ Error fetching workshops:", err);
-        // Fallback to hardcoded data
-        setWorkshops(workshopsData);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWorkshops();
-  }, []);
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
   const triggerNotify = (msg, type = "info") => {
     setNotification({ msg, type });
@@ -77,26 +55,100 @@ export default function WorkshopsPage() {
     return !!localStorage.getItem("basho_user");
   };
 
-  const activeWorkshops = workshops
-    .filter(w => !isCompleted(w) && !w.isCustom)
-    .sort((a, b) => getStartDateTime(a) - getStartDateTime(b));
+  useEffect(() => {
+    async function fetchWorkshops() {
+      try {
+        const res = await fetch(`${API_URL}/api/admin/workshop-events`);
+        const data = await res.json();
 
-  const completedWorkshops = workshops
-    .filter(w => isCompleted(w) && !w.isCustom);
+        if (data.success) {
+          const formatted = (data.workshops || []).map((w) => ({
+            id: w._id,
+            title: w.title,
+            description: w.description || "",
+            date: new Date(w.date).toLocaleDateString(),
+            time: "Flexible",
+            location: "BASHO Studio",
+            duration: "2 hrs",
+            price: `₹${w.price}`,
+            image: w.image || "/placeholder.jpg",
+            maxParticipants: Number(w.capacity || 10),
+            bookedSeats: 0,
+            isCustom: false,
+          }));
 
-  const customWorkshop = workshops.find(w => w.isCustom);
+          setWorkshopsData(formatted);
+        } else {
+          setWorkshopsData([]);
+        }
+      } catch (err) {
+        console.error("Failed to load workshops:", err);
+        setWorkshopsData([]);
+      } finally {
+        setLoadingWorkshops(false);
+      }
+    }
 
-  if (loading) {
-    return <div className="workshops-page"><p>Loading workshops...</p></div>;
+    fetchWorkshops();
+  }, [API_URL]);
+
+  const activeWorkshops = workshopsData
+    .filter((w) => !isCompleted(w) && !w.isCustom)
+    .sort((a, b) => {
+      const da = getStartDateTime(a);
+      const db = getStartDateTime(b);
+      if (!da || !db) return 0;
+      return da - db;
+    });
+
+  const completedWorkshops = workshopsData.filter(
+    (w) => isCompleted(w) && !w.isCustom
+  );
+
+  const customWorkshop = {
+    id: "custom-workshop",
+    title: "Custom Pottery Experience",
+    description:
+      "Want a private session? Choose a one-on-one class, pottery date, or group event.",
+    date: "Flexible",
+    time: "Flexible",
+    location: "BASHO Studio",
+    duration: "Flexible",
+    price: "Custom",
+    image:
+      "https://res.cloudinary.com/ddcxodbaa/image/upload/v1768402259/workshop4_etmk2f.png",
+    maxParticipants: 0,
+    bookedSeats: 0,
+    isCustom: true,
+  };
+
+  if (loadingWorkshops) {
+    return (
+      <div className="workshops-page">
+        <div className="featured-header">
+          <div className="featured-container">
+            <div className="featured-subtitle">Learn & Create</div>
+            <h1 className="featured-title">POTTERY WORKSHOPS</h1>
+            <div className="featured-divider"></div>
+          </div>
+        </div>
+
+        <p style={{ textAlign: "center", marginTop: "30px" }}>
+          Loading workshops...
+        </p>
+
+        <Footer />
+      </div>
+    );
   }
 
   return (
     <div className="workshops-page">
       {notification && (
-        <Toast 
-          message={notification.msg} 
-          type={notification.type} 
-          onClose={() => setNotification(null)} 
+        <Toast
+          message={notification.msg}
+          type={notification.type}
+          onClose={() => setNotification(null)}
         />
       )}
 
@@ -112,11 +164,17 @@ export default function WorkshopsPage() {
         <h2 className="section-label">Upcoming Sessions</h2>
         <div className="grid">
           {activeWorkshops.map((workshop) => (
-            <WorkshopCard key={workshop.id} workshop={workshop} onClick={() => setSelectedWorkshop(workshop)} />
+            <WorkshopCard
+              key={workshop.id}
+              workshop={workshop}
+              onClick={() => setSelectedWorkshop(workshop)}
+            />
           ))}
-          {customWorkshop && (
-            <WorkshopCard workshop={customWorkshop} onClick={() => setSelectedWorkshop(customWorkshop)} />
-          )}
+
+          <WorkshopCard
+            workshop={customWorkshop}
+            onClick={() => setSelectedWorkshop(customWorkshop)}
+          />
         </div>
       </section>
 
@@ -125,7 +183,11 @@ export default function WorkshopsPage() {
           <h2 className="section-label">Past Workshops</h2>
           <div className="grid">
             {completedWorkshops.map((workshop) => (
-              <div key={workshop.id} className="product-card workshop-card-item grayscale-card" onClick={() => setSelectedWorkshop(workshop)}>
+              <div
+                key={workshop.id}
+                className="product-card workshop-card-item grayscale-card"
+                onClick={() => setSelectedWorkshop(workshop)}
+              >
                 <div className="img-wrap">
                   <img src={workshop.image} alt={workshop.title} />
                   <div className="completed-overlay">Workshop Finished</div>
@@ -145,6 +207,7 @@ export default function WorkshopsPage() {
           triggerNotify={triggerNotify}
           isLoggedIn={isLoggedIn}
           setShowLoginAlert={setShowLoginAlert}
+          API_URL={API_URL}
         />
       )}
 
@@ -178,36 +241,51 @@ function Toast({ message, type, onClose }) {
     <div className={`toast-message ${type}`}>
       <div className="toast-content">
         <span className="toast-icon">
-          {type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️'}
+          {type === "error" ? "⚠️" : type === "success" ? "✅" : "ℹ️"}
         </span>
         <p>{message}</p>
       </div>
-      <button className="toast-close" onClick={onClose}>×</button>
+      <button className="toast-close" onClick={onClose}>
+        ×
+      </button>
     </div>
   );
 }
 
 function WorkshopCard({ workshop, onClick }) {
   const full = isFullyBooked(workshop);
+
   return (
     <div className="product-card workshop-card-item" onClick={onClick}>
       <div className="img-wrap">
         <img src={workshop.image} alt={workshop.title} />
-        {full && !workshop.isCustom && <div className="sold-out-badge">Sold Out</div>}
+        {full && !workshop.isCustom && (
+          <div className="sold-out-badge">Sold Out</div>
+        )}
         <span className="price">{workshop.price}</span>
         <span className="duration-badge">{workshop.duration}</span>
       </div>
       <h3>{workshop.title}</h3>
+
       {!workshop.isCustom && (
-        <p className={`seats-status ${full ? 'text-red' : 'text-green'}`}>
-          {full ? "No seats left" : `${workshop.maxParticipants - workshop.bookedSeats} spots left`}
+        <p className={`seats-status ${full ? "text-red" : "text-green"}`}>
+          {full
+            ? "No seats left"
+            : `${workshop.maxParticipants - workshop.bookedSeats} spots left`}
         </p>
       )}
     </div>
   );
 }
 
-function WorkshopModal({ workshop, onClose, triggerNotify, isLoggedIn, setShowLoginAlert }) {
+function WorkshopModal({
+  workshop,
+  onClose,
+  triggerNotify,
+  isLoggedIn,
+  setShowLoginAlert,
+  API_URL,
+}) {
   const [showBookingForm, setShowBookingForm] = useState(false);
   const closed = isBookingClosed(workshop);
   const full = isFullyBooked(workshop);
@@ -229,7 +307,10 @@ function WorkshopModal({ workshop, onClose, triggerNotify, isLoggedIn, setShowLo
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>×</button>
+        <button className="modal-close" onClick={onClose}>
+          ×
+        </button>
+
         <div className="modal-inner-scroll">
           {workshop.isCustom ? (
             <CustomWorkshopForm triggerNotify={triggerNotify} />
@@ -239,18 +320,34 @@ function WorkshopModal({ workshop, onClose, triggerNotify, isLoggedIn, setShowLo
                 <>
                   <WorkshopDetails workshop={workshop} />
                   <div className="modal-footer-btn-container">
-                    <button 
-                      className={`book-now-btn ${(closed || full) ? 'disabled-btn' : ''}`}
+                    <button
+                      className={`book-now-btn ${
+                        closed || full ? "disabled-btn" : ""
+                      }`}
                       onClick={handleBookClick}
                     >
-                      {closed ? "Booking Closed" : full ? "Sold Out" : "Book This Workshop"}
+                      {closed
+                        ? "Booking Closed"
+                        : full
+                        ? "Sold Out"
+                        : "Book This Workshop"}
                     </button>
                   </div>
                 </>
               ) : (
                 <>
-                  <button className="back-btn" onClick={() => setShowBookingForm(false)}>← Back</button>
-                  <WorkshopBookingForm workshop={workshop} triggerNotify={triggerNotify} />
+                  <button
+                    className="back-btn"
+                    onClick={() => setShowBookingForm(false)}
+                  >
+                    ← Back
+                  </button>
+
+                  <WorkshopBookingForm
+                    workshop={workshop}
+                    triggerNotify={triggerNotify}
+                    API_URL={API_URL}
+                  />
                 </>
               )}
             </>
@@ -265,18 +362,19 @@ function WorkshopModal({ workshop, onClose, triggerNotify, isLoggedIn, setShowLo
 /* FORMS */
 /* ================================================= */
 
-function WorkshopBookingForm({ workshop, triggerNotify }) {
+function WorkshopBookingForm({ workshop, triggerNotify, API_URL }) {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
-    source: ""
+    source: "",
   });
+
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -292,41 +390,33 @@ function WorkshopBookingForm({ workshop, triggerNotify }) {
     try {
       triggerNotify("Creating payment order...", "info");
 
-      // Step 1: Extract price amount
       const priceText = workshop.price.replace(/[^\d]/g, "");
       const amount = parseInt(priceText);
 
-      if (!amount || amount <= 0) {
-        throw new Error("Invalid workshop price");
-      }
+      if (!amount || amount <= 0) throw new Error("Invalid workshop price");
 
-      console.log('🟡 Creating workshop order for amount:', amount);
-
-      // Step 2: Create Razorpay order
-      const orderResponse = await fetch("http://localhost:5000/api/workshops/create-order", {
+      const orderResponse = await fetch(`${API_URL}/api/workshops/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: amount,
+          amount,
           currency: "INR",
-          receipt: `workshop-${Date.now()}`
-        })
+          receipt: `workshop-${Date.now()}`,
+        }),
       });
 
       if (!orderResponse.ok) {
         const errorText = await orderResponse.text();
-        console.error('❌ Server error:', errorText);
+        console.error("❌ Server error:", errorText);
         throw new Error("Failed to create order");
       }
 
       const orderData = await orderResponse.json();
-      console.log('✅ Order created:', orderData);
 
       if (!orderData.success) {
         throw new Error(orderData.error || "Order creation failed");
       }
 
-      // Step 3: Load Razorpay script
       if (!window.Razorpay) {
         const script = document.createElement("script");
         script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -340,7 +430,7 @@ function WorkshopBookingForm({ workshop, triggerNotify }) {
         openRazorpay(orderData);
       }
     } catch (error) {
-      console.error('🔴 Workshop booking error:', error);
+      console.error("🔴 Workshop booking error:", error);
       triggerNotify("Error: " + error.message, "error");
       setLoading(false);
     }
@@ -357,66 +447,71 @@ function WorkshopBookingForm({ workshop, triggerNotify }) {
       prefill: {
         name: formData.name,
         email: formData.email,
-        contact: formData.phone
-      },
-      theme: {
-        color: "#8B4513"
+        contact: formData.phone,
       },
       handler: async (response) => {
         try {
-          console.log('💳 Payment completed, verifying...', response);
           triggerNotify("Verifying payment...", "info");
 
-          const verifyResponse = await fetch("http://localhost:5000/api/workshops/verify-payment", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              bookingData: {
-                name: formData.name,
-                email: formData.email,
-                phone: formData.phone,
-                workshopType: workshop.title,
-                preferredDate: workshop.date,
-                participants: 1,
-                source: formData.source
-              }
-            })
-          });
+          const verifyResponse = await fetch(
+            `${API_URL}/api/workshops/verify-payment`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                bookingData: {
+                  name: formData.name,
+                  email: formData.email,
+                  phone: formData.phone,
+                  workshopType: workshop.title,
+                  preferredDate: workshop.date,
+                  participants: 1,
+                  source: formData.source,
+                },
+              }),
+            }
+          );
 
           const verifyData = await verifyResponse.json();
-          console.log('✅ Verification response:', verifyData);
 
           if (verifyData.success) {
-            triggerNotify("✅ Workshop booked successfully! Check your email for confirmation.", "success");
+            triggerNotify(
+              "✅ Workshop booked successfully! Check your email for confirmation.",
+              "success"
+            );
             setLoading(false);
             setTimeout(() => window.location.reload(), 2000);
           } else {
-            triggerNotify("Payment verification failed: " + (verifyData.message || "Unknown error"), "error");
+            triggerNotify(
+              "Payment verification failed: " +
+                (verifyData.message || "Unknown error"),
+              "error"
+            );
             setLoading(false);
           }
         } catch (error) {
-          console.error('❌ Verification error:', error);
           triggerNotify("Error verifying payment: " + error.message, "error");
           setLoading(false);
         }
       },
       modal: {
         ondismiss: () => {
-          console.log('Payment modal closed');
           triggerNotify("Payment cancelled", "info");
           setLoading(false);
-        }
-      }
+        },
+      },
     };
 
     const rzp = new window.Razorpay(options);
-    
-    rzp.on('payment.failed', function (response) {
-      console.error('🔴 Payment failed:', response.error);
-      triggerNotify("Payment failed: " + (response.error.description || "Unknown error"), "error");
+
+    rzp.on("payment.failed", function (response) {
+      triggerNotify(
+        "Payment failed: " + (response.error.description || "Unknown error"),
+        "error"
+      );
       setLoading(false);
     });
 
@@ -426,41 +521,45 @@ function WorkshopBookingForm({ workshop, triggerNotify }) {
   return (
     <form className="booking-form-container" onSubmit={handleSubmit}>
       <h2 className="form-title">Booking Details</h2>
+
       <div className="form-row">
         <div className="form-group">
           <label>Full Name *</label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            required 
+            required
           />
         </div>
+
         <div className="form-group">
           <label>Phone *</label>
-          <input 
-            type="tel" 
+          <input
+            type="tel"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            required 
+            required
           />
         </div>
       </div>
+
       <div className="form-group">
         <label>Email *</label>
-        <input 
-          type="email" 
+        <input
+          type="email"
           name="email"
           value={formData.email}
           onChange={handleChange}
-          required 
+          required
         />
       </div>
+
       <div className="form-group">
         <label>How did you hear about us? *</label>
-        <select 
+        <select
           name="source"
           value={formData.source}
           onChange={handleChange}
@@ -472,8 +571,11 @@ function WorkshopBookingForm({ workshop, triggerNotify }) {
           <option value="friends">Friends/Family</option>
         </select>
       </div>
+
       <div className="form-summary">
-        <p className="total-price">Total: <span>{workshop.price}</span></p>
+        <p className="total-price">
+          Total: <span>{workshop.price}</span>
+        </p>
         <button type="submit" className="submit-btn" disabled={loading}>
           {loading ? "Processing..." : "Pay & Confirm"}
         </button>
@@ -495,8 +597,16 @@ function CustomWorkshopForm({ triggerNotify }) {
   }
 
   return (
-    <form className="custom-form" onSubmit={(e) => { e.preventDefault(); setSubmitted(true); triggerNotify("Request sent successfully!", "success"); }}>
+    <form
+      className="custom-form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSubmitted(true);
+        triggerNotify("Request sent successfully!", "success");
+      }}
+    >
       <h2 className="form-title">Custom Experience</h2>
+
       <div className="form-group">
         <label>Session Type *</label>
         <select required>
@@ -506,13 +616,31 @@ function CustomWorkshopForm({ triggerNotify }) {
           <option value="group">Private Group Event</option>
         </select>
       </div>
+
       <div className="form-row">
-        <div className="form-group"><label>Name *</label><input type="text" required /></div>
-        <div className="form-group"><label>Phone *</label><input type="tel" required /></div>
+        <div className="form-group">
+          <label>Name *</label>
+          <input type="text" required />
+        </div>
+        <div className="form-group">
+          <label>Phone *</label>
+          <input type="tel" required />
+        </div>
       </div>
-      <div className="form-group"><label>Email *</label><input type="email" required /></div>
-      <div className="form-group"><label>Message</label><textarea rows="3"></textarea></div>
-      <button type="submit" className="submit-btn">Send Request</button>
+
+      <div className="form-group">
+        <label>Email *</label>
+        <input type="email" required />
+      </div>
+
+      <div className="form-group">
+        <label>Message</label>
+        <textarea rows="3"></textarea>
+      </div>
+
+      <button type="submit" className="submit-btn">
+        Send Request
+      </button>
     </form>
   );
 }
@@ -524,13 +652,22 @@ function WorkshopDetails({ workshop }) {
         <img src={workshop.image} alt={workshop.title} />
         <span className="detail-price">{workshop.price}</span>
       </div>
+
       <div className="workshop-detail-info">
         <h2 className="detail-title">{workshop.title}</h2>
+
         <div className="detail-meta">
-          <p><strong>Date:</strong> {workshop.date}</p>
-          <p><strong>Time:</strong> {workshop.time}</p>
-          <p><strong>Location:</strong> {workshop.location}</p>
+          <p>
+            <strong>Date:</strong> {workshop.date}
+          </p>
+          <p>
+            <strong>Time:</strong> {workshop.time}
+          </p>
+          <p>
+            <strong>Location:</strong> {workshop.location}
+          </p>
         </div>
+
         <p className="detail-description">{workshop.description}</p>
       </div>
     </div>

@@ -11,12 +11,20 @@ export default function AdminLogin() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  // ✅ Backend base URL (works in Vercel + local)
+  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setLoading(true);
+
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/admin-login", { email, password });
+      const res = await axios.post(`${API_URL}/api/auth/admin-login`, {
+        email,
+        password,
+      });
+
       if (res.data && res.data.token) {
         localStorage.setItem("admin_token", res.data.token);
         localStorage.setItem("basho_token", res.data.token);
@@ -69,8 +77,12 @@ export default function AdminLogin() {
             </form>
 
             <div style={{ marginTop: 16, fontSize: 13, color: "#555" }}>
-              <p style={{ margin: 0 }}>Tip: Use the admin credentials shown below to sign in.</p>
-              <p style={{ margin: "6px 0", fontWeight: 600 }}>Email: admin@123.com &nbsp; | &nbsp; Password: admin123</p>
+              <p style={{ margin: 0 }}>
+                Tip: Use the admin credentials shown below to sign in.
+              </p>
+              <p style={{ margin: "6px 0", fontWeight: 600 }}>
+                Email: admin@123.com &nbsp; | &nbsp; Password: admin123
+              </p>
             </div>
           </div>
         </div>

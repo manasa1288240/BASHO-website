@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import "./CheckoutForm.css";
 
 export default function CheckoutForm({ items, total, onClose, onBack }) {
+  // ✅ Backend base URL (works in Vercel + local)
+  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -78,30 +81,37 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
 
     try {
       // Create order
-      console.log('📦 Creating order for amount:', total);
-      const orderRes = await fetch("http://localhost:5000/api/payment/create-order", {
+      console.log("📦 Creating order for amount:", total);
+
+      const orderRes = await fetch(`${API_URL}/api/payment/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: total,
           currency: "INR",
-          receipt: `order-${Date.now()}`
-        })
+          receipt: `order-${Date.now()}`,
+        }),
       });
 
       if (!orderRes.ok) {
         const errorText = await orderRes.text();
-        console.error('❌ Server error response:', errorText);
-        throw new Error(`Server error: ${orderRes.status} ${orderRes.statusText}`);
+        console.error("❌ Server error response:", errorText);
+        throw new Error(
+          `Server error: ${orderRes.status} ${orderRes.statusText}`
+        );
       }
 
       const orderData = await orderRes.json();
-      console.log('✅ Order created:', orderData);
-      if (!orderData.success) throw new Error(orderData.message || orderData.error || "Failed to create order");
+      console.log("✅ Order created:", orderData);
+      if (!orderData.success)
+        throw new Error(
+          orderData.message || orderData.error || "Failed to create order"
+        );
 
       // Open Razorpay checkout
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_S2dB2rrkK9f1cG",
+        key:
+          import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_S2dB2rrkK9f1cG",
         amount: orderData.amount,
         currency: orderData.currency,
         order_id: orderData.id,
@@ -110,12 +120,13 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
         prefill: {
           name: formData.fullName,
           email: formData.email,
-          contact: formData.phone
+          contact: formData.phone,
         },
         handler: async (response) => {
           try {
-            console.log('💳 Payment completed, verifying...', response);
-            const verifyRes = await fetch("http://localhost:5000/api/payment/verify", {
+            console.log("💳 Payment completed, verifying...", response);
+
+            const verifyRes = await fetch(`${API_URL}/api/payment/verify`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -125,20 +136,24 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
                 orderData: {
                   ...formData,
                   items: items,
-                  amount: total
-                }
-              })
+                  amount: total,
+                },
+              }),
             });
 
             const verifyData = await verifyRes.json();
-            console.log('✅ Verification response:', verifyData);
+            console.log("✅ Verification response:", verifyData);
+
             if (verifyData.success) {
               setOrderPlaced(true);
             } else {
-              alert("Payment verification failed: " + (verifyData.message || verifyData.error));
+              alert(
+                "Payment verification failed: " +
+                  (verifyData.message || verifyData.error)
+              );
             }
           } catch (err) {
-            console.error('❌ Verification error:', err);
+            console.error("❌ Verification error:", err);
             alert("Error verifying payment: " + err.message);
           }
           setLoading(false);
@@ -147,21 +162,24 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
           ondismiss: () => {
             setLoading(false);
             alert("Payment cancelled");
-          }
-        }
+          },
+        },
       };
 
       const rzp = new window.Razorpay(options);
-      
-      rzp.on('payment.failed', function (response) {
-        console.error('🔴 Payment failed:', response.error);
+
+      rzp.on("payment.failed", function (response) {
+        console.error("🔴 Payment failed:", response.error);
         setLoading(false);
-        alert('Payment failed: ' + (response.error.description || 'Unknown error'));
+        alert(
+          "Payment failed: " +
+            (response.error.description || "Unknown error")
+        );
       });
-      
+
       rzp.open();
     } catch (err) {
-      console.error('🔴 Checkout error:', err);
+      console.error("🔴 Checkout error:", err);
       alert("Error: " + err.message);
       setLoading(false);
     }
@@ -170,7 +188,10 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
   if (orderPlaced) {
     return (
       <div className="checkout-overlay" onClick={onClose}>
-        <div className="checkout-container" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="checkout-container"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="success-message">
             <div className="success-icon">✓</div>
             <h2>Order Placed Successfully!</h2>
@@ -179,7 +200,8 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
               Your order has been confirmed and will be delivered to:
             </p>
             <p className="delivery-address">
-              {formData.address}, {formData.city}, {formData.state} - {formData.pincode}
+              {formData.address}, {formData.city}, {formData.state} -{" "}
+              {formData.pincode}
             </p>
             <p className="confirmation-email">
               A confirmation email has been sent to {formData.email}
@@ -327,7 +349,9 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
             </div>
 
             <button type="submit" className="place-order-btn" disabled={loading}>
-              {loading ? "Processing..." : `Pay ₹${total.toFixed(2)} with Razorpay`}
+              {loading
+                ? "Processing..."
+                : `Pay ₹${total.toFixed(2)} with Razorpay`}
             </button>
           </form>
         </div>

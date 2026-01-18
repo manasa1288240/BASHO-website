@@ -18,18 +18,32 @@ const galleryRoutes = require("./routes/galleryRoutes");
 const adminProductRoutes = require("./routes/adminProductRoutes");
 const adminWorkshopRoutes = require("./routes/adminWorkshopRoutes");
 
+// ADMIN ROUTES
+const adminWorkshopEventRoutes = require("./routes/adminWorkshopEventRoutes");
+const adminTestimonialRoutes = require("./routes/adminTestimonialRoutes");
+const adminVideoTestimonialRoutes = require("./routes/adminVideoTestimonialRoutes");
+const adminStatsRoutes = require("./routes/adminStatsRoutes");
+const adminCustomerRoutes = require("./routes/adminCustomerRoutes");
+const adminOrderRoutes = require("./routes/adminOrderRoutes");
+
+// PUBLIC: CONTACT + REVIEWS ROUTES
+const contactRoutes = require("./routes/contactRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
+
+// ✅ NEW: ADMIN VIEW ROUTES (for admin panel)
+const adminMessageRoutes = require("./routes/adminMessageRoutes");
+const adminReviewRoutes = require("./routes/adminReviewRoutes");
+
 const app = express();
 
 // ========== CRITICAL MIDDLEWARE ==========
-// Parse JSON bodies (THIS IS WHAT YOU'RE MISSING)
 app.use(express.json());
-// Parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware
+// ✅ CORS
 app.use(
   cors({
-    origin: "*", // Allow all origins for now
+    origin: "*",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -39,17 +53,15 @@ app.use(
 /* -------------------- DEBUG MIDDLEWARE -------------------- */
 app.use((req, res, next) => {
   console.log(`\n=== ${req.method} ${req.url} ===`);
-  
-  // Log headers for payment requests
-  if (req.url.includes('/payment')) {
-    console.log('Headers:', req.headers);
+
+  if (req.url.includes("/payment")) {
+    console.log("Headers:", req.headers);
   }
-  
-  // Log request body for POST/PUT requests
-  if (req.method === 'POST' || req.method === 'PUT') {
-    console.log('Request Body:', req.body);
+
+  if (req.method === "POST" || req.method === "PUT") {
+    console.log("Request Body:", req.body);
   }
-  
+
   next();
 });
 
@@ -63,15 +75,14 @@ app.get("/api/test-env", (req, res) => {
     razorpayKeyId: process.env.RAZORPAY_KEY_ID ? "✅ Present" : "❌ Missing",
     razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET ? "✅ Present" : "❌ Missing",
     nodeEnv: process.env.NODE_ENV || "Not set",
-    port: process.env.PORT || "5000 (default)"
+    port: process.env.PORT || "5000 (default)",
   });
 });
 
 app.post("/api/payment/test-simple", (req, res) => {
   console.log("✅ Simple test endpoint called");
   console.log("Body:", req.body);
-  
-  // Return a fixed test order
+
   res.json({
     success: true,
     id: "order_test_" + Date.now(),
@@ -83,27 +94,71 @@ app.post("/api/payment/test-simple", (req, res) => {
     receipt: "test_receipt",
     status: "created",
     attempts: 0,
-    created_at: Date.now()
+    created_at: Date.now(),
   });
 });
 
 /* -------------------- API ROUTES -------------------- */
 
-// Public APIs
+// Workshop bookings + Razorpay
 app.use("/api/workshops", workshopRoutes);
+
+// Products
 app.use("/api/products", productRoutes);
+
+// Auth
 app.use("/api/auth", authRoutes);
+
+// Payments
 app.use("/api/payment", paymentRoutes);
+
+// Wishlist
 app.use("/api/wishlist", wishlistRoutes);
+
+// Cart
 app.use("/api/cart", cartRoutes);
+
+// Chatbot
 app.use("/api/chatbot", chatbotRoutes);
 
-// Gallery API
+// Gallery
 app.use("/api/gallery", galleryRoutes);
 
-// Admin APIs
+// ✅ Contact messages (public submit)
+app.use("/api/contact", contactRoutes);
+
+// ✅ Reviews (public submit)
+app.use("/api/reviews", reviewRoutes);
+
+// -------------------- ADMIN ROUTES --------------------
+
+// Admin products
 app.use("/api/admin/products", adminProductRoutes);
 app.use("/api/admin/workshop-events", adminWorkshopRoutes);
+
+// Admin workshop events
+app.use("/api/admin/workshop-events", adminWorkshopEventRoutes);
+
+// Admin written testimonials
+app.use("/api/admin/testimonials", adminTestimonialRoutes);
+
+// Admin video testimonials
+app.use("/api/admin/video-testimonials", adminVideoTestimonialRoutes);
+
+// Admin stats
+app.use("/api/admin/stats", adminStatsRoutes);
+
+// Admin customers
+app.use("/api/admin/customers", adminCustomerRoutes);
+
+// Admin orders
+app.use("/api/admin/orders", adminOrderRoutes);
+
+// ✅ Admin messages (view inquiries)
+app.use("/api/admin/messages", adminMessageRoutes);
+
+// ✅ Admin reviews (view customer reviews)
+app.use("/api/admin/reviews", adminReviewRoutes);
 
 /* -------------------- ERROR HANDLER -------------------- */
 app.use((err, req, res, next) => {
@@ -120,11 +175,7 @@ const PORT = process.env.PORT || 5000;
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-      console.log("📋 Available test routes:");
-      console.log(`   - http://localhost:${PORT}/ (Basic test)`);
-      console.log(`   - http://localhost:${PORT}/api/test-env (Check env variables)`);
-      console.log(`   - POST http://localhost:${PORT}/api/payment/test-simple (Test payment)`);
+      console.log(`🚀 Server running on port ${PORT}`);
     });
   })
   .catch((err) => {

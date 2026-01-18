@@ -3,6 +3,9 @@ import axios from "axios";
 import "./AuthModal.css";
 
 export default function AuthModal({ open, onClose, onLoginSuccess }) {
+  // ✅ Backend base URL (works in Vercel + local)
+  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
+
   const inputRef = useRef(null);
   const otpRefs = useRef([]);
   const [step, setStep] = useState("login"); // login | otp
@@ -55,7 +58,7 @@ export default function AuthModal({ open, onClose, onLoginSuccess }) {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/auth/send-otp", {
+      await axios.post(`${API_URL}/api/auth/send-otp`, {
         email: value,
       });
       setContact(value);
@@ -78,19 +81,13 @@ export default function AuthModal({ open, onClose, onLoginSuccess }) {
 
     setLoading(true);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/verify-otp",
-        {
-          email: contact,
-          otp,
-        }
-      );
+      const res = await axios.post(`${API_URL}/api/auth/verify-otp`, {
+        email: contact,
+        otp,
+      });
 
       // ✅ SAVE LOGIN STATE
-      localStorage.setItem(
-        "basho_user",
-        JSON.stringify(res.data.user)
-      );
+      localStorage.setItem("basho_user", JSON.stringify(res.data.user));
 
       if (onLoginSuccess) onLoginSuccess(res.data.user);
 
@@ -105,14 +102,14 @@ export default function AuthModal({ open, onClose, onLoginSuccess }) {
   return (
     <div className="auth-backdrop">
       <div className="auth-modal">
-        <button className="auth-close" onClick={onClose}>×</button>
+        <button className="auth-close" onClick={onClose}>
+          ×
+        </button>
 
         {step === "login" && (
           <>
             <h2 className="auth-title">Login or Sign up</h2>
-            <p className="auth-subtitle">
-              Please enter your email to continue
-            </p>
+            <p className="auth-subtitle">Please enter your email to continue</p>
 
             <form onSubmit={handleLoginSubmit} noValidate>
               <input
@@ -161,11 +158,7 @@ export default function AuthModal({ open, onClose, onLoginSuccess }) {
               ))}
             </div>
 
-            <button
-              className="auth-btn"
-              onClick={handleVerify}
-              disabled={loading}
-            >
+            <button className="auth-btn" onClick={handleVerify} disabled={loading}>
               {loading ? "Verifying..." : "Verify"}
             </button>
 

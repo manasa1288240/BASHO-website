@@ -1,18 +1,22 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Lock, Sparkles } from "lucide-react";
+import { Lock, Sparkles, Eye, EyeOff } from "lucide-react";
 import Footer from "../components/Footer";
 import "../styles/AuthPage.css";
 
 export default function AuthPage() {
   const navigate = useNavigate();
-  const [authMode, setAuthMode] = useState("choice"); // choice | signin | signup
-  const [step, setStep] = useState("email"); // email | password (signin) | otp | profile (signup)
-  
+
+  // ✅ Backend base URL (works in Vercel + local if you set .env)
+  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
+
+  const [authMode, setAuthMode] = useState("choice"); // choice | signin | signup | forgot-password
+  const [step, setStep] = useState("email"); // email | password (signin) | otp | profile (signup) | verify-email (forgot) | new-password (forgot)
+
   // Sign In State
   const [signInData, setSignInData] = useState({ email: "", password: "" });
-  
+
   // Sign Up State
   const [signUpEmail, setSignUpEmail] = useState("");
   const [signUpData, setSignUpData] = useState({
@@ -20,12 +24,25 @@ export default function AuthPage() {
     lastName: "",
     phone: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [showSignInPassword, setShowSignInPassword] = useState(false);
+  const [showSignUpPassword, setShowSignUpPassword] = useState(false);
+  const [showSignUpConfirmPassword, setShowSignUpConfirmPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+  
+  // Forgot Password State
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [forgotPasswordOtp, setForgotPasswordOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  
   const otpRefs = useRef([]);
+  const forgotOtpRefs = useRef([]);
   const emailInputRef = useRef(null);
   const signInInputRef = useRef(null);
 
@@ -48,12 +65,16 @@ export default function AuthPage() {
     setLoading(true);
     try {
       // Check if this is an admin account
-      console.log('📧 Checking email:', signInData.email);
-      const checkRes = await axios.post("http://localhost:5000/api/auth/check-admin-email", {
-        email: signInData.email,
-      });
+      console.log("📧 Checking email:", signInData.email);
 
-      console.log('✅ Email check response:', checkRes.data);
+      const checkRes = await axios.post(
+        `${API_URL}/api/auth/check-admin-email`,
+        {
+          email: signInData.email,
+        }
+      );
+
+      console.log("✅ Email check response:", checkRes.data);
 
       if (checkRes.data.isAdmin) {
         // Admin: proceed to password step
@@ -69,13 +90,12 @@ export default function AuthPage() {
       }
       setLoading(false);
     } catch (err) {
-      console.error('❌ Email check error:', err.message);
-      console.error('Error response:', err.response?.data);
-      console.error('Error status:', err.response?.status);
-      
+      console.error("❌ Email check error:", err.message);
+      console.error("Error response:", err.response?.data);
+      console.error("Error status:", err.response?.status);
+
       // Fallback: still proceed to password step in case of error
-      // This allows user to continue even if the check fails
-      console.warn('⚠️ Proceeding to password step despite error');
+      console.warn("⚠️ Proceeding to password step despite error");
       setStep("password");
       setLoading(false);
     }
@@ -92,7 +112,7 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/signin", {
+      const res = await axios.post(`${API_URL}/api/auth/signin`, {
         email: signInData.email,
         password: signInData.password,
       });
@@ -138,10 +158,13 @@ export default function AuthPage() {
     setLoading(true);
     try {
       // Check if email already exists
-      const checkRes = await axios.post("http://localhost:5000/api/auth/check-admin-email", {
-        email: signUpEmail,
-      });
-      
+      const checkRes = await axios.post(
+        `${API_URL}/api/auth/check-admin-email`,
+        {
+          email: signUpEmail,
+        }
+      );
+
       if (checkRes.data.exists) {
         setMessage("Email already registered. Please sign in instead.");
         setLoading(false);
@@ -149,10 +172,10 @@ export default function AuthPage() {
       }
 
       // Send OTP
-      await axios.post("http://localhost:5000/api/auth/send-otp", {
+      await axios.post(`${API_URL}/api/auth/send-otp`, {
         email: signUpEmail,
       });
-      
+
       setStep("otp");
       setLoading(false);
     } catch (err) {
@@ -171,7 +194,7 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/auth/verify-otp", {
+      await axios.post(`${API_URL}/api/auth/verify-otp`, {
         email: signUpEmail,
         otp,
       });
@@ -189,7 +212,12 @@ export default function AuthPage() {
     e.preventDefault();
     setMessage("");
 
-    if (!signUpData.firstName || !signUpData.lastName || !signUpData.phone || !signUpData.password) {
+    if (
+      !signUpData.firstName ||
+      !signUpData.lastName ||
+      !signUpData.phone ||
+      !signUpData.password
+    ) {
       setMessage("Please fill in all fields");
       return;
     }
@@ -206,7 +234,7 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/update-profile", {
+      const res = await axios.post(`${API_URL}/api/auth/update-profile`, {
         email: signUpEmail,
         firstName: signUpData.firstName,
         lastName: signUpData.lastName,
@@ -228,6 +256,122 @@ export default function AuthPage() {
     }
   };
 
+  /* ================== FORGOT PASSWORD FLOWS ================== */
+
+  const handleForgotPasswordEmailSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    if (!forgotPasswordEmail) {
+      setMessage("Please enter your email");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotPasswordEmail)) {
+      setMessage("Please enter a valid email");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Check if email exists
+      const checkRes = await axios.post(
+        `${API_URL}/api/auth/check-admin-email`,
+        {
+          email: forgotPasswordEmail,
+        }
+      );
+
+      if (!checkRes.data.exists) {
+        setMessage("Email not registered");
+        setLoading(false);
+        return;
+      }
+
+      // Send OTP
+      await axios.post(`${API_URL}/api/auth/send-otp`, {
+        email: forgotPasswordEmail,
+      });
+
+      setStep("verify-email");
+      setLoading(false);
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Failed to send OTP");
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPasswordOtpVerify = async () => {
+    const otp = forgotOtpRefs.current.map((el) => el?.value).join("");
+
+    if (otp.length !== 6) {
+      setMessage("Please enter 6-digit OTP");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await axios.post(`${API_URL}/api/auth/verify-otp`, {
+        email: forgotPasswordEmail,
+        otp,
+      });
+
+      // OTP verified, move to new password step
+      setStep("new-password");
+      setLoading(false);
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Invalid OTP");
+      setLoading(false);
+    }
+  };
+
+  const handleResetPasswordSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    if (!newPassword || !confirmNewPassword) {
+      setMessage("Please fill in all fields");
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setMessage("Passwords do not match");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setMessage("Password must be at least 6 characters");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await axios.post(`${API_URL}/api/auth/reset-password`, {
+        email: forgotPasswordEmail,
+        newPassword: newPassword,
+      });
+
+      setMessage("Password reset successfully!");
+      setTimeout(() => {
+        resetForgotPassword();
+      }, 1500);
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Failed to reset password");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetForgotPassword = () => {
+    setAuthMode("choice");
+    setStep("email");
+    setForgotPasswordEmail("");
+    setForgotPasswordOtp("");
+    setNewPassword("");
+    setConfirmNewPassword("");
+    setMessage("");
+  };
+
   const resetSignIn = () => {
     setAuthMode("choice");
     setStep("email");
@@ -239,7 +383,13 @@ export default function AuthPage() {
     setAuthMode("choice");
     setStep("email");
     setSignUpEmail("");
-    setSignUpData({ firstName: "", lastName: "", phone: "", password: "", confirmPassword: "" });
+    setSignUpData({
+      firstName: "",
+      lastName: "",
+      phone: "",
+      password: "",
+      confirmPassword: "",
+    });
     setMessage("");
   };
 
@@ -254,8 +404,8 @@ export default function AuthPage() {
             </p>
             <div className="branding-divider"></div>
             <p className="branding-description">
-              Join our community to explore handcrafted pottery,
-              exclusive workshops, and timeless ceramics.
+              Join our community to explore handcrafted pottery, exclusive
+              workshops, and timeless ceramics.
             </p>
           </div>
         </div>
@@ -266,7 +416,9 @@ export default function AuthPage() {
             {authMode === "choice" && (
               <>
                 <h2 className="auth-title">Welcome Back</h2>
-                <p className="auth-subtitle">Choose how you'd like to proceed</p>
+                <p className="auth-subtitle">
+                  Choose how you'd like to proceed
+                </p>
 
                 <div className="auth-choice-buttons">
                   <button
@@ -314,7 +466,10 @@ export default function AuthPage() {
                           placeholder="your@email.com"
                           value={signInData.email}
                           onChange={(e) => {
-                            setSignInData({ ...signInData, email: e.target.value });
+                            setSignInData({
+                              ...signInData,
+                              email: e.target.value,
+                            });
                             setMessage("");
                           }}
                           disabled={loading}
@@ -341,24 +496,39 @@ export default function AuthPage() {
                 {step === "password" && (
                   <>
                     <h2 className="auth-title">Enter Password</h2>
-                    <p className="auth-subtitle">Password for {signInData.email}</p>
+                    <p className="auth-subtitle">
+                      Password for {signInData.email}
+                    </p>
 
                     <form onSubmit={handleSignInPasswordSubmit} noValidate>
                       <div className="form-group">
                         <label>Password</label>
-                        <input
-                          ref={signInInputRef}
-                          type="password"
-                          className="auth-input"
-                          placeholder="••••••••"
-                          value={signInData.password}
-                          onChange={(e) => {
-                            setSignInData({ ...signInData, password: e.target.value });
-                            setMessage("");
-                          }}
-                          disabled={loading}
-                          autoFocus
-                        />
+                        <div className="password-input-wrapper">
+                          <input
+                            ref={signInInputRef}
+                            type={showSignInPassword ? "text" : "password"}
+                            className="auth-input"
+                            placeholder="••••••••"
+                            value={signInData.password}
+                            onChange={(e) => {
+                              setSignInData({
+                                ...signInData,
+                                password: e.target.value,
+                              });
+                              setMessage("");
+                            }}
+                            disabled={loading}
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            className="password-toggle-btn"
+                            onClick={() => setShowSignInPassword(!showSignInPassword)}
+                            disabled={loading}
+                          >
+                            {showSignInPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
                       </div>
 
                       <button className="auth-btn" disabled={loading}>
@@ -367,6 +537,19 @@ export default function AuthPage() {
                     </form>
 
                     {message && <p className="auth-error">{message}</p>}
+
+                    <button
+                      className="forgot-password-link"
+                      type="button"
+                      onClick={() => {
+                        setAuthMode("forgot-password");
+                        setStep("email");
+                        setMessage("");
+                      }}
+                      disabled={loading}
+                    >
+                      Forgot Password?
+                    </button>
 
                     <button
                       className="auth-back-btn"
@@ -429,7 +612,11 @@ export default function AuthPage() {
                   <>
                     <h2 className="auth-title">Verify Email</h2>
                     <p className="auth-subtitle">
-                      Code sent to <strong>{signUpEmail.split("@")[0]}•••@{signUpEmail.split("@")[1]}</strong>
+                      Code sent to{" "}
+                      <strong>
+                        {signUpEmail.split("@")[0]}•••@
+                        {signUpEmail.split("@")[1]}
+                      </strong>
                     </p>
 
                     <div className="otp-container">
@@ -492,7 +679,10 @@ export default function AuthPage() {
                             placeholder="John"
                             value={signUpData.firstName}
                             onChange={(e) => {
-                              setSignUpData({ ...signUpData, firstName: e.target.value });
+                              setSignUpData({
+                                ...signUpData,
+                                firstName: e.target.value,
+                              });
                               setMessage("");
                             }}
                             disabled={loading}
@@ -506,7 +696,10 @@ export default function AuthPage() {
                             placeholder="Doe"
                             value={signUpData.lastName}
                             onChange={(e) => {
-                              setSignUpData({ ...signUpData, lastName: e.target.value });
+                              setSignUpData({
+                                ...signUpData,
+                                lastName: e.target.value,
+                              });
                               setMessage("");
                             }}
                             disabled={loading}
@@ -522,7 +715,10 @@ export default function AuthPage() {
                           placeholder="+91 9999999999"
                           value={signUpData.phone}
                           onChange={(e) => {
-                            setSignUpData({ ...signUpData, phone: e.target.value });
+                            setSignUpData({
+                              ...signUpData,
+                              phone: e.target.value,
+                            });
                             setMessage("");
                           }}
                           disabled={loading}
@@ -531,32 +727,58 @@ export default function AuthPage() {
 
                       <div className="form-group">
                         <label>Password *</label>
-                        <input
-                          type="password"
-                          className="auth-input"
-                          placeholder="••••••••"
-                          value={signUpData.password}
-                          onChange={(e) => {
-                            setSignUpData({ ...signUpData, password: e.target.value });
-                            setMessage("");
-                          }}
-                          disabled={loading}
-                        />
+                        <div className="password-input-wrapper">
+                          <input
+                            type={showSignUpPassword ? "text" : "password"}
+                            className="auth-input"
+                            placeholder="••••••••"
+                            value={signUpData.password}
+                            onChange={(e) => {
+                              setSignUpData({
+                                ...signUpData,
+                                password: e.target.value,
+                              });
+                              setMessage("");
+                            }}
+                            disabled={loading}
+                          />
+                          <button
+                            type="button"
+                            className="password-toggle-btn"
+                            onClick={() => setShowSignUpPassword(!showSignUpPassword)}
+                            disabled={loading}
+                          >
+                            {showSignUpPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
                       </div>
 
                       <div className="form-group">
                         <label>Confirm Password *</label>
-                        <input
-                          type="password"
-                          className="auth-input"
-                          placeholder="••••••••"
-                          value={signUpData.confirmPassword}
-                          onChange={(e) => {
-                            setSignUpData({ ...signUpData, confirmPassword: e.target.value });
-                            setMessage("");
-                          }}
-                          disabled={loading}
-                        />
+                        <div className="password-input-wrapper">
+                          <input
+                            type={showSignUpConfirmPassword ? "text" : "password"}
+                            className="auth-input"
+                            placeholder="••••••••"
+                            value={signUpData.confirmPassword}
+                            onChange={(e) => {
+                              setSignUpData({
+                                ...signUpData,
+                                confirmPassword: e.target.value,
+                              });
+                              setMessage("");
+                            }}
+                            disabled={loading}
+                          />
+                          <button
+                            type="button"
+                            className="password-toggle-btn"
+                            onClick={() => setShowSignUpConfirmPassword(!showSignUpConfirmPassword)}
+                            disabled={loading}
+                          >
+                            {showSignUpConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
                       </div>
 
                       <button className="auth-btn" disabled={loading}>
@@ -570,6 +792,191 @@ export default function AuthPage() {
                       className="auth-back-btn"
                       onClick={() => {
                         setStep("otp");
+                        setMessage("");
+                      }}
+                      disabled={loading}
+                    >
+                      ← Back
+                    </button>
+                  </>
+                )}
+              </>
+            )}
+
+            {/* FORGOT PASSWORD FLOW */}
+            {authMode === "forgot-password" && (
+              <>
+                {step === "email" && (
+                  <>
+                    <h2 className="auth-title">Reset Password</h2>
+                    <p className="auth-subtitle">Enter your registered email</p>
+
+                    <form onSubmit={handleForgotPasswordEmailSubmit} noValidate>
+                      <div className="form-group">
+                        <label>Email *</label>
+                        <input
+                          ref={emailInputRef}
+                          type="email"
+                          className="auth-input"
+                          placeholder="your@email.com"
+                          value={forgotPasswordEmail}
+                          onChange={(e) => {
+                            setForgotPasswordEmail(e.target.value);
+                            setMessage("");
+                          }}
+                          disabled={loading}
+                          autoFocus
+                        />
+                      </div>
+
+                      <button className="auth-btn" disabled={loading}>
+                        {loading ? "Sending OTP..." : "Send OTP"}
+                      </button>
+                    </form>
+
+                    {message && <p className="auth-error">{message}</p>}
+
+                    <button
+                      className="auth-back-btn"
+                      onClick={resetForgotPassword}
+                      disabled={loading}
+                    >
+                      ← Back
+                    </button>
+                  </>
+                )}
+
+                {step === "verify-email" && (
+                  <>
+                    <h2 className="auth-title">Verify Email</h2>
+                    <p className="auth-subtitle">
+                      Enter the OTP sent to <br />
+                      <strong>{forgotPasswordEmail}</strong>
+                    </p>
+
+                    <div className="otp-boxes">
+                      {[...Array(6)].map((_, i) => (
+                        <input
+                          key={i}
+                          ref={(el) => (forgotOtpRefs.current[i] = el)}
+                          className="otp-input"
+                          maxLength="1"
+                          inputMode="numeric"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              handleForgotPasswordOtpVerify();
+                            }
+                            if (
+                              e.key === "Backspace" &&
+                              !e.currentTarget.value &&
+                              i > 0
+                            ) {
+                              forgotOtpRefs.current[i - 1].focus();
+                            }
+                          }}
+                          onChange={(e) => {
+                            if (e.currentTarget.value && i < 5) {
+                              forgotOtpRefs.current[i + 1].focus();
+                            }
+                          }}
+                          disabled={loading}
+                        />
+                      ))}
+                    </div>
+
+                    <button
+                      className="auth-btn"
+                      onClick={handleForgotPasswordOtpVerify}
+                      disabled={loading}
+                    >
+                      {loading ? "Verifying..." : "Verify OTP"}
+                    </button>
+
+                    {message && <p className="auth-error">{message}</p>}
+
+                    <button
+                      className="auth-back-btn"
+                      onClick={() => {
+                        setStep("email");
+                        setMessage("");
+                        forgotOtpRefs.current = [];
+                      }}
+                      disabled={loading}
+                    >
+                      ← Back
+                    </button>
+                  </>
+                )}
+
+                {step === "new-password" && (
+                  <>
+                    <h2 className="auth-title">Create New Password</h2>
+                    <p className="auth-subtitle">Set a new password for your account</p>
+
+                    <form onSubmit={handleResetPasswordSubmit} noValidate>
+                      <div className="form-group">
+                        <label>New Password *</label>
+                        <div className="password-input-wrapper">
+                          <input
+                            type={showNewPassword ? "text" : "password"}
+                            className="auth-input"
+                            placeholder="••••••••"
+                            value={newPassword}
+                            onChange={(e) => {
+                              setNewPassword(e.target.value);
+                              setMessage("");
+                            }}
+                            disabled={loading}
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            className="password-toggle-btn"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            disabled={loading}
+                          >
+                            {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label>Confirm Password *</label>
+                        <div className="password-input-wrapper">
+                          <input
+                            type={showConfirmNewPassword ? "text" : "password"}
+                            className="auth-input"
+                            placeholder="••••••••"
+                            value={confirmNewPassword}
+                            onChange={(e) => {
+                              setConfirmNewPassword(e.target.value);
+                              setMessage("");
+                            }}
+                            disabled={loading}
+                          />
+                          <button
+                            type="button"
+                            className="password-toggle-btn"
+                            onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                            disabled={loading}
+                          >
+                            {showConfirmNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <button className="auth-btn" disabled={loading}>
+                        {loading ? "Resetting..." : "Reset Password"}
+                      </button>
+                    </form>
+
+                    {message && <p className="auth-error">{message}</p>}
+
+                    <button
+                      className="auth-back-btn"
+                      onClick={() => {
+                        setStep("verify-email");
                         setMessage("");
                       }}
                       disabled={loading}

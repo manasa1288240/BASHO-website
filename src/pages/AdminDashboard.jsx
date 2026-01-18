@@ -1,104 +1,36 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import ProductList from "../components/admin/ProductList";
 import WorkshopList from "../components/admin/WorkshopList";
 import OrderList from "../components/admin/OrderList";
-import CustomerList from "../components/admin/CustomerList"; 
-// ✅ STEP 1: Import the new GalleryManager component
-import GalleryManager from "../components/admin/GalleryManager"; 
-import "../styles/admin.css"; 
+import CustomerList from "../components/admin/CustomerList";
+import MessageList from "../components/admin/MessageList";
+import ReviewList from "../components/admin/ReviewList";
+import GalleryManager from "../components/admin/GalleryManager";
+import TestimonialManager from "../components/admin/TestimonialManager";
+import VideoTestimonialManager from "../components/admin/VideoTestimonialManager";
+
+import "../styles/admin.css";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("products");
   const [adminUser, setAdminUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalRevenue: "₹0",
-    activeOrders: "0",
-    workshopSignups: "0",
-    gstCollected: "₹0"
-  });
 
   useEffect(() => {
-    // Check if user is admin
     const user = JSON.parse(localStorage.getItem("basho_user") || "{}");
     const adminToken = localStorage.getItem("admin_token");
 
     if (!user.isAdmin || !adminToken) {
-      console.log("❌ Not authorized as admin");
       navigate("/auth");
       return;
     }
 
     setAdminUser(user);
     setLoading(false);
-    
-    // Fetch dashboard stats
-    fetchDashboardStats();
   }, [navigate]);
-
-  const fetchDashboardStats = async () => {
-    try {
-      const adminToken = localStorage.getItem("admin_token");
-      
-      // Fetch users to get order data
-      const usersRes = await fetch("http://localhost:5000/api/auth/all-users", {
-        headers: {
-          "Authorization": `Bearer ${adminToken}`
-        }
-      });
-      
-      const usersData = await usersRes.json();
-      const users = usersData.users || [];
-      
-      // Calculate total revenue and active orders
-      let totalRevenue = 0;
-      let activeOrders = 0;
-      let totalGST = 0;
-      
-      users.forEach(user => {
-        if (user.orders && user.orders.length > 0) {
-          activeOrders += user.orders.length;
-          user.orders.forEach(order => {
-            if (order.items) {
-              order.items.forEach(item => {
-                if (item.product && item.product.price) {
-                  const itemPrice = item.product.price * item.qty;
-                  totalRevenue += itemPrice;
-                  
-                  // Calculate GST
-                  const gstPercent = item.product.gstPercent || 18;
-                  totalGST += (itemPrice * gstPercent) / 100;
-                }
-              });
-            }
-          });
-        }
-      });
-      
-      // Fetch workshops count
-      const workshopsRes = await fetch("http://localhost:5000/api/admin/workshops", {
-        headers: {
-          "Authorization": `Bearer ${adminToken}`
-        }
-      });
-      
-      const workshopsData = await workshopsRes.json();
-      const workshopCount = Array.isArray(workshopsData) ? workshopsData.length : 0;
-      
-      // Update stats
-      setStats({
-        totalRevenue: `₹${totalRevenue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
-        activeOrders: activeOrders.toString(),
-        workshopSignups: workshopCount.toString(),
-        gstCollected: `₹${totalGST.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
-      });
-    } catch (error) {
-      console.error("Error fetching dashboard stats:", error);
-      // Keep default values if fetch fails
-    }
-  };
 
   const handleLogout = () => {
     localStorage.removeItem("basho_user");
@@ -107,62 +39,158 @@ export default function AdminDashboard() {
     navigate("/auth");
   };
 
+  const [stats] = useState({
+    totalRevenue: "₹45,231",
+    activeOrders: "12",
+    workshopSignups: "24",
+    gstCollected: "₹8,141",
+  });
+
   if (loading) {
-    return <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>;
+    return (
+      <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>
+    );
   }
 
+  const getHeaderTitle = () => {
+    if (activeTab === "products") return "Inventory Management";
+    if (activeTab === "orders") return "Order Tracking";
+    if (activeTab === "workshops") return "Workshops Management";
+    if (activeTab === "customers") return "Customers Management";
+    if (activeTab === "gallery") return "Gallery Management";
+    if (activeTab === "testimonials") return "Testimonials Management";
+    if (activeTab === "videoTestimonials")
+      return "Video Testimonials Management";
+    if (activeTab === "messages") return "Inquiries";
+    if (activeTab === "reviews") return "Customer Reviews";
+    return "Admin Dashboard";
+  };
+
   return (
-    <div className="admin-wrapper">
-      <aside className="admin-sidebar-new">
+    <div
+      className="admin-wrapper"
+      style={{
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
+      {/* SIDEBAR */}
+      <aside
+        className="admin-sidebar-new"
+        style={{
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
         <div className="admin-logo">
           <h2>BASHO ADMIN</h2>
         </div>
-        <nav className="admin-nav-links">
-          <button 
+
+        {/* NAV SCROLL AREA */}
+        <nav
+          className="admin-nav-links"
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            paddingBottom: "14px",
+          }}
+        >
+          <button
             className={activeTab === "products" ? "nav-item active" : "nav-item"}
             onClick={() => setActiveTab("products")}
           >
             <span className="icon">📦</span> Inventory
           </button>
-          <button 
+
+          <button
             className={activeTab === "orders" ? "nav-item active" : "nav-item"}
             onClick={() => setActiveTab("orders")}
           >
             <span className="icon">🛒</span> Order Tracking
           </button>
-          <button 
+
+          <button
             className={activeTab === "workshops" ? "nav-item active" : "nav-item"}
             onClick={() => setActiveTab("workshops")}
           >
             <span className="icon">🎨</span> Workshops
           </button>
-          <button 
-            className={activeTab === "customers" ? "nav-item active" : "nav-item"}
+
+          <button
+            className={
+              activeTab === "customers" ? "nav-item active" : "nav-item"
+            }
             onClick={() => setActiveTab("customers")}
           >
             <span className="icon">👥</span> Customers
           </button>
-          <button 
+
+          <button
             className={activeTab === "gallery" ? "nav-item active" : "nav-item"}
             onClick={() => setActiveTab("gallery")}
           >
-            <span className="icon">🖼️</span> Gallery & Testimonials
+            <span className="icon">🖼️</span> Gallery
           </button>
-          <button 
-            className="nav-item logout-btn"
-            onClick={handleLogout}
+
+          <button
+            className={
+              activeTab === "testimonials" ? "nav-item active" : "nav-item"
+            }
+            onClick={() => setActiveTab("testimonials")}
           >
-            <span className="icon">🚪</span> Logout
+            <span className="icon">💬</span> Testimonials
+          </button>
+
+          <button
+            className={
+              activeTab === "videoTestimonials"
+                ? "nav-item active"
+                : "nav-item"
+            }
+            onClick={() => setActiveTab("videoTestimonials")}
+          >
+            <span className="icon">🎥</span> Video Testimonials
+          </button>
+
+          <button
+            className={activeTab === "messages" ? "nav-item active" : "nav-item"}
+            onClick={() => setActiveTab("messages")}
+          >
+            <span className="icon">📧</span> Inquiries
+          </button>
+
+          <button
+            className={activeTab === "reviews" ? "nav-item active" : "nav-item"}
+            onClick={() => setActiveTab("reviews")}
+          >
+            <span className="icon">⭐</span> Customer Reviews
           </button>
         </nav>
+
+        {/* LOGOUT FIXED AT BOTTOM */}
+        <div style={{ padding: "12px" }}>
+          <button className="nav-item logout-btn" onClick={handleLogout}>
+            <span className="icon">🚪</span> Logout
+          </button>
+        </div>
       </aside>
 
-      <main className="admin-main-view">
+      {/* MAIN */}
+      <main
+        className="admin-main-view"
+        style={{
+          height: "100vh",
+          overflowY: "auto",
+        }}
+      >
         <header className="admin-top-bar">
-          <h1>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Management</h1>
+          <h1>{getHeaderTitle()}</h1>
+
           <div className="admin-profile">
             <span>{adminUser?.email || "Admin"}</span>
-            <button 
+            <button
               className="logout-btn-small"
               onClick={handleLogout}
               title="Logout"
@@ -177,14 +205,17 @@ export default function AdminDashboard() {
             <p className="stat-label">Total Revenue</p>
             <h3 className="stat-value">{stats.totalRevenue}</h3>
           </div>
+
           <div className="stat-card-pro">
             <p className="stat-label">Active Orders</p>
             <h3 className="stat-value">{stats.activeOrders}</h3>
           </div>
+
           <div className="stat-card-pro">
             <p className="stat-label">Workshops</p>
             <h3 className="stat-value">{stats.workshopSignups}</h3>
           </div>
+
           <div className="stat-card-pro">
             <p className="stat-label">GST Handling</p>
             <h3 className="stat-value">{stats.gstCollected}</h3>
@@ -196,8 +227,13 @@ export default function AdminDashboard() {
           {activeTab === "orders" && <OrderList />}
           {activeTab === "workshops" && <WorkshopList />}
           {activeTab === "customers" && <CustomerList />}
-          {/* ✅ STEP 2: Replace the "Coming Soon" div with the actual component */}
           {activeTab === "gallery" && <GalleryManager />}
+          {activeTab === "testimonials" && <TestimonialManager />}
+          {activeTab === "videoTestimonials" && (
+            <VideoTestimonialManager />
+          )}
+          {activeTab === "messages" && <MessageList />}
+          {activeTab === "reviews" && <ReviewList />}
         </section>
       </main>
     </div>
