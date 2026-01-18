@@ -25,9 +25,13 @@ const adminStatsRoutes = require("./routes/adminStatsRoutes");
 const adminCustomerRoutes = require("./routes/adminCustomerRoutes");
 const adminOrderRoutes = require("./routes/adminOrderRoutes");
 
-// NEW: CONTACT + REVIEWS ROUTES
+// PUBLIC: CONTACT + REVIEWS ROUTES
 const contactRoutes = require("./routes/contactRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
+
+// ✅ NEW: ADMIN VIEW ROUTES (for admin panel)
+const adminMessageRoutes = require("./routes/adminMessageRoutes");
+const adminReviewRoutes = require("./routes/adminReviewRoutes");
 
 const app = express();
 
@@ -119,11 +123,13 @@ app.use("/api/chatbot", chatbotRoutes);
 // Gallery
 app.use("/api/gallery", galleryRoutes);
 
-// Contact messages
+// ✅ Contact messages (public submit)
 app.use("/api/contact", contactRoutes);
 
-// Reviews
+// ✅ Reviews (public submit)
 app.use("/api/reviews", reviewRoutes);
+
+// -------------------- ADMIN ROUTES --------------------
 
 // Admin products
 app.use("/api/admin/products", adminProductRoutes);
@@ -145,6 +151,12 @@ app.use("/api/admin/customers", adminCustomerRoutes);
 
 // Admin orders
 app.use("/api/admin/orders", adminOrderRoutes);
+
+// ✅ Admin messages (view inquiries)
+app.use("/api/admin/messages", adminMessageRoutes);
+
+// ✅ Admin reviews (view customer reviews)
+app.use("/api/admin/reviews", adminReviewRoutes);
 
 /* -------------------- ERROR HANDLER -------------------- */
 app.use((err, req, res, next) => {
