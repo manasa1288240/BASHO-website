@@ -1,5 +1,4 @@
 /* Basho About Page - structured layout using existing design tokens */
-
 .basho-about-page {
     background: var(--bg);
     padding-top: 6rem; /* offset for fixed navbar */
@@ -1258,14 +1257,18 @@
     font-size: 0.85rem;
   }
 
-  .basho-about-founder-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
+ .basho-about-founder-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important; /* Forces equal split */
+    align-items: center !important;             /* Forces vertical center */
+    gap: 4rem !important;
+}
 
-  .basho-founder-header {
-    margin-bottom: 1.5rem;
-  }
+.basho-founder-image-container {
+    max-width: 550px !important;               /* Forces image to be large */
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+}
 
   .basho-founder-title {
     font-size: 1.8rem;
@@ -1276,13 +1279,22 @@
   }
 
   .basho-founder-text-content {
-    gap: 1.25rem;
-  }
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Reduced gap slightly for tighter grouping */
+    justify-content: center;
+}
 
   .basho-founder-intro-text {
-    font-size: 1rem;
-    line-height: 1.6;
-  }
+    font-family: "Playfair Display", serif;
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: #442D1C;
+    opacity: 0.85;
+    margin: 0;
+    /* Keeps the text from stretching too wide */
+    max-width: 550px; 
+}
 
   .basho-founder-quote-card {
     padding: 1.25rem;
@@ -1321,9 +1333,7 @@
     font-size: 0.8rem;
   }
 
-  .basho-founder-image-container {
-    max-width: 240px;
-  }
+
 
   .basho-about-mission-cards {
     grid-template-columns: 1fr;
@@ -1397,4 +1407,24 @@
     font-size: 1.6rem;
     margin: 2rem 0 1.5rem;
   }
+}
+/* Force the desktop layout for larger screens to ensure it doesn't snap to mobile too early */
+@media (min-width: 1025px) {
+    .basho-about-founder-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1.2fr !important; 
+        align-items: center !important;
+        gap: 5rem !important;
+    }
+
+    .basho-founder-image-container {
+        max-width: 500px !important;
+        height: 500px !important; /* Force the height */
+    }
+
+    .basho-founder-carousel-image {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
 }

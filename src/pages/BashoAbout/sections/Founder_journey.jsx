@@ -21,19 +21,20 @@ function Founder_journey() {
       <div className="basho-about-inner">
         <div className="basho-founder-header">
           <h2 className="basho-founder-title">
-            Shivangi's Journey
+            Shivangi's Journey 
           </h2>
         </div>
         <div className="basho-about-founder-grid">
           {/* Left: Carousel */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ delay: 0.2 }}
-            className="basho-founder-carousel-wrapper"
-          >
-            <FounderHeaderCarousel />
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ delay: 0.2 }}
+              className="basho-founder-carousel-wrapper"
+              style={{ width: '100%', display: 'flex', justifyContent: 'center' }} // Add this line
+            >
+              <FounderHeaderCarousel />
+            </motion.div>
           {/* Right: All text content */}
           <div className="basho-founder-text-content">
             <p className="basho-founder-intro-text">
