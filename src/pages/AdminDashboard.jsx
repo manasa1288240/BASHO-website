@@ -10,13 +10,8 @@ import ReviewList from "../components/admin/ReviewList";
 // ✅ STEP 1: Import the new GalleryManager component
 import GalleryManager from "../components/admin/GalleryManager"; 
 import "../styles/admin.css"; 
-import CustomerList from "../components/admin/CustomerList";
-
-import GalleryManager from "../components/admin/GalleryManager";
 import TestimonialManager from "../components/admin/TestimonialManager";
 import VideoTestimonialManager from "../components/admin/VideoTestimonialManager";
-
-import "../styles/admin.css";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
