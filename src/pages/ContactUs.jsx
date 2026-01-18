@@ -9,7 +9,7 @@ export default function ContactUs() {
     e.preventDefault();
     // Replace '/api/contact' with your actual backend endpoint
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/contact`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://basho-backend.onrender.com'}/api/contact`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(formData),
@@ -26,7 +26,7 @@ export default function ContactUs() {
   const handleReviewSubmit = async () => {
     if (rating === 0) return alert("Please select a star rating!");
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/reviews`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://basho-backend.onrender.com'}/api/reviews`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ rating, review: reviewText }),
