@@ -4,6 +4,8 @@ import ProductList from "../components/admin/ProductList";
 import WorkshopList from "../components/admin/WorkshopList";
 import OrderList from "../components/admin/OrderList";
 import CustomerList from "../components/admin/CustomerList"; 
+import MessageList from "../components/admin/MessageList";
+import ReviewList from "../components/admin/ReviewList";
 // ✅ STEP 1: Import the new GalleryManager component
 import GalleryManager from "../components/admin/GalleryManager"; 
 import "../styles/admin.css"; 
@@ -90,6 +92,19 @@ export default function AdminDashboard() {
           >
             <span className="icon">🚪</span> Logout
           </button>
+          <button 
+  className={activeTab === "messages" ? "nav-item active" : "nav-item"}
+  onClick={() => setActiveTab("messages")}
+>
+  <span className="icon">📧</span> Inquiries
+</button>
+
+<button 
+  className={activeTab === "reviews" ? "nav-item active" : "nav-item"}
+  onClick={() => setActiveTab("reviews")}
+>
+  <span className="icon">⭐</span> Customer Reviews
+</button>
         </nav>
       </aside>
 
@@ -134,6 +149,8 @@ export default function AdminDashboard() {
           {activeTab === "customers" && <CustomerList />}
           {/* ✅ STEP 2: Replace the "Coming Soon" div with the actual component */}
           {activeTab === "gallery" && <GalleryManager />}
+          {activeTab === "messages" && <MessageList />}
+          {activeTab === "reviews" && <ReviewList />}
         </section>
       </main>
     </div>

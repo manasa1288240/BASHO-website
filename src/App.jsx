@@ -26,6 +26,7 @@ import CareGuide from "./pages/CareGuide";
 import WishlistPage from "./pages/WishlistPage";
 import CartPage from "./pages/CartPage";
 import GalleryPage from "./pages/GalleryPage";
+import ContactUs from "./pages/ContactUs";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
 
@@ -75,6 +76,7 @@ function AppRoutes() {
         <Route path="/care-guide" element={<CareGuide />} />
         <Route path="/about-basho" element={<BashoAbout />} />
         <Route path="/gallery" element={<GalleryPage />} />
+        <Route path="/contact" element={<ContactUs />} />
         <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/cart" element={<CartPage />} />
 

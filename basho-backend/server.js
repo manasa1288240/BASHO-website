@@ -80,6 +80,30 @@ app.post("/api/payment/test-simple", (req, res) => {
     created_at: Date.now(),
   });
 });
+// Contact Message Route
+app.post('/api/contact', async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+    // Assuming you have a Message model
+    const newMessage = new Message({ name, email, message, date: new Date() });
+    await newMessage.save();
+    res.status(200).json({ message: "Success" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Review Route
+app.post('/api/reviews', async (req, res) => {
+  try {
+    const { rating, review } = req.body;
+    const newReview = new Review({ rating, review, date: new Date() });
+    await newReview.save();
+    res.status(200).json({ message: "Success" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 /* -------------------- API ROUTES -------------------- */
 app.use("/api/workshops", workshopRoutes);
