@@ -29,8 +29,11 @@ const adminVideoTestimonialRoutes = require("./routes/adminVideoTestimonialRoute
 // ✅ ADMIN STATS ROUTE
 const adminStatsRoutes = require("./routes/adminStatsRoutes");
 
-// ✅ ADMIN CUSTOMERS ROUTE (NEW)
+// ✅ ADMIN CUSTOMERS ROUTE
 const adminCustomerRoutes = require("./routes/adminCustomerRoutes");
+
+// ✅ ADMIN ORDERS ROUTE (NEW)
+const adminOrderRoutes = require("./routes/adminOrderRoutes");
 
 const app = express();
 
@@ -134,11 +137,14 @@ app.use("/api/admin/testimonials", adminTestimonialRoutes);
 // Admin video testimonials (Instagram reels)
 app.use("/api/admin/video-testimonials", adminVideoTestimonialRoutes);
 
-// ✅ Admin stats (real dashboard numbers)
+// Admin stats
 app.use("/api/admin/stats", adminStatsRoutes);
 
-// ✅ Admin customers (real customers tab)
+// Admin customers
 app.use("/api/admin/customers", adminCustomerRoutes);
+
+// ✅ Admin orders (Order Tracking tab)
+app.use("/api/admin/orders", adminOrderRoutes);
 
 /* -------------------- ERROR HANDLER -------------------- */
 app.use((err, req, res, next) => {
