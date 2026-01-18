@@ -29,6 +29,9 @@ const adminVideoTestimonialRoutes = require("./routes/adminVideoTestimonialRoute
 // ✅ ADMIN STATS ROUTE
 const adminStatsRoutes = require("./routes/adminStatsRoutes");
 
+// ✅ ADMIN CUSTOMERS ROUTE (NEW)
+const adminCustomerRoutes = require("./routes/adminCustomerRoutes");
+
 const app = express();
 
 // ========== CRITICAL MIDDLEWARE ==========
@@ -68,9 +71,7 @@ app.get("/", (req, res) => {
 app.get("/api/test-env", (req, res) => {
   res.json({
     razorpayKeyId: process.env.RAZORPAY_KEY_ID ? "✅ Present" : "❌ Missing",
-    razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET
-      ? "✅ Present"
-      : "❌ Missing",
+    razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET ? "✅ Present" : "❌ Missing",
     nodeEnv: process.env.NODE_ENV || "Not set",
     port: process.env.PORT || "5000 (default)",
   });
@@ -135,6 +136,9 @@ app.use("/api/admin/video-testimonials", adminVideoTestimonialRoutes);
 
 // ✅ Admin stats (real dashboard numbers)
 app.use("/api/admin/stats", adminStatsRoutes);
+
+// ✅ Admin customers (real customers tab)
+app.use("/api/admin/customers", adminCustomerRoutes);
 
 /* -------------------- ERROR HANDLER -------------------- */
 app.use((err, req, res, next) => {
