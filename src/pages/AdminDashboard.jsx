@@ -132,23 +132,23 @@ export default function AdminDashboard() {
           >
             <span className="icon">🎥</span> Video Testimonials
           </button>
+                    <button 
+            className={activeTab === "messages" ? "nav-item active" : "nav-item"}
+            onClick={() => setActiveTab("messages")}
+          >
+            <span className="icon">📧</span> Inquiries
+          </button>
+
+          <button 
+            className={activeTab === "reviews" ? "nav-item active" : "nav-item"}
+            onClick={() => setActiveTab("reviews")}
+          >
+            <span className="icon">⭐</span> Customer Reviews
+          </button>
 
           <button className="nav-item logout-btn" onClick={handleLogout}>
             <span className="icon">🚪</span> Logout
           </button>
-          <button 
-  className={activeTab === "messages" ? "nav-item active" : "nav-item"}
-  onClick={() => setActiveTab("messages")}
->
-  <span className="icon">📧</span> Inquiries
-</button>
-
-<button 
-  className={activeTab === "reviews" ? "nav-item active" : "nav-item"}
-  onClick={() => setActiveTab("reviews")}
->
-  <span className="icon">⭐</span> Customer Reviews
-</button>
         </nav>
       </aside>
 
