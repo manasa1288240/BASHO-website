@@ -17,25 +17,15 @@ const chatbotRoutes = require("./routes/chatbotRoutes");
 const galleryRoutes = require("./routes/galleryRoutes");
 const adminProductRoutes = require("./routes/adminProductRoutes");
 
-// ✅ ADMIN WORKSHOP EVENTS ROUTE
+// ADMIN ROUTES
 const adminWorkshopEventRoutes = require("./routes/adminWorkshopEventRoutes");
-
-// ✅ ADMIN TESTIMONIAL ROUTE
 const adminTestimonialRoutes = require("./routes/adminTestimonialRoutes");
-
-// ✅ ADMIN VIDEO TESTIMONIAL ROUTE
 const adminVideoTestimonialRoutes = require("./routes/adminVideoTestimonialRoutes");
-
-// ✅ ADMIN STATS ROUTE
 const adminStatsRoutes = require("./routes/adminStatsRoutes");
-
-// ✅ ADMIN CUSTOMERS ROUTE
 const adminCustomerRoutes = require("./routes/adminCustomerRoutes");
-
-// ✅ ADMIN ORDERS ROUTE
 const adminOrderRoutes = require("./routes/adminOrderRoutes");
 
-// ✅ NEW: CONTACT + REVIEWS ROUTES
+// NEW: CONTACT + REVIEWS ROUTES
 const contactRoutes = require("./routes/contactRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 
@@ -129,10 +119,10 @@ app.use("/api/chatbot", chatbotRoutes);
 // Gallery
 app.use("/api/gallery", galleryRoutes);
 
-// ✅ Contact messages
+// Contact messages
 app.use("/api/contact", contactRoutes);
 
-// ✅ Reviews
+// Reviews
 app.use("/api/reviews", reviewRoutes);
 
 // Admin products
