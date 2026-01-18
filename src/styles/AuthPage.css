@@ -154,6 +154,40 @@
   letter-spacing: 0.5px;
 }
 
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #7c4a33;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover:not(:disabled) {
+  color: #5e3525;
+}
+
+.password-toggle-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.password-input-wrapper .auth-input {
+  padding-right: 45px;
+}
+
 .auth-input {
   width: 100%;
   padding: 0.85rem 1rem;
@@ -238,6 +272,34 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.forgot-password-link {
+  width: 100%;
+  padding: 0.75rem;
+  background: transparent;
+  color: #b8860b;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  text-decoration: underline;
+  box-sizing: border-box;
+}
+
+.forgot-password-link:hover:not(:disabled) {
+  color: #8b6914;
+  background: rgba(184, 134, 11, 0.05);
+}
+
+.forgot-password-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 
 /* ===============================
    OTP SECTION
@@ -557,7 +619,6 @@
    RESPONSIVE
 ================================ */
 
-}
 
 .form-row .form-group {
   margin-bottom: 1rem;

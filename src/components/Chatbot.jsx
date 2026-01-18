@@ -96,7 +96,7 @@ const IconMapper = {
 
 export default function Chatbot() {
   // ✅ Backend base URL (works in Vercel + local)
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([

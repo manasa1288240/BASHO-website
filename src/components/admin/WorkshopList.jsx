@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
-// ✅ Works in Vercel + Local
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL =
+  import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 const API_BASE = `${API_URL}/api/admin/workshop-events`;
 
 function authHeader() {
@@ -11,10 +11,15 @@ function authHeader() {
 
 export default function WorkshopList() {
   const [workshops, setWorkshops] = useState([]);
+
+  const [editingId, setEditingId] = useState(null);
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     date: "",
+    time: "",
+    duration: "",
     price: "",
     image: "",
     category: "",
@@ -23,7 +28,7 @@ export default function WorkshopList() {
 
   async function load() {
     try {
-      const res = await fetch(API_BASE, { headers: { ...authHeader() } });
+      const res = await fetch(API_BASE, { headers: authHeader() });
       const data = await res.json();
       if (data.success) setWorkshops(data.workshops);
     } catch (err) {
@@ -35,37 +40,70 @@ export default function WorkshopList() {
     load();
   }, []);
 
+  const resetForm = () => {
+    setEditingId(null);
+    setFormData({
+      title: "",
+      description: "",
+      date: "",
+      time: "",
+      duration: "",
+      price: "",
+      image: "",
+      category: "",
+      capacity: "10",
+    });
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch(API_BASE, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeader() },
+      const isEditing = !!editingId;
+
+      const url = isEditing ? `${API_BASE}/${editingId}` : API_BASE;
+      const method = isEditing ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeader(),
+        },
         body: JSON.stringify(formData),
       });
 
       if (res.ok) {
-        alert("Workshop Saved!");
-        setFormData({
-          title: "",
-          description: "",
-          date: "",
-          price: "",
-          image: "",
-          category: "",
-          capacity: "10",
-        });
+        alert(isEditing ? "Workshop Updated!" : "Workshop Saved!");
+        resetForm();
         load();
       } else {
         const errText = await res.text();
-        console.error("Workshop save failed:", errText);
+        console.error("Save failed:", errText);
         alert("Failed to save workshop");
       }
     } catch (err) {
-      console.error("Workshop save error:", err);
+      console.error("Save error:", err);
       alert("Error saving workshop");
     }
+  };
+
+  const startEdit = (w) => {
+    setEditingId(w._id);
+
+    setFormData({
+      title: w.title || "",
+      description: w.description || "",
+      date: w.date ? new Date(w.date).toISOString().slice(0, 10) : "",
+      time: w.time || "",
+      duration: w.duration || "",
+      price: w.price || "",
+      image: w.image || "",
+      category: w.category || "",
+      capacity: w.capacity || "10",
+    });
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -87,7 +125,6 @@ export default function WorkshopList() {
             placeholder="e.g. Weekend Wheel Throwing"
           />
 
-          {/* CATEGORY TEXT INPUT */}
           <label>Category</label>
           <input
             type="text"
@@ -130,6 +167,26 @@ export default function WorkshopList() {
             }
           />
 
+          <label>Time</label>
+          <input
+            type="text"
+            value={formData.time}
+            onChange={(e) =>
+              setFormData({ ...formData, time: e.target.value })
+            }
+            placeholder="e.g. 11:00 AM – 1:00 PM"
+          />
+
+          <label>Duration</label>
+          <input
+            type="text"
+            value={formData.duration}
+            onChange={(e) =>
+              setFormData({ ...formData, duration: e.target.value })
+            }
+            placeholder="e.g. 2 hrs"
+          />
+
           <label>Capacity (Seats)</label>
           <input
             type="number"
@@ -152,8 +209,19 @@ export default function WorkshopList() {
 
         <div className="form-actions">
           <button type="submit" className="save-btn">
-            Save Workshop
+            {editingId ? "Update Workshop" : "Save Workshop"}
           </button>
+
+          {editingId && (
+            <button
+              type="button"
+              className="delete-btn"
+              style={{ marginLeft: "10px" }}
+              onClick={resetForm}
+            >
+              Cancel
+            </button>
+          )}
         </div>
       </form>
 
@@ -165,8 +233,9 @@ export default function WorkshopList() {
         <thead>
           <tr>
             <th>Title</th>
-            <th>Category</th>
             <th>Date</th>
+            <th>Time</th>
+            <th>Duration</th>
             <th>Price + GST</th>
             <th>Capacity</th>
             <th>Actions</th>
@@ -180,16 +249,20 @@ export default function WorkshopList() {
             return (
               <tr key={w._id}>
                 <td style={{ fontWeight: "600" }}>{w.title}</td>
-                <td>
-                  <span className="badge-category">{w.category}</span>
-                </td>
                 <td>{new Date(w.date).toLocaleDateString()}</td>
+                <td>{w.time || "Flexible"}</td>
+                <td>{w.duration || "2 hrs"}</td>
                 <td>
                   ₹{w.price}{" "}
                   <small style={{ color: "green" }}>(+₹{gst})</small>
                 </td>
                 <td>{w.capacity} Seats</td>
-                <td>
+
+                <td style={{ display: "flex", gap: "10px" }}>
+                  <button className="save-btn" onClick={() => startEdit(w)}>
+                    Edit
+                  </button>
+
                   <button
                     className="delete-btn"
                     onClick={async () => {

@@ -17,16 +17,34 @@ const chatbotRoutes = require("./routes/chatbotRoutes");
 const galleryRoutes = require("./routes/galleryRoutes");
 const adminProductRoutes = require("./routes/adminProductRoutes");
 
+// ✅ ADMIN WORKSHOP EVENTS ROUTE
+const adminWorkshopEventRoutes = require("./routes/adminWorkshopEventRoutes");
+
+// ✅ ADMIN TESTIMONIAL ROUTE
+const adminTestimonialRoutes = require("./routes/adminTestimonialRoutes");
+
+// ✅ ADMIN VIDEO TESTIMONIAL ROUTE
+const adminVideoTestimonialRoutes = require("./routes/adminVideoTestimonialRoutes");
+
+// ✅ ADMIN STATS ROUTE
+const adminStatsRoutes = require("./routes/adminStatsRoutes");
+
+// ✅ ADMIN CUSTOMERS ROUTE
+const adminCustomerRoutes = require("./routes/adminCustomerRoutes");
+
+// ✅ ADMIN ORDERS ROUTE (NEW)
+const adminOrderRoutes = require("./routes/adminOrderRoutes");
+
 const app = express();
 
 // ========== CRITICAL MIDDLEWARE ==========
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ CORS (keep only ONE)
+// ✅ CORS
 app.use(
   cors({
-    origin: "*", // later we can restrict
+    origin: "*",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -106,15 +124,51 @@ app.post('/api/reviews', async (req, res) => {
 });
 
 /* -------------------- API ROUTES -------------------- */
+
+// Workshop bookings + Razorpay
 app.use("/api/workshops", workshopRoutes);
+
+// Products
 app.use("/api/products", productRoutes);
+
+// Auth
 app.use("/api/auth", authRoutes);
+
+// Payments
 app.use("/api/payment", paymentRoutes);
+
+// Wishlist
 app.use("/api/wishlist", wishlistRoutes);
+
+// Cart
 app.use("/api/cart", cartRoutes);
+
+// Chatbot
 app.use("/api/chatbot", chatbotRoutes);
+
+// Gallery
 app.use("/api/gallery", galleryRoutes);
+
+// Admin products
 app.use("/api/admin/products", adminProductRoutes);
+
+// Admin workshop events
+app.use("/api/admin/workshop-events", adminWorkshopEventRoutes);
+
+// Admin written testimonials
+app.use("/api/admin/testimonials", adminTestimonialRoutes);
+
+// Admin video testimonials (Instagram reels)
+app.use("/api/admin/video-testimonials", adminVideoTestimonialRoutes);
+
+// Admin stats
+app.use("/api/admin/stats", adminStatsRoutes);
+
+// Admin customers
+app.use("/api/admin/customers", adminCustomerRoutes);
+
+// ✅ Admin orders (Order Tracking tab)
+app.use("/api/admin/orders", adminOrderRoutes);
 
 /* -------------------- ERROR HANDLER -------------------- */
 app.use((err, req, res, next) => {

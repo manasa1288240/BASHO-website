@@ -4,7 +4,7 @@ import "./AuthModal.css";
 
 export default function AuthModal({ open, onClose, onLoginSuccess }) {
   // ✅ Backend base URL (works in Vercel + local)
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
   const inputRef = useRef(null);
   const otpRefs = useRef([]);

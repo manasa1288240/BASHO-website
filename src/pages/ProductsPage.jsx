@@ -19,7 +19,7 @@ export default function ProductsPage() {
   const navigate = useNavigate();
 
   // ✅ Backend base URL (works in Vercel + local)
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
   const isLoggedIn = () => {
     return !!localStorage.getItem("basho_user");

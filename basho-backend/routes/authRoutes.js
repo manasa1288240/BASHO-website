@@ -14,7 +14,7 @@ const router = express.Router();
 router.post("/check-admin-email", async (req, res) => {
   try {
     console.log("🔍 CHECK-ADMIN-EMAIL called with:", req.body);
-    
+
     const { email } = req.body;
     if (!email) {
       console.log("⚠️  No email provided");
@@ -22,14 +22,17 @@ router.post("/check-admin-email", async (req, res) => {
     }
 
     const user = await User.findOne({ email });
-    console.log(`✅ Found user for ${email}:`, { exists: !!user, isAdmin: user?.isAdmin });
-    
+    console.log(`✅ Found user for ${email}:`, {
+      exists: !!user,
+      isAdmin: user?.isAdmin,
+    });
+
     const isAdmin = user && user.isAdmin ? true : false;
-    
-    res.json({ isAdmin, exists: !!user });
+
+    return res.json({ isAdmin, exists: !!user });
   } catch (err) {
     console.error("❌ Error in check-admin-email:", err.message);
-    res.status(500).json({ error: "Server error", message: err.message });
+    return res.status(500).json({ error: "Server error", message: err.message });
   }
 });
 
@@ -55,9 +58,13 @@ router.post("/signin", async (req, res) => {
     }
 
     // Issue JWT
-    const token = jwt.sign({ id: user._id, isAdmin: !!user.isAdmin }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign(
+      { id: user._id, isAdmin: !!user.isAdmin },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-    res.json({
+    return res.json({
       message: "Sign in successful",
       token,
       user: {
@@ -65,12 +72,12 @@ router.post("/signin", async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         phone: user.phone,
-        isAdmin: !!user.isAdmin
+        isAdmin: !!user.isAdmin,
       },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ SIGNIN ERROR:", err);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -81,7 +88,7 @@ router.post("/signin", async (req, res) => {
 router.post("/update-profile", async (req, res) => {
   try {
     const { email, firstName, lastName, phone, password } = req.body;
-    
+
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
     }
@@ -104,9 +111,13 @@ router.post("/update-profile", async (req, res) => {
     await user.save();
 
     // Issue JWT
-    const token = jwt.sign({ id: user._id, isAdmin: !!user.isAdmin }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign(
+      { id: user._id, isAdmin: !!user.isAdmin },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-    res.json({
+    return res.json({
       message: "Profile updated successfully",
       token,
       user: {
@@ -114,21 +125,25 @@ router.post("/update-profile", async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         phone: user.phone,
-        isAdmin: !!user.isAdmin
+        isAdmin: !!user.isAdmin,
       },
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ UPDATE PROFILE ERROR:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
 /**
  * SEND OTP (EMAIL ONLY)
+ * ✅ FIXED: Responds immediately so frontend does NOT stay stuck on "Sending..."
+ * Email will be sent in background.
+ * For signup: Does NOT create user yet (user is created only after profile submission)
+ * For existing users: Just stores OTP
  */
 router.post("/send-otp", async (req, res) => {
   try {
-    console.log("SEND OTP BODY --->", req.body);
+    console.log("📩 SEND OTP BODY --->", req.body);
 
     const { email } = req.body;
     if (!email) {
@@ -138,32 +153,48 @@ router.post("/send-otp", async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
 
+    // For signup flow: only store OTP temporarily, don't create user
+    // For signin flow or forgot password: update existing user or create temp OTP record
     let user = await User.findOne({ email });
-    if (!user) user = new User({ email });
+    
+    if (!user) {
+      // For signup: just send OTP, don't create user yet
+      // Store OTP in a temporary way - we'll use User model but mark it somehow
+      // Actually, let's create a minimal user doc that will be replaced on profile submission
+      user = new User({ email });
+    }
 
     user.otp = otp;
     user.otpExpiresAt = otpExpiry;
     await user.save();
 
-    await sendEmail({
+    // ✅ Respond immediately so frontend can show OTP screen
+    res.json({ message: "OTP generated" });
+
+    // ✅ Send email in background (won't block request)
+    sendEmail({
       to: email,
       subject: "Your BASHO Login OTP",
       text: `Your OTP is ${otp}. Valid for 5 minutes.`,
-    });
-
-    res.json({ message: "OTP sent to email" });
+    })
+      .then(() => console.log("✅ OTP email sent to:", email))
+      .catch((err) =>
+        console.log("❌ OTP email failed:", err.message || err)
+      );
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ SEND OTP ERROR:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
 /**
  * VERIFY OTP
+ * For signup: Just verifies OTP, doesn't create full account
+ * For signin/forgot-password: Verifies OTP and can issue token if password exists
  */
 router.post("/verify-otp", async (req, res) => {
   try {
-    console.log("VERIFY OTP BODY --->", req.body);
+    console.log("✅ VERIFY OTP BODY --->", req.body);
 
     const { email, otp } = req.body;
     if (!email || !otp) {
@@ -185,17 +216,31 @@ router.post("/verify-otp", async (req, res) => {
     user.otpExpiresAt = null;
     await user.save();
 
-    // Issue JWT (include isAdmin flag)
-    const token = jwt.sign({ id: user._id, isAdmin: !!user.isAdmin }, JWT_SECRET, { expiresIn: "7d" });
+    // For signup: just verify OTP, don't issue token yet (token issued after profile submission)
+    // For signin/forgot-password: if user has a password, they are an existing user, issue token
+    if (user.password) {
+      // Existing user (signin or forgot password flow)
+      const token = jwt.sign(
+        { id: user._id, isAdmin: !!user.isAdmin },
+        JWT_SECRET,
+        { expiresIn: "7d" }
+      );
 
-    res.json({
-      message: "Login successful",
-      token,
-      user: { email: user.email, isAdmin: !!user.isAdmin },
-    });
+      return res.json({
+        message: "OTP verified",
+        token,
+        user: { email: user.email, isAdmin: !!user.isAdmin },
+      });
+    } else {
+      // New user in signup flow - just verify, no token yet
+      return res.json({
+        message: "OTP verified successfully",
+        verified: true,
+      });
+    }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ VERIFY OTP ERROR:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -206,22 +251,31 @@ router.post("/verify-otp", async (req, res) => {
 router.post("/admin-login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: "Email and password required" });
+    if (!email || !password)
+      return res.status(400).json({ message: "Email and password required" });
 
     const user = await User.findOne({ email });
-    if (!user || !user.password) return res.status(401).json({ message: "Invalid credentials" });
+    if (!user || !user.password)
+      return res.status(401).json({ message: "Invalid credentials" });
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: "Invalid credentials" });
 
-    if (!user.isAdmin) return res.status(403).json({ message: "Forbidden: not an admin" });
+    if (!user.isAdmin)
+      return res.status(403).json({ message: "Forbidden: not an admin" });
 
-    const token = jwt.sign({ id: user._id, isAdmin: true }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ id: user._id, isAdmin: true }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
-    res.json({ message: "Admin login successful", token, user: { email: user.email, isAdmin: true } });
+    return res.json({
+      message: "Admin login successful",
+      token,
+      user: { email: user.email, isAdmin: true },
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ ADMIN LOGIN ERROR:", err);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -230,12 +284,18 @@ router.get("/admin-exists", async (req, res) => {
   try {
     const { email } = req.query;
     if (!email) return res.status(400).json({ message: "email query required" });
+
     const user = await User.findOne({ email });
     if (!user) return res.json({ exists: false });
-    return res.json({ exists: true, email: user.email, isAdmin: !!user.isAdmin });
+
+    return res.json({
+      exists: true,
+      email: user.email,
+      isAdmin: !!user.isAdmin,
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ ADMIN EXISTS ERROR:", err);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -243,14 +303,48 @@ router.get("/admin-exists", async (req, res) => {
 router.post("/check-password", async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: "email and password required" });
+    if (!email || !password)
+      return res.status(400).json({ message: "email and password required" });
+
     const user = await User.findOne({ email });
-    if (!user || !user.password) return res.status(404).json({ message: "user or password not found" });
+    if (!user || !user.password)
+      return res.status(404).json({ message: "user or password not found" });
+
     const match = await bcrypt.compare(password, user.password);
     return res.json({ match });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ CHECK PASSWORD ERROR:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+/**
+ * RESET PASSWORD (after OTP verification)
+ * Used for "Forgot Password" flow
+ */
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+      return res.status(400).json({ message: "Email and new password are required" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Hash the new password
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return res.json({
+      message: "Password reset successfully"
+    });
+  } catch (error) {
+    console.error("❌ RESET PASSWORD ERROR:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 

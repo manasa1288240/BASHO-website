@@ -4,6 +4,7 @@ const CartContext = createContext(null);
 
 export const CartProvider = ({ children }) => {
   const STORAGE_KEY = "basho_cart_v1";
+
   const [items, setItems] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { products: [], workshops: [] };
@@ -34,6 +35,16 @@ export const CartProvider = ({ children }) => {
     };
     window.addEventListener("basho:login", onLogin);
     return () => window.removeEventListener("basho:login", onLogin);
+  }, []);
+
+  useEffect(() => {
+    const onLogout = () => {
+      localStorage.removeItem(STORAGE_KEY);
+      setItems({ products: [], workshops: [] });
+    };
+
+    window.addEventListener("basho:logout", onLogout);
+    return () => window.removeEventListener("basho:logout", onLogout);
   }, []);
 
   const addProduct = (product) => {

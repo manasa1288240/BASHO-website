@@ -18,7 +18,7 @@ const CartPage = () => {
   const safeHistory = Array.isArray(history) ? history : [];
 
   // ✅ Backend base URL (works in Vercel + local)
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
   // Load full product data so we can show images in the cart
   useEffect(() => {
