@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useCart } from "../contexts/CartContext";
 import CheckoutForm from "./CheckoutForm";
+import { calculateCartTotal, getNumericPrice } from "../utils/priceCalculations";
 import "./CartModal.css";
 
 export default function CartModal({ onClose }) {
@@ -11,22 +12,16 @@ export default function CartModal({ onClose }) {
   const workshops = items.workshops || [];
   const allItems = [...products, ...workshops];
 
-  // Helper function to extract numeric price
-  const getNumericPrice = (price) => {
-    if (typeof price === "number") return price;
-    const numericPrice = parseFloat(String(price).replace(/[^\d.-]/g, ""));
-    return isNaN(numericPrice) ? 0 : numericPrice;
-  };
-
-  const total = allItems.reduce((sum, item) => {
-    return sum + getNumericPrice(item.price);
-  }, 0);
+  // Calculate cart total with GST and shipping
+  const totals = calculateCartTotal(items, {});
+  const total = totals?.grandTotal || 0;
 
   if (showCheckout) {
     return (
       <CheckoutForm
         items={allItems}
         total={total}
+        totals={totals}
         onClose={onClose}
         onBack={() => setShowCheckout(false)}
       />
@@ -66,15 +61,27 @@ export default function CartModal({ onClose }) {
               <div className="cart-summary">
                 <div className="summary-row">
                   <span>Subtotal:</span>
-                  <span>₹{total.toFixed(2)}</span>
+                  <span>₹{totals?.subtotal?.toFixed(2) || "0.00"}</span>
+                </div>
+                <div className="summary-row">
+                  <span>Weight:</span>
+                  <span>{totals?.totalWeight?.toFixed(3) || "0.000"} kg</span>
                 </div>
                 <div className="summary-row">
                   <span>Shipping:</span>
-                  <span>Free</span>
+                  <span>₹{totals?.shippingCharge?.toFixed(2) || "0.00"}</span>
+                </div>
+                <div className="summary-row">
+                  <span>CGST (6%):</span>
+                  <span>₹{totals?.cgst?.toFixed(2) || "0.00"}</span>
+                </div>
+                <div className="summary-row">
+                  <span>SGST (6%):</span>
+                  <span>₹{totals?.sgst?.toFixed(2) || "0.00"}</span>
                 </div>
                 <div className="summary-row total">
-                  <span>Total:</span>
-                  <span>₹{total.toFixed(2)}</span>
+                  <span>Grand Total:</span>
+                  <span>₹{totals?.grandTotal?.toFixed(2) || "0.00"}</span>
                 </div>
               </div>
 

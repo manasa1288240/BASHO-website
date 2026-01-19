@@ -3,6 +3,9 @@ import { useShop } from "../context/ShopContext";
 import "./ProductQuickViewModal.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingBag, Heart, Star, Minus, Plus } from "lucide-react";
+import pot3 from "../assets/pot3.png";
+import featuredProducts from "../data/products";
+import AddToCartLoginPrompt from "./AddToCartLoginPrompt";
 
 export default function ProductQuickViewModal({ product, isOpen, onClose }) {
     const { wishlist, addToCart, toggleWishlist } = useShop();
@@ -10,8 +13,31 @@ export default function ProductQuickViewModal({ product, isOpen, onClose }) {
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [isAdded, setIsAdded] = useState(false);
     const [selectedGlaze, setSelectedGlaze] = useState(null);
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
     const productId = product?._id || product?.id;
+
+    // Check if user is logged in
+    const isLoggedIn = () => {
+        return !!localStorage.getItem("basho_user");
+    };
+
+    // Helper to get product image
+    const getProductImage = (prod) => {
+        if (!prod) return pot3;
+        if (prod.image) return prod.image;
+        
+        const staticMatch = featuredProducts.find((p) => p.name === prod.name);
+        if (staticMatch?.image) return staticMatch.image;
+        
+        if (Array.isArray(prod.images) && prod.images.length > 0) {
+            return prod.images[0];
+        }
+        
+        return pot3;
+    };
+
+    const productImage = getProductImage(product);
 
     useEffect(() => {
         if (productId) {
@@ -47,6 +73,10 @@ export default function ProductQuickViewModal({ product, isOpen, onClose }) {
     if (!product) return null;
 
     const handleAddToCart = () => {
+        if (!isLoggedIn()) {
+            setShowLoginModal(true);
+            return;
+        }
         addToCart(product, quantity);
         setIsAdded(true);
         setTimeout(() => setIsAdded(false), 2000);
@@ -86,21 +116,22 @@ export default function ProductQuickViewModal({ product, isOpen, onClose }) {
     };
 
     return (
-        <AnimatePresence>
-            {isOpen && (
-                <motion.div
-                    className="quick-view-overlay"
-                    onClick={handleOverlayClick}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    variants={overflowVariants}
-                >
+        <>
+            <AnimatePresence>
+                {isOpen && (
                     <motion.div
-                        className="quick-view-modal"
-                        variants={modalVariants}
-                        onClick={(e) => e.stopPropagation()}
+                        className="quick-view-overlay"
+                        onClick={handleOverlayClick}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        variants={overflowVariants}
                     >
+                        <motion.div
+                            className="quick-view-modal"
+                            variants={modalVariants}
+                            onClick={(e) => e.stopPropagation()}
+                        >
                         <button className="close-btn" onClick={onClose} aria-label="Close modal">
                             <X size={20} />
                         </button>
@@ -109,8 +140,8 @@ export default function ProductQuickViewModal({ product, isOpen, onClose }) {
                             {/* Left Column: Image */}
                             <div className="modal-image-container">
                                 <img
-                                    src={product.image}
-                                    alt={product.name}
+                                    src={productImage}
+                                    alt={product.name || "Product"}
                                     className="modal-product-image"
                                 />
                                 <div className="image-overlay-gradient"></div>
@@ -210,6 +241,14 @@ export default function ProductQuickViewModal({ product, isOpen, onClose }) {
                     </motion.div>
                 </motion.div>
             )}
-        </AnimatePresence>
+            </AnimatePresence>
+
+            {/* Login Prompt - Show when user tries to add to cart without signing in */}
+            {showLoginModal && (
+                <AddToCartLoginPrompt
+                    onClose={() => setShowLoginModal(false)}
+                />
+            )}
+        </>
     );
 }

@@ -1,0 +1,115 @@
+.login-prompt-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.login-prompt-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 40px 32px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.login-prompt-modal h2 {
+  font-size: 24px;
+  color: #333;
+  margin: 0 0 12px 0;
+  font-weight: 600;
+}
+
+.login-prompt-modal p {
+  font-size: 16px;
+  color: #666;
+  margin: 0 0 32px 0;
+  line-height: 1.5;
+}
+
+.prompt-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.login-btn,
+.cancel-btn {
+  flex: 1;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.login-btn {
+  background: #8b7355;
+  color: white;
+}
+
+.login-btn:hover {
+  background: #6f5a45;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(139, 115, 85, 0.3);
+}
+
+.cancel-btn {
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #e0e0e0;
+}
+
+.cancel-btn:hover {
+  background: #e8e8e8;
+  border-color: #d0d0d0;
+}
+
+@media (max-width: 480px) {
+  .login-prompt-modal {
+    padding: 32px 20px;
+  }
+
+  .login-prompt-modal h2 {
+    font-size: 20px;
+  }
+
+  .prompt-buttons {
+    flex-direction: column;
+  }
+
+  .login-btn,
+  .cancel-btn {
+    width: 100%;
+  }
+}

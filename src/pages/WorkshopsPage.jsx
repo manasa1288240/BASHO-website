@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import LoginAlert from "../components/LoginAlert";
+import { calculateWorkshopTotal, getNumericPrice } from "../utils/priceCalculations";
 import "../styles/WorkshopsPage.css";
 
 /* ================================================= */
@@ -390,8 +391,9 @@ function WorkshopBookingForm({ workshop, triggerNotify, API_URL }) {
     try {
       triggerNotify("Creating payment order...", "info");
 
-      const priceText = workshop.price.replace(/[^\d]/g, "");
-      const amount = parseInt(priceText);
+      // Calculate workshop total with GST
+      const workshopTotal = calculateWorkshopTotal(workshop.price);
+      const amount = workshopTotal.total;
 
       if (!amount || amount <= 0) throw new Error("Invalid workshop price");
 
@@ -572,14 +574,33 @@ function WorkshopBookingForm({ workshop, triggerNotify, API_URL }) {
         </select>
       </div>
 
-      <div className="form-summary">
-        <p className="total-price">
-          Total: <span>{workshop.price}</span>
-        </p>
-        <button type="submit" className="submit-btn" disabled={loading}>
-          {loading ? "Processing..." : "Pay & Confirm"}
-        </button>
-      </div>
+      {(() => {
+        const workshopTotal = calculateWorkshopTotal(workshop.price);
+        return (
+          <div className="form-summary">
+            <div className="summary-breakdown-workshop">
+              <div className="breakdown-row">
+                <span>Workshop Fee:</span>
+                <span>₹{workshopTotal.workshopFee.toFixed(2)}</span>
+              </div>
+              <div className="breakdown-row">
+                <span>CGST (6%):</span>
+                <span>₹{workshopTotal.cgst.toFixed(2)}</span>
+              </div>
+              <div className="breakdown-row">
+                <span>SGST (6%):</span>
+                <span>₹{workshopTotal.sgst.toFixed(2)}</span>
+              </div>
+            </div>
+            <p className="total-price">
+              Total: <span>₹{workshopTotal.total.toFixed(2)}</span>
+            </p>
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? "Processing..." : "Pay & Confirm"}
+            </button>
+          </div>
+        );
+      })()}
     </form>
   );
 }

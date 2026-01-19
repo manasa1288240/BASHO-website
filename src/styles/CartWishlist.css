@@ -218,6 +218,32 @@
   border-left: 4px solid #7c4a33;
 }
 
+.summary-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(124, 74, 51, 0.2);
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  color: #5a4a42;
+}
+
+.breakdown-row span:first-child {
+  font-weight: 500;
+}
+
+.breakdown-row span:last-child {
+  font-weight: 600;
+  color: #7c4a33;
+}
+
 .summary-total {
   display: flex;
   justify-content: space-between;
