@@ -174,45 +174,45 @@ export default function ContactUs() {
 
   return (
     <div className="contact-page-wrapper" style={{ backgroundColor: '#fffcf9', minHeight: '100vh' }}>
-      <div className="contact-page" style={{ padding: '160px 20px 100px', maxWidth: '1400px', margin: '0 auto' }}>
+      <div className="contact-page" style={{ padding: '140px 20px 80px', maxWidth: '1250px', margin: '0 auto' }}>
         
-        <motion.header {...fadeInUp} style={{ textAlign: 'center', marginBottom: '100px' }}>
-          <span style={{ color: '#C85428', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '1rem', fontWeight: 'bold' }}>Get in Touch</span>
-          <h1 style={{ fontSize: '3.5rem', color: '#442D1C', fontFamily: '"Playfair Display", serif', marginTop: '15px' }}>Let’s start a conversation</h1>
-          <div style={{ width: '80px', height: '2px', backgroundColor: '#EDD8B4', margin: '25px auto' }}></div>
+        <motion.header {...fadeInUp} style={{ textAlign: 'center', marginBottom: '70px' }}>
+          <span style={{ color: '#C85428', textTransform: 'uppercase', letterSpacing: '3px', fontSize: '0.9rem', fontWeight: 'bold' }}>Get in Touch</span>
+          <h1 style={{ fontSize: '3rem', color: '#442D1C', fontFamily: '"Playfair Display", serif', marginTop: '10px' }}>Let’s start a conversation</h1>
+          <div style={{ width: '70px', height: '2px', backgroundColor: '#EDD8B4', margin: '20px auto' }}></div>
         </motion.header>
 
-        <div className="contact-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '50px' }}>
+        <div className="contact-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '40px' }}>
           
           {/* Column 1: Studio Details */}
           <motion.section {...fadeInUp} transition={{ delay: 0.2 }} style={cardStyle}>
             <h3 style={titleStyle}>The Studio</h3>
             
-            <div style={{ ...infoItemStyle, alignItems: 'flex-start', marginTop: '20px' }}>
-              <MapPin size={26} color="#8E5022" style={{ marginTop: '4px', flexShrink: 0 }} />
-              <p style={{ margin: 0, lineHeight: '1.8', fontSize: '1.1rem' }}>311, Silent Zone, Gavier, Dumas Road, Surat-395007, India</p>
+            <div style={{ ...infoItemStyle, alignItems: 'flex-start', marginTop: '10px' }}>
+              <MapPin size={24} color="#8E5022" style={{ marginTop: '3px', flexShrink: 0 }} />
+              <p style={{ margin: 0, lineHeight: '1.7', fontSize: '1rem' }}>311, Silent Zone, Gavier, Dumas Road, Surat-395007, India</p>
             </div>
             
             <a href="https://wa.me/919879575601" target="_blank" rel="noopener noreferrer" style={linkResetStyle}>
               <div style={infoItemStyle}>
-                <MessageCircle size={26} color="#8E5022" style={{ flexShrink: 0 }} />
-                <p style={{ margin: 0, fontSize: '1.1rem' }}>+91 98795 75601 (WhatsApp)</p>
+                <MessageCircle size={24} color="#8E5022" style={{ flexShrink: 0 }} />
+                <p style={{ margin: 0, fontSize: '1rem' }}>+91 98795 75601 (WhatsApp)</p>
               </div>
             </a>
 
             <div style={infoItemStyle}>
-              <Mail size={26} color="#8E5022" style={{ flexShrink: 0 }} />
-              <p style={{ margin: 0, fontSize: '1.1rem' }}>bashobyyshivangi@gmail.com</p>
+              <Mail size={24} color="#8E5022" style={{ flexShrink: 0 }} />
+              <p style={{ margin: 0, fontSize: '1rem' }}>bashobyyshivangi@gmail.com</p>
             </div>
 
-            <div style={{ marginTop: 'auto', paddingTop: '40px', borderTop: '1px solid #EDD8B4' }}>
-              <p style={{ marginBottom: '20px', fontWeight: 'bold', color: '#442D1C', fontSize: '1.1rem' }}>Follow our process</p>
-              <div style={{ display: 'flex', gap: '25px' }}>
+            <div style={{ marginTop: 'auto', paddingTop: '35px', borderTop: '1px solid #EDD8B4' }}>
+              <p style={{ marginBottom: '15px', fontWeight: 'bold', color: '#442D1C' }}>Follow our process</p>
+              <div style={{ display: 'flex', gap: '20px' }}>
                 <a href="https://www.instagram.com/bashobyyshivangi/" target="_blank" rel="noopener noreferrer" style={{ color: '#652810' }}>
-                  <Instagram style={{ cursor: 'pointer' }} size={32} />
+                  <Instagram style={{ cursor: 'pointer' }} size={30} />
                 </a>
                 <a href="https://wa.me/919879575601" target="_blank" rel="noopener noreferrer" style={{ color: '#652810' }}>
-                  <MessageCircle style={{ cursor: 'pointer' }} size={32} />
+                  <MessageCircle style={{ cursor: 'pointer' }} size={30} />
                 </a>
               </div>
             </div>
@@ -221,10 +221,10 @@ export default function ContactUs() {
           {/* Column 2: Contact Form */}
           <motion.section {...fadeInUp} transition={{ delay: 0.4 }} style={cardStyle}>
             <h3 style={titleStyle}>Send a Message</h3>
-            <form onSubmit={handleContactSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+            <form onSubmit={handleContactSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
               <input type="text" placeholder="Your Name" style={inputStyle} required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
               <input type="email" placeholder="Your Email" style={inputStyle} required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
-              <textarea placeholder="How can we help?" rows="6" style={inputStyle} required value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})}></textarea>
+              <textarea placeholder="How can we help?" rows="5" style={inputStyle} required value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})}></textarea>
               <button type="submit" style={mainButtonStyle}>Send Message</button>
             </form>
           </motion.section>
@@ -232,13 +232,13 @@ export default function ContactUs() {
           {/* Column 3: Review Section */}
           <motion.section {...fadeInUp} transition={{ delay: 0.6 }} style={{ ...cardStyle, backgroundColor: '#442D1C', color: '#EDD8B4' }}>
             <h3 style={{ ...titleStyle, color: '#EDD8B4' }}>Share the Love</h3>
-            <p style={{ fontSize: '1rem', opacity: 0.8, marginBottom: '30px' }}>How was your Bashō experience?</p>
-            <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'center', gap: '8px' }}>
+            <p style={{ fontSize: '0.95rem', opacity: 0.8, marginBottom: '25px' }}>How was your Bashō experience?</p>
+            <div style={{ marginBottom: '25px', display: 'flex', justifyContent: 'center', gap: '6px' }}>
               {[1, 2, 3, 4, 5].map((star) => (
-                <span key={star} onClick={() => setRating(star)} style={{ cursor: 'pointer', fontSize: '2.5rem', color: star <= rating ? '#EDD8B4' : '#652810' }}>★</span>
+                <span key={star} onClick={() => setRating(star)} style={{ cursor: 'pointer', fontSize: '2.2rem', color: star <= rating ? '#EDD8B4' : '#652810' }}>★</span>
               ))}
             </div>
-            <textarea placeholder="Your feedback..." rows="5" style={{ ...inputStyle, backgroundColor: 'rgba(255,255,255,0.05)', color: '#fff', borderColor: '#652810' }} value={reviewText} onChange={(e) => setReviewText(e.target.value)}></textarea>
+            <textarea placeholder="Your feedback..." rows="4" style={{ ...inputStyle, backgroundColor: 'rgba(255,255,255,0.05)', color: '#fff', borderColor: '#652810' }} value={reviewText} onChange={(e) => setReviewText(e.target.value)}></textarea>
             <button onClick={handleReviewSubmit} type="button" style={reviewButtonStyle}>Submit Review</button>
           </motion.section>
 
@@ -250,28 +250,28 @@ export default function ContactUs() {
 
 // --- STYLES ---
 const cardStyle = {
-  padding: '60px 45px', // Increased padding for a larger feel
-  borderRadius: '32px', // Slightly more rounded for larger size
+  padding: '50px 35px',
+  borderRadius: '28px',
   backgroundColor: '#fff',
-  boxShadow: '0 20px 45px rgba(68, 45, 28, 0.06)',
+  boxShadow: '0 18px 40px rgba(68, 45, 28, 0.05)',
   border: '1px solid rgba(237, 216, 180, 0.5)',
   display: 'flex',
   flexDirection: 'column',
-  minHeight: '600px' // Significantly increased height
+  minHeight: '520px' 
 };
 
 const titleStyle = {
-  fontSize: '1.8rem', // Bigger titles
+  fontSize: '1.65rem',
   color: '#442D1C',
   fontFamily: '"Playfair Display", serif',
-  marginBottom: '35px'
+  marginBottom: '30px'
 };
 
 const infoItemStyle = {
   display: 'flex',
   alignItems: 'center',
-  gap: '20px',
-  marginBottom: '30px',
+  gap: '18px',
+  marginBottom: '25px',
   color: '#652810'
 };
 
@@ -281,10 +281,10 @@ const linkResetStyle = {
 };
 
 const inputStyle = {
-  padding: '18px 20px',
+  padding: '16px 18px',
   border: '1px solid #EDD8B4',
-  borderRadius: '14px',
-  fontSize: '1rem',
+  borderRadius: '12px',
+  fontSize: '0.95rem',
   width: '100%',
   backgroundColor: '#fffcf9',
   outline: 'none',
@@ -292,22 +292,22 @@ const inputStyle = {
 };
 
 const mainButtonStyle = {
-  padding: '18px',
+  padding: '16px',
   background: '#8E5022',
   color: 'white',
   border: 'none',
-  borderRadius: '14px',
+  borderRadius: '12px',
   cursor: 'pointer',
   fontWeight: 'bold',
-  fontSize: '1.1rem',
+  fontSize: '1rem',
   transition: '0.3s ease',
-  boxShadow: '0 6px 20px rgba(142, 80, 34, 0.25)'
+  boxShadow: '0 5px 15px rgba(142, 80, 34, 0.2)'
 };
 
 const reviewButtonStyle = {
   ...mainButtonStyle,
   background: '#EDD8B4',
   color: '#442D1C',
-  marginTop: '20px',
+  marginTop: '15px',
   width: '100%'
 };
