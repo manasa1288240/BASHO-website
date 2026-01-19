@@ -16,6 +16,7 @@ const cartRoutes = require("./routes/cartRoutes");
 const chatbotRoutes = require("./routes/chatbotRoutes");
 const galleryRoutes = require("./routes/galleryRoutes");
 const adminProductRoutes = require("./routes/adminProductRoutes");
+const adminWorkshopRoutes = require("./routes/adminWorkshopRoutes");
 
 // ADMIN ROUTES
 const adminWorkshopEventRoutes = require("./routes/adminWorkshopEventRoutes");
@@ -133,6 +134,7 @@ app.use("/api/reviews", reviewRoutes);
 
 // Admin products
 app.use("/api/admin/products", adminProductRoutes);
+app.use("/api/admin/workshop-events", adminWorkshopRoutes);
 
 // Admin workshop events
 app.use("/api/admin/workshop-events", adminWorkshopEventRoutes);

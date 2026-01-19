@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
+import { calculateCartTotal } from "../utils/priceCalculations";
 import "./CheckoutForm.css";
 
-export default function CheckoutForm({ items, total, onClose, onBack }) {
+export default function CheckoutForm({ items, total, totals, onClose, onBack }) {
   // ✅ Backend base URL (works in Vercel + local)
   const API_URL = import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
 
@@ -17,6 +18,10 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
 
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [loading, setLoading] = useState(false);
+  
+  // Use provided totals or calculate if not provided
+  const finalTotal = totals?.grandTotal || total;
+  const displayTotals = totals || { subtotal: total, shippingCharge: 0, cgst: 0, sgst: 0, grandTotal: total };
 
   useEffect(() => {
     // Load Razorpay script
@@ -81,13 +86,13 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
 
     try {
       // Create order
-      console.log("📦 Creating order for amount:", total);
+      console.log("📦 Creating order for amount:", finalTotal);
 
       const orderRes = await fetch(`${API_URL}/api/payment/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: total,
+          amount: finalTotal,
           currency: "INR",
           receipt: `order-${Date.now()}`,
         }),
@@ -342,16 +347,38 @@ export default function CheckoutForm({ items, total, onClose, onBack }) {
                   </div>
                 ))}
               </div>
+              
+              <div className="summary-breakdown">
+                <div className="breakdown-row">
+                  <span>Subtotal:</span>
+                  <span>₹{displayTotals.subtotal?.toFixed(2) || "0.00"}</span>
+                </div>
+                {displayTotals.shippingCharge > 0 && (
+                  <div className="breakdown-row">
+                    <span>Shipping:</span>
+                    <span>₹{displayTotals.shippingCharge.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="breakdown-row">
+                  <span>CGST (6%):</span>
+                  <span>₹{displayTotals.cgst?.toFixed(2) || "0.00"}</span>
+                </div>
+                <div className="breakdown-row">
+                  <span>SGST (6%):</span>
+                  <span>₹{displayTotals.sgst?.toFixed(2) || "0.00"}</span>
+                </div>
+              </div>
+
               <div className="summary-total">
                 <span>Total Amount:</span>
-                <span className="amount">₹{total.toFixed(2)}</span>
+                <span className="amount">₹{finalTotal.toFixed(2)}</span>
               </div>
             </div>
 
             <button type="submit" className="place-order-btn" disabled={loading}>
               {loading
                 ? "Processing..."
-                : `Pay ₹${total.toFixed(2)} with Razorpay`}
+                : `Pay ₹${finalTotal.toFixed(2)} with Razorpay`}
             </button>
           </form>
         </div>

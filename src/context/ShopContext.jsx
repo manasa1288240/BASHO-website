@@ -137,6 +137,13 @@ export function ShopProvider({ children }) {
     const id = getProductKey(product);
     if (!id) return;
 
+    // Check if user is logged in FIRST - don't add to local cart if not authenticated
+    const email = getCurrentUserEmail();
+    if (!email) {
+      console.warn("[Shop] User must be logged in to add to cart");
+      return;
+    }
+
     setCart((prev) => {
       const existing = prev.find((item) => item.id === id);
       if (existing)
@@ -146,9 +153,6 @@ export function ShopProvider({ children }) {
 
       return [...prev, { id, name: product.title || product.name, price: product.price, qty: 1 }];
     });
-
-    const email = getCurrentUserEmail();
-    if (!email) return;
 
     try {
       await axios.post(`${API_BASE}/api/cart/add`, { email, productId: id });

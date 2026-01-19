@@ -1,10 +1,67 @@
 const express = require("express");
 const Workshop = require("../models/workshop");
+const WorkshopEvent = require("../models/WorkshopEvent");
 const sendEmail = require("../utils/sendEmail");
 const razorpay = require("../Razorpay");
 const crypto = require("crypto"); // Moved to top for consistency
 
 const router = express.Router();
+
+/* -------------------- PUBLIC WORKSHOP ENDPOINTS -------------------- */
+
+// GET all published workshops from database (for frontend)
+router.get("/published", async (req, res) => {
+  try {
+    const workshops = await WorkshopEvent.find().sort({ date: 1 });
+    
+    // Transform database format to frontend format
+    const formattedWorkshops = workshops.map(w => ({
+      id: w._id,
+      title: w.title,
+      category: w.category,
+      description: w.description || "Explore the art of pottery with our expert instructors",
+      duration: w.duration || "2 hours",
+      price: `₹${w.price}`,
+      date: w.date ? new Date(w.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : "Flexible",
+      time: w.time || "4:00 PM",
+      endTime: w.time ? calculateEndTime(w.time, w.duration) : "6:00 PM",
+      image: w.image || "https://via.placeholder.com/400x300",
+      location: w.location || "BASHO Studio, Silent Zone",
+      maxParticipants: w.capacity || 10,
+      bookedSeats: w.bookedSeats || 0,
+      includes: [
+        "Personalised experience",
+        "Flexible dates",
+        "Beginner friendly",
+        "Custom pricing"
+      ]
+    }));
+    
+    res.json({
+      success: true,
+      workshops: formattedWorkshops
+    });
+  } catch (err) {
+    console.error("❌ Error fetching published workshops:", err.message);
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to fetch workshops" 
+    });
+  }
+});
+
+// Helper function to calculate end time
+function calculateEndTime(startTime, duration) {
+  if (!startTime || !duration) return "6:00 PM";
+  
+  const durationHours = parseInt(duration) || 2;
+  const [hours, minutes] = startTime.split(":").map(Number);
+  const endHours = (hours + durationHours) % 24;
+  const period = endHours >= 12 ? "PM" : "AM";
+  const displayHours = endHours > 12 ? endHours - 12 : endHours || 12;
+  
+  return `${displayHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+}
 
 /* -------------------- RAZORPAY PAYMENT ROUTES -------------------- */
 

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import CustomOrderForm from "../components/CustomOrderForm";
 import LoginAlert from "../components/LoginAlert";
+import ProductQuickViewModal from "../components/ProductQuickViewModal";
 import featuredProducts from "../data/products";
 import { useShop } from "../context/ShopContext";
 import pot3 from "../assets/pot3.png";
@@ -14,6 +15,8 @@ export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showCustomForm, setShowCustomForm] = useState(false);
   const [showLoginAlert, setShowLoginAlert] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { wishlist, cart, toggleWishlist, addToCart } = useShop();
   const location = useLocation();
   const navigate = useNavigate();
@@ -147,13 +150,16 @@ export default function ProductsPage() {
         {filteredProducts.map((product) => {
           const title = product.title || product.name;
           const imageSrc = getProductImage(product);
-          const inWishlist = isInWishlist(product);
-          const inCart = isInCart(product);
 
           return (
             <div
               key={product._id || product.id || product.name}
               className="product-card"
+              onClick={() => {
+                setSelectedProduct(product);
+                setIsModalOpen(true);
+              }}
+              style={{ cursor: "pointer" }}
             >
               <div className="img-wrap">
                 <img src={imageSrc} alt={title} />
@@ -166,23 +172,6 @@ export default function ProductsPage() {
               <div className="product-meta">
                 <span className="category">{product.category}</span>
                 <h3>{title}</h3>
-              </div>
-
-              <div className="product-actions">
-                <button
-                  type="button"
-                  className={`wishlist-btn ${inWishlist ? "active" : ""}`}
-                  onClick={() => requireLogin(() => toggleWishlist(product))}
-                >
-                  {inWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
-                </button>
-                <button
-                  type="button"
-                  className={`cart-btn ${inCart ? "active" : ""}`}
-                  onClick={() => requireLogin(() => addToCart(product))}
-                >
-                  {inCart ? "Add More" : "Add to Cart"}
-                </button>
               </div>
             </div>
           );
@@ -222,6 +211,12 @@ export default function ProductsPage() {
           }}
         />
       )}
+
+      <ProductQuickViewModal
+        product={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
 
       <Footer />
     </div>

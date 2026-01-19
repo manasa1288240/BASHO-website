@@ -348,4 +348,37 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
+// GET all users with their orders (Admin only)
+router.get("/all-users", async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ message: "No authorization header" });
+    }
+
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (!user || !user.isAdmin) {
+      return res.status(403).json({ message: "Forbidden: not an admin" });
+    }
+
+    // Get all users with their orders populated
+    const users = await User.find().populate({
+      path: "orders.items.product",
+      select: "name price gstPercent"
+    });
+
+    res.json({ users });
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).json({ error: "Server error", message: err.message });
+  }
+});
+
 module.exports = router;

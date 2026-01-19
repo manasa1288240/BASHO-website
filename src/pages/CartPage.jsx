@@ -4,6 +4,7 @@ import { useShop } from "../context/ShopContext";
 import CheckoutForm from "../components/CheckoutForm";
 import featuredProducts from "../data/products";
 import pot3 from "../assets/pot3.png";
+import { calculateCartTotal, getNumericPrice } from "../utils/priceCalculations";
 import "../styles/CartWishlist.css";
 
 const safeArray = (v) => (Array.isArray(v) ? v : []);
@@ -74,15 +75,15 @@ const CartPage = () => {
       };
     }) || [];
 
-  const total = cartItems.reduce((sum, item) => {
-    return sum + getNumericPrice(item.price) * item.qty;
-  }, 0);
+  // Calculate totals with GST and shipping
+  const totals = calculateCartTotal(safeCart, products);
 
   if (showCheckout) {
     return (
       <CheckoutForm
         items={cartItems}
-        total={total}
+        total={totals.grandTotal}
+        totals={totals}
         onClose={() => {
           setShowCheckout(false);
           navigate("/");
@@ -169,9 +170,31 @@ const CartPage = () => {
             </ul>
 
             <div className="cart-summary-section">
-              <div className="summary-total">
-                <span>Total:</span>
-                <span className="total-amount">₹{total.toFixed(2)}</span>
+              <div className="summary-breakdown">
+                <div className="breakdown-row">
+                  <span>Subtotal:</span>
+                  <span>₹{totals.subtotal.toFixed(2)}</span>
+                </div>
+                <div className="breakdown-row">
+                  <span>Total Weight:</span>
+                  <span>{totals.totalWeight.toFixed(3)} kg</span>
+                </div>
+                <div className="breakdown-row">
+                  <span>Shipping Charge:</span>
+                  <span>₹{totals.shippingCharge.toFixed(2)}</span>
+                </div>
+                <div className="breakdown-row">
+                  <span>CGST (6%):</span>
+                  <span>₹{totals.cgst.toFixed(2)}</span>
+                </div>
+                <div className="breakdown-row">
+                  <span>SGST (6%):</span>
+                  <span>₹{totals.sgst.toFixed(2)}</span>
+                </div>
+                <div className="summary-total">
+                  <span>Grand Total:</span>
+                  <span className="total-amount">₹{totals.grandTotal.toFixed(2)}</span>
+                </div>
               </div>
               <button
                 className="checkout-btn"

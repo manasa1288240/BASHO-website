@@ -1,30 +1,38 @@
-import { useCart } from "../contexts/CartContext";
+import { useState } from "react";
+import ProductQuickViewModal from "./ProductQuickViewModal";
 
 export default function ProductCard({ product }) {
-  const { addProduct } = useCart();
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
-  const handleAddToCart = () => {
-    addProduct(product);
-    alert(`${product.name || product.title} added to cart!`);
+  const handleCardClick = () => {
+    setIsQuickViewOpen(true);
   };
 
   return (
-    <div className="product-card">
-      <div className="img-wrap">
-        <img src={product.image} alt={product.name} />
+    <>
+      <div className="product-card" onClick={handleCardClick} style={{ cursor: "pointer" }}>
+        <div className="img-wrap">
+          <img src={product.image} alt={product.name} />
 
-        <div className="hover-info">
-          <p>{product.description}</p>
+          <div className="hover-info">
+            <p>{product.description}</p>
+          </div>
+
+          <span className="price">{product.price}</span>
         </div>
 
-        <span className="price">{product.price}</span>
+        <div className="product-info">
+          <span className="category">{product.category}</span>
+          <h3>{product.name}</h3>
+        </div>
       </div>
 
-      <span className="category">{product.category}</span>
-      <h3>{product.name}</h3>
-      <button onClick={handleAddToCart} className="add-to-cart-btn">
-        Add to Cart
-      </button>
-    </div>
+      {/* Modal Popup */}
+      <ProductQuickViewModal
+        product={product}
+        isOpen={isQuickViewOpen}
+        onClose={() => setIsQuickViewOpen(false)}
+      />
+    </>
   );
 }
