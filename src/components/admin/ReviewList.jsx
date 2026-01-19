@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 export default function ReviewList() {
   const [reviews, setReviews] = useState([]);
   const API_URL =
-    import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com";
+    import.meta.env.VITE_API_URL || "https://basho-backend.onrender.com"; //backend link
 
   useEffect(() => {
     fetch(`${API_URL}/api/admin/reviews`)
