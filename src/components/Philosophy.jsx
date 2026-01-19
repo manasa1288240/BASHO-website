@@ -16,19 +16,7 @@ function Philosophy() {
   useEffect(() => {
     // Skip GSAP animation on mobile - clear any inline styles
     if (window.innerWidth <= 768) {
-      const textBlocks = document.querySelectorAll(".reveal-text-item");
-      const images = document.querySelectorAll(".philosophy-image");
-      
-      // Clear inline styles set by GSAP
-      textBlocks.forEach(block => {
-        block.style.opacity = "";
-        block.style.transform = "";
-      });
-      
-      images.forEach(img => {
-        img.style.clipPath = "";
-      });
-      
+      // Don't set up any GSAP animations for mobile
       return;
     }
 
