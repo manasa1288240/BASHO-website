@@ -1420,13 +1420,38 @@ section h2::after {
   }
 
   .collection-scroll {
-    grid-template-columns: 1fr;
+    display: flex !important;
+    grid-template-columns: unset !important;
     gap: 1rem;
     padding: 1.5rem 1rem 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    flex-wrap: nowrap;
+    justify-content: center;
+    padding-left: calc(50vw - 140px);
+    padding-right: calc(50vw - 140px);
+  }
+
+  .collection-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .collection-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .collection-scroll::-webkit-scrollbar-thumb {
+    background: #c5a386;
+    border-radius: 2px;
   }
 
   .collection-card {
     border-radius: 14px;
+    flex-shrink: 0;
+    width: 280px;
+    min-width: 280px;
   }
 
   .collection-card img {
